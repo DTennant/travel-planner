@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>✈️ Bingchen & Yue 假期规划 — 从伦敦出发</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+  :root {
+    --bg: #0a0e17;
+    --card-bg: #141b2d;
+    --card-hover: #1a2340;
+    --border: #1e2a45;
+    --text: #e2e8f0;
+    --text-dim: #8892a4;
+    --accent: #6366f1;
+    --accent-glow: rgba(99,102,241,0.15);
+    --green: #22c55e;
+    --yellow: #eab308;
+    --red: #ef4444;
+    --orange: #f97316;
+    --cyan: #06b6d4;
+    --pink: #ec4899;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    padding: 48px 24px 24px;
+    background: linear-gradient(180deg, rgba(99,102,241,0.08) 0%, transparent 100%);
+  }
+  .header h1 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #818cf8, #c084fc, #f472b6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+  }
+  .header p {
+    color: var(--text-dim);
+    font-size: 1rem;
+    font-weight: 300;
+  }
+  .header .names {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 6px 20px;
+    margin-top: 12px;
+    font-size: 0.9rem;
+  }
+
+  /* Month Slider */
+  .slider-section {
+    max-width: 900px;
+    margin: 24px auto;
+    padding: 0 24px;
+  }
+  .slider-container {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px 32px;
+  }
+  .slider-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .slider-label span { font-weight: 600; font-size: 0.95rem; }
+  .month-display {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #818cf8;
+  }
+  input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: linear-gradient(90deg, #6366f1, #c084fc, #f472b6);
+    outline: none;
+    cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: white;
+    border: 3px solid #6366f1;
+    box-shadow: 0 0 12px rgba(99,102,241,0.4);
+    cursor: pointer;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: white;
+    border: 3px solid #6366f1;
+    box-shadow: 0 0 12px rgba(99,102,241,0.4);
+    cursor: pointer;
+  }
+  .month-ticks {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+  }
+
+  /* Sort Bar */
+  .controls {
+    max-width: 1400px;
+    margin: 16px auto;
+    padding: 0 24px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .controls label {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    font-weight: 500;
+  }
+  .sort-btn {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .sort-btn:hover { border-color: #6366f1; background: rgba(99,102,241,0.1); }
+  .sort-btn.active { border-color: #6366f1; background: rgba(99,102,241,0.15); color: #818cf8; font-weight: 600; }
+
+  /* Cards Grid */
+  .cards-grid {
+    max-width: 1400px;
+    margin: 24px auto;
+    padding: 0 24px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 20px;
+  }
+
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+  .card:hover {
+    border-color: rgba(99,102,241,0.4);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(99,102,241,0.1);
+  }
+
+  .card-header {
+    padding: 20px 20px 12px;
+    position: relative;
+  }
+  .card-header .dest-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-header .airport-code {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #818cf8;
+    background: rgba(99,102,241,0.12);
+    padding: 2px 8px;
+    border-radius: 6px;
+    letter-spacing: 0.5px;
+  }
+  .card-header .tagline {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    margin-top: 4px;
+    font-style: italic;
+  }
+  .card-header .type-badge {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    font-size: 0.7rem;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .type-beach { background: rgba(6,182,212,0.15); color: #22d3ee; }
+  .type-city { background: rgba(236,72,153,0.15); color: #f472b6; }
+  .type-culture { background: rgba(249,115,22,0.15); color: #fb923c; }
+  .type-nature { background: rgba(34,197,94,0.15); color: #4ade80; }
+  .type-adventure { background: rgba(139,92,246,0.15); color: #a78bfa; }
+
+  .card-body {
+    padding: 0 20px 16px;
+  }
+
+  .weather-strip {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+  }
+  .weather-strip .temp {
+    font-size: 1.8rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .weather-strip .weather-icon {
+    font-size: 2rem;
+  }
+  .weather-strip .weather-desc {
+    font-size: 0.82rem;
+    color: var(--text-dim);
+  }
+  .weather-strip .rec-badge {
+    margin-left: auto;
+    font-size: 1.1rem;
+  }
+
+  .price-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .price-item {
+    background: rgba(255,255,255,0.03);
+    border-radius: 8px;
+    padding: 8px 10px;
+    text-align: center;
+  }
+  .price-item .price-label {
+    font-size: 0.68rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+  }
+  .price-item .price-value {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #22d3ee;
+  }
+  .price-item .price-value.hotel-price { color: #a78bfa; }
+  .price-item .price-value.days-value { color: #f472b6; }
+
+  .attractions {
+    margin-top: 8px;
+  }
+  .attractions-title {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .attraction-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .attraction-tag {
+    font-size: 0.73rem;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 3px 10px;
+    border-radius: 12px;
+    color: var(--text-dim);
+  }
+
+  .best-months {
+    margin-top: 10px;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+  }
+  .best-months strong { color: var(--green); font-weight: 600; }
+
+  /* Budget Calculator */
+  .budget-section {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 24px 60px;
+  }
+  .budget-container {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 32px;
+  }
+  .budget-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .budget-controls {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    align-items: end;
+  }
+  .budget-field {
+    flex: 1;
+    min-width: 200px;
+  }
+  .budget-field label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .budget-field select, .budget-field input {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    outline: none;
+  }
+  .budget-field select:focus, .budget-field input:focus {
+    border-color: #6366f1;
+  }
+  .budget-field select option { background: var(--card-bg); }
+
+  .budget-result {
+    background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(192,132,252,0.1));
+    border: 1px solid rgba(99,102,241,0.2);
+    border-radius: 12px;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 16px;
+    text-align: center;
+  }
+  .budget-item .b-label {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+  }
+  .budget-item .b-value {
+    font-size: 1.3rem;
+    font-weight: 700;
+  }
+  .budget-item .b-value.total {
+    font-size: 1.8rem;
+    background: linear-gradient(135deg, #818cf8, #f472b6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-dim);
+    font-size: 0.75rem;
+    border-top: 1px solid var(--border);
+  }
+
+  /* Animation */
+  .card { animation: fadeUp 0.5s ease both; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Responsive */
+  @media (max-width: 480px) {
+    .header h1 { font-size: 1.5rem; }
+    .cards-grid { grid-template-columns: 1fr; padding: 0 12px; }
+    .price-row { grid-template-columns: 1fr; }
+    .budget-controls { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>✈️ 假期去哪儿？</h1>
+  <p>从伦敦出发 · 10个精选目的地 · 实时价格参考</p>
+  <div class="names">👫 Bingchen & Yue · 2026–2027</div>
+</div>
+
+<!-- Month Slider -->
+<div class="slider-section">
+  <div class="slider-container">
+    <div class="slider-label">
+      <span>📅 选择出行月份</span>
+      <div class="month-display" id="monthDisplay">2026年6月</div>
+    </div>
+    <input type="range" min="0" max="9" value="0" id="monthSlider">
+    <div class="month-ticks">
+      <span>6月</span><span>7月</span><span>8月</span><span>9月</span><span>10月</span>
+      <span>11月</span><span>12月</span><span>1月</span><span>2月</span><span>3月</span>
+    </div>
+  </div>
+</div>
+
+<!-- Sort Controls -->
+<div class="controls">
+  <label>排序：</label>
+  <button class="sort-btn active" data-sort="default" onclick="sortCards('default')">🏆 推荐度</button>
+  <button class="sort-btn" data-sort="price-asc" onclick="sortCards('price-asc')">💰 价格↑</button>
+  <button class="sort-btn" data-sort="price-desc" onclick="sortCards('price-desc')">💰 价格↓</button>
+  <button class="sort-btn" data-sort="temp-desc" onclick="sortCards('temp-desc')">🌡️ 温度↓</button>
+  <button class="sort-btn" data-sort="temp-asc" onclick="sortCards('temp-asc')">🌡️ 温度↑</button>
+</div>
+
+<!-- Cards -->
+<div class="cards-grid" id="cardsGrid"></div>
+
+<!-- Budget Calculator -->
+<div class="budget-section">
+  <div class="budget-container">
+    <div class="budget-title">💰 预算估算器 <span style="font-size:0.8rem;font-weight:400;color:var(--text-dim)">（双人）</span></div>
+    <div class="budget-controls">
+      <div class="budget-field">
+        <label>目的地</label>
+        <select id="budgetDest"></select>
+      </div>
+      <div class="budget-field">
+        <label>天数</label>
+        <input type="number" id="budgetDays" value="4" min="1" max="14">
+      </div>
+    </div>
+    <div class="budget-result">
+      <div class="budget-item">
+        <div class="b-label">✈️ 往返机票 ×2</div>
+        <div class="b-value" id="bFlights">—</div>
+      </div>
+      <div class="budget-item">
+        <div class="b-label">🏨 酒店 (×晚)</div>
+        <div class="b-value" id="bHotel">—</div>
+      </div>
+      <div class="budget-item">
+        <div class="b-label">🍽️ 餐饮估算</div>
+        <div class="b-value" id="bFood">—</div>
+      </div>
+      <div class="budget-item">
+        <div class="b-label">💷 总计估算</div>
+        <div class="b-value total" id="bTotal">—</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  数据来源：British Airways, Skyscanner, Booking.com, Holiday Weather · 价格为估算参考，实际可能有所浮动<br>
+  Built with ❤️ for Bingchen & Yue · 2026
+</div>
+
+<script>
+// ============================================================
+// DESTINATION DATA (researched from web)
+// ============================================================
+const destinations = [
+  {
+    id: 'mallorca',
+    name: '马略卡岛',
+    nameEn: 'Mallorca',
+    country: 'Spain',
+    flag: '🇪🇸',
+    code: 'PMI',
+    tagline: '蔚蓝地中海 · 金色沙滩 · 完美海岛度假',
+    type: 'beach',
+    typeLabel: '海岛',
+    // Flight: BA ~£140 return off-peak, ~£250 peak summer (Expedia/Kayak data)
+    flightBase: 150, // base return price per person (£)
+    // Seasonal multipliers: Jun Jul Aug Sep Oct Nov Dec Jan Feb Mar
+    flightMultiplier: [1.5, 1.7, 1.8, 1.3, 1.0, 0.8, 0.85, 0.7, 0.7, 0.8],
+    hotelPerNight: 95, // £ avg 3-4 star
+    days: '4-7',
+    daysNum: 5,
+    bestMonths: '5月–9月',
+    // Monthly avg HIGH temps °C: Jun Jul Aug Sep Oct Nov Dec Jan Feb Mar
+    temps: [28, 31, 31, 27, 23, 18, 15, 15, 15, 17],
+    // Weather: sun/cloud/rain/cold
+    weather: ['☀️', '☀️', '☀️', '🌤', '🌤', '🌧', '🌧', '🌤', '🌤', '🌤'],
+    weatherDesc: ['晴热', '炎热晴朗', '炎热晴朗', '温暖宜人', '秋高气爽', '凉爽多雨', '阴冷多雨', '冬季凉爽', '冬季凉爽', '初春渐暖'],
+    // Recommendation: green/yellow/red per month
+    rec: ['✅', '✅', '✅', '✅', '⚠️', '❌', '❌', '❌', '❌', '⚠️'],
+    attractions: ['Palma 大教堂', 'Serra de Tramuntana 徒步', '海滩浮潜', 'Valldemossa 小镇', '日落游船'],
+    foodCostPerDay: 60 // £ per person per day
+  },
+  {
+    id: 'belfast',
+    name: '北爱尔兰',
+    nameEn: 'Belfast',
+    country: 'Northern Ireland',
+    flag: '🇬🇧',
+    code: 'BFS',
+    tagline: '权力的游戏取景地 · 巨人堤道 · 绿色田园',
+    type: 'nature',
+    typeLabel: '田园',
+    flightBase: 65,
+    flightMultiplier: [1.3, 1.5, 1.5, 1.2, 1.0, 0.8, 0.9, 0.7, 0.7, 0.8],
+    hotelPerNight: 80,
+    days: '3-5',
+    daysNum: 4,
+    bestMonths: '5月–8月',
+    temps: [17, 18, 18, 16, 13, 9, 7, 7, 7, 9],
+    weather: ['🌤', '🌤', '🌤', '🌤', '🌧', '🌧', '🌧', '🌧', '🌧', '🌤'],
+    weatherDesc: ['温和多云', '温和最暖', '温和宜人', '渐凉多云', '秋凉多雨', '阴冷多雨', '寒冷潮湿', '冬季最冷', '寒冷阴天', '初春渐暖'],
+    rec: ['✅', '✅', '✅', '⚠️', '⚠️', '❌', '❌', '❌', '❌', '⚠️'],
+    attractions: ['巨人堤道', 'Titanic 博物馆', '黑暗树篱', 'Carrick 吊桥', '贝尔法斯特城堡'],
+    foodCostPerDay: 45
+  },
+  {
+    id: 'naples',
+    name: '庞贝古城',
+    nameEn: 'Naples / Pompeii',
+    country: 'Italy',
+    flag: '🇮🇹',
+    code: 'NAP',
+    tagline: '千年火山废墟 · 阿马尔菲海岸 · 正宗拿波里披萨',
+    type: 'culture',
+    typeLabel: '文化',
+    flightBase: 110,
+    flightMultiplier: [1.5, 1.7, 1.8, 1.3, 1.0, 0.8, 0.85, 0.75, 0.75, 0.85],
+    hotelPerNight: 80,
+    days: '3-5',
+    daysNum: 4,
+    bestMonths: '4月–6月, 9月–10月',
+    temps: [28, 30, 30, 27, 22, 17, 13, 13, 13, 16],
+    weather: ['☀️', '☀️', '☀️', '☀️', '🌤', '🌧', '🌧', '🌤', '🌤', '🌤'],
+    weatherDesc: ['晴热舒适', '炎热晴朗', '盛夏最热', '温暖宜人', '秋季凉爽', '凉爽多雨', '冬季阴冷', '冬季最冷', '冬季渐暖', '春暖花开'],
+    rec: ['✅', '⚠️', '⚠️', '✅', '✅', '⚠️', '❌', '❌', '❌', '⚠️'],
+    attractions: ['庞贝古城遗址', '维苏威火山', '阿马尔菲海岸', 'Capri 岛', '那不勒斯地下城'],
+    foodCostPerDay: 50
+  },
+  {
+    id: 'malta',
+    name: '马耳他',
+    nameEn: 'Malta',
+    country: 'Malta',
+    flag: '🇲🇹',
+    code: 'MLA',
+    tagline: '骑士团古城 · 蔚蓝海洞 · 地中海明珠',
+    type: 'culture',
+    typeLabel: '海岛+文化',
+    flightBase: 100,
+    flightMultiplier: [1.5, 1.6, 1.7, 1.3, 1.0, 0.8, 0.85, 0.7, 0.7, 0.8],
+    hotelPerNight: 75,
+    days: '3-5',
+    daysNum: 4,
+    bestMonths: '4月–6月, 9月–10月',
+    temps: [29, 32, 32, 28, 24, 19, 16, 15, 15, 17],
+    weather: ['☀️', '☀️', '☀️', '☀️', '🌤', '🌧', '🌤', '🌤', '🌤', '🌤'],
+    weatherDesc: ['晴热', '炎热日照强', '盛夏最热', '温暖宜人', '秋高气爽', '凉爽偶雨', '温和冬季', '冬季凉爽', '冬季最冷', '初春回暖'],
+    rec: ['✅', '⚠️', '⚠️', '✅', '✅', '⚠️', '⚠️', '❌', '❌', '⚠️'],
+    attractions: ['Valletta 古城', 'Blue Grotto 蓝洞', 'Mdina 静城', 'Gozo 岛', '圣约翰大教堂'],
+    foodCostPerDay: 45
+  },
+  {
+    id: 'tenerife',
+    name: '特内里费',
+    nameEn: 'Tenerife',
+    country: 'Canary Islands',
+    flag: '🇪🇸',
+    code: 'TFS',
+    tagline: '永恒之春 · 泰德火山 · 全年阳光海滩',
+    type: 'beach',
+    typeLabel: '海岛',
+    flightBase: 130,
+    flightMultiplier: [1.3, 1.4, 1.4, 1.1, 1.0, 0.9, 1.1, 0.8, 0.8, 0.9],
+    hotelPerNight: 70,
+    days: '5-7',
+    daysNum: 5,
+    bestMonths: '全年皆宜（冬季避寒首选）',
+    temps: [24, 26, 27, 26, 23, 21, 20, 19, 19, 20],
+    weather: ['☀️', '☀️', '☀️', '☀️', '🌤', '🌤', '🌤', '🌤', '🌤', '🌤'],
+    weatherDesc: ['温暖晴朗', '夏季最暖', '盛夏晴热', '温暖宜人', '舒适宜人', '温暖如春', '温和舒适', '冬日温暖', '冬日温暖', '春暖花开'],
+    rec: ['✅', '✅', '✅', '✅', '✅', '✅', '✅', '✅', '✅', '✅'],
+    attractions: ['泰德火山国家公园', 'Los Gigantes 悬崖', 'Siam Park 水上乐园', '观鲸之旅', 'Masca 山谷徒步'],
+    foodCostPerDay: 50
+  },
+  {
+    id: 'barcelona',
+    name: '巴塞罗那',
+    nameEn: 'Barcelona',
+    country: 'Spain',
+    flag: '🇪🇸',
+    code: 'BCN',
+    tagline: '高迪建筑奇想 · 兰布拉大道 · City Walk 天堂',
+    type: 'city',
+    typeLabel: 'City Walk',
+    flightBase: 90,
+    flightMultiplier: [1.5, 1.6, 1.7, 1.3, 1.0, 0.8, 0.85, 0.7, 0.7, 0.8],
+    hotelPerNight: 110,
+    days: '3-5',
+    daysNum: 4,
+    bestMonths: '4月–6月, 9月–10月',
+    temps: [26, 29, 29, 25, 21, 16, 13, 12, 13, 15],
+    weather: ['☀️', '☀️', '☀️', '🌤', '🌤', '🌤', '🌤', '🌤', '🌤', '🌤'],
+    weatherDesc: ['温暖晴朗', '炎热干燥', '盛夏最热', '温暖宜人', '秋季凉爽', '温和多云', '冬季凉爽', '冬季最冷', '冬季偏冷', '初春回暖'],
+    rec: ['✅', '⚠️', '⚠️', '✅', '✅', '⚠️', '⚠️', '❌', '❌', '⚠️'],
+    attractions: ['圣家堂', 'Park Güell', '兰布拉大道', '哥特区漫步', 'Barceloneta 海滩'],
+    foodCostPerDay: 55
+  },
+  {
+    id: 'porto',
+    name: '波尔图',
+    nameEn: 'Porto',
+    country: 'Portugal',
+    flag: '🇵🇹',
+    code: 'OPO',
+    tagline: '波特酒窖 · 杜罗河畔 · 蓝色瓷砖之城',
+    type: 'city',
+    typeLabel: 'City Walk',
+    flightBase: 100,
+    flightMultiplier: [1.5, 1.5, 1.5, 1.2, 1.0, 0.8, 0.85, 0.7, 0.7, 0.8],
+    hotelPerNight: 80,
+    days: '3-4',
+    daysNum: 3,
+    bestMonths: '5月–9月',
+    temps: [23, 25, 25, 23, 19, 15, 14, 14, 14, 16],
+    weather: ['☀️', '☀️', '☀️', '🌤', '🌤', '🌧', '🌧', '🌧', '🌧', '🌤'],
+    weatherDesc: ['温暖晴朗', '夏季最暖', '炎热干燥', '温暖宜人', '秋凉微雨', '凉爽多雨', '冬季潮湿', '冬季阴冷', '冬季多雨', '春暖回升'],
+    rec: ['✅', '✅', '✅', '✅', '⚠️', '❌', '❌', '❌', '❌', '⚠️'],
+    attractions: ['Livraria Lello 书店', '杜罗河游船', 'Ribeira 河畔区', '波特酒窖品酒', 'São Bento 火车站'],
+    foodCostPerDay: 40
+  },
+  {
+    id: 'florence',
+    name: '佛罗伦萨',
+    nameEn: 'Florence',
+    country: 'Italy',
+    flag: '🇮🇹',
+    code: 'FLR',
+    tagline: '文艺复兴心脏 · 乌菲齐画廊 · 托斯卡纳日落',
+    type: 'city',
+    typeLabel: 'City Walk',
+    flightBase: 100,
+    flightMultiplier: [1.5, 1.6, 1.7, 1.3, 1.0, 0.8, 0.85, 0.7, 0.7, 0.8],
+    hotelPerNight: 110,
+    days: '3-5',
+    daysNum: 4,
+    bestMonths: '4月–6月, 9月–10月',
+    temps: [30, 33, 32, 27, 21, 14, 10, 9, 11, 15],
+    weather: ['☀️', '☀️', '☀️', '🌤', '🌤', '🌧', '🌧', '🌤', '🌤', '🌤'],
+    weatherDesc: ['温暖晴朗', '炎热少雨', '盛夏最热', '温暖宜人', '秋高气爽', '凉爽多雨', '寒冷冬季', '冬季最冷', '冬季偏冷', '春暖花开'],
+    rec: ['✅', '⚠️', '⚠️', '✅', '✅', '⚠️', '❌', '❌', '❌', '⚠️'],
+    attractions: ['乌菲齐美术馆', '圣母百花大教堂', '老桥 Ponte Vecchio', '米开朗基罗广场', '托斯卡纳酒庄之旅'],
+    foodCostPerDay: 55
+  },
+  {
+    id: 'oslo',
+    name: '挪威',
+    nameEn: 'Oslo / Bergen',
+    country: 'Norway',
+    flag: '🇳🇴',
+    code: 'OSL',
+    tagline: '峡湾壮景 · 北欧设计 · 午夜太阳与极光',
+    type: 'nature',
+    typeLabel: '自然',
+    flightBase: 100,
+    flightMultiplier: [1.4, 1.5, 1.4, 1.1, 0.9, 0.8, 0.9, 0.7, 0.7, 0.8],
+    hotelPerNight: 130,
+    days: '4-6',
+    daysNum: 5,
+    bestMonths: '6月–8月（夏季）/ 11月–2月（极光）',
+    temps: [20, 22, 21, 15, 9, 3, 0, -1, -1, 4],
+    weather: ['🌤', '☀️', '🌤', '🌤', '🌧', '❄️', '❄️', '❄️', '❄️', '🌤'],
+    weatherDesc: ['白夜长昼', '夏季最暖', '温和舒适', '初秋渐凉', '深秋寒冷', '入冬飘雪', '极夜严寒', '最冷月份', '严寒冰雪', '初春化雪'],
+    rec: ['✅', '✅', '✅', '⚠️', '⚠️', '⚠️', '⚠️', '❌', '❌', '⚠️'],
+    attractions: ['松恩峡湾游船', 'Vigeland 雕塑公园', 'Bergen 布吕根', '卑尔根缆车', '奥斯陆歌剧院'],
+    foodCostPerDay: 75
+  },
+  {
+    id: 'iceland',
+    name: '冰岛',
+    nameEn: 'Reykjavik',
+    country: 'Iceland',
+    flag: '🇮🇸',
+    code: 'KEF',
+    tagline: '冰与火之歌 · 极光蓝湖 · 世界尽头的冒险',
+    type: 'adventure',
+    typeLabel: '冒险',
+    flightBase: 160,
+    flightMultiplier: [1.5, 1.6, 1.4, 1.1, 0.9, 0.8, 0.9, 0.7, 0.7, 0.8],
+    hotelPerNight: 150,
+    days: '5-7',
+    daysNum: 5,
+    bestMonths: '6月–8月（白夜）/ 10月–3月（极光）',
+    temps: [12, 13, 13, 10, 7, 3, 2, 1, 1, 3],
+    weather: ['🌤', '🌤', '🌤', '🌤', '🌧', '❄️', '❄️', '❄️', '❄️', '❄️'],
+    weatherDesc: ['白夜极昼', '最暖月份', '夏末凉爽', '初秋渐冷', '极光季开始', '极光+暴风雪', '极夜最暗', '严寒冰雪', '冰雪极光', '渐长日照'],
+    rec: ['✅', '✅', '✅', '⚠️', '⚠️', '⚠️', '⚠️', '⚠️', '⚠️', '⚠️'],
+    attractions: ['蓝湖温泉', '黄金圈 (间歇泉+瀑布)', '冰川徒步', '观鲸之旅', '黑沙滩 Vik'],
+    foodCostPerDay: 80
+  }
+];
+
+// Month mapping: slider 0-9 → Jun2026 to Mar2027
+const monthLabels = [
+  '2026年6月', '2026年7月', '2026年8月', '2026年9月', '2026年10月',
+  '2026年11月', '2026年12月', '2027年1月', '2027年2月', '2027年3月'
+];
+
+let currentMonthIdx = 0;
+let currentSort = 'default';
+
+// ============================================================
+// RENDER
+// ============================================================
+function getFlightPrice(dest, monthIdx) {
+  return Math.round(dest.flightBase * dest.flightMultiplier[monthIdx]);
+}
+
+function getRecScore(rec) {
+  if (rec === '✅') return 3;
+  if (rec === '⚠️') return 2;
+  return 1;
+}
+
+function getTypeClass(type) {
+  const map = { beach:'type-beach', city:'type-city', culture:'type-culture', nature:'type-nature', adventure:'type-adventure' };
+  return map[type] || 'type-culture';
+}
+
+function getTempColor(temp) {
+  if (temp >= 28) return '#ef4444';
+  if (temp >= 22) return '#f97316';
+  if (temp >= 16) return '#eab308';
+  if (temp >= 10) return '#22d3ee';
+  if (temp >= 5) return '#6366f1';
+  return '#818cf8';
+}
+
+function getRecColor(rec) {
+  if (rec === '✅') return 'var(--green)';
+  if (rec === '⚠️') return 'var(--yellow)';
+  return 'var(--red)';
+}
+
+function renderCards() {
+  const grid = document.getElementById('cardsGrid');
+  let sorted = [...destinations];
+
+  const mi = currentMonthIdx;
+  if (currentSort === 'price-asc') {
+    sorted.sort((a, b) => getFlightPrice(a, mi) - getFlightPrice(b, mi));
+  } else if (currentSort === 'price-desc') {
+    sorted.sort((a, b) => getFlightPrice(b, mi) - getFlightPrice(a, mi));
+  } else if (currentSort === 'temp-desc') {
+    sorted.sort((a, b) => b.temps[mi] - a.temps[mi]);
+  } else if (currentSort === 'temp-asc') {
+    sorted.sort((a, b) => a.temps[mi] - b.temps[mi]);
+  } else {
+    // default: by recommendation then price
+    sorted.sort((a, b) => {
+      const rd = getRecScore(b.rec[mi]) - getRecScore(a.rec[mi]);
+      if (rd !== 0) return rd;
+      return getFlightPrice(a, mi) - getFlightPrice(b, mi);
+    });
+  }
+
+  grid.innerHTML = sorted.map((d, i) => {
+    const fp = getFlightPrice(d, mi);
+    const temp = d.temps[mi];
+    const wx = d.weather[mi];
+    const wxDesc = d.weatherDesc[mi];
+    const rec = d.rec[mi];
+
+    return `
+    <div class="card" style="animation-delay:${i * 0.05}s" data-id="${d.id}">
+      <div class="card-header">
+        <div class="dest-name">
+          ${d.flag} ${d.name}
+          <span class="airport-code">${d.code}</span>
+        </div>
+        <div class="tagline">${d.tagline}</div>
+        <span class="type-badge ${getTypeClass(d.type)}">${d.typeLabel}</span>
+      </div>
+      <div class="card-body">
+        <div class="weather-strip">
+          <span class="weather-icon">${wx}</span>
+          <div>
+            <div class="temp" style="color:${getTempColor(temp)}">${temp}°C</div>
+            <div class="weather-desc">${wxDesc}</div>
+          </div>
+          <span class="rec-badge" title="${rec === '✅' ? '推荐' : rec === '⚠️' ? '尚可' : '不推荐'}" style="font-size:1.4rem;filter:${rec === '❌' ? 'grayscale(0)' : 'none'}">${rec}</span>
+        </div>
+        <div class="price-row">
+          <div class="price-item">
+            <div class="price-label">✈️ 往返/人</div>
+            <div class="price-value">£${fp}</div>
+          </div>
+          <div class="price-item">
+            <div class="price-label">🏨 酒店/晚</div>
+            <div class="price-value hotel-price">£${d.hotelPerNight}</div>
+          </div>
+          <div class="price-item">
+            <div class="price-label">📅 推荐天数</div>
+            <div class="price-value days-value">${d.days}天</div>
+          </div>
+        </div>
+        <div class="attractions">
+          <div class="attractions-title">🎯 主要玩点</div>
+          <div class="attraction-tags">
+            ${d.attractions.map(a => `<span class="attraction-tag">${a}</span>`).join('')}
+          </div>
+        </div>
+        <div class="best-months">
+          🗓️ 最佳月份：<strong>${d.bestMonths}</strong>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// SLIDER
+// ============================================================
+const slider = document.getElementById('monthSlider');
+const display = document.getElementById('monthDisplay');
+
+slider.addEventListener('input', () => {
+  currentMonthIdx = parseInt(slider.value);
+  display.textContent = monthLabels[currentMonthIdx];
+  renderCards();
+  updateBudget();
+});
+
+// ============================================================
+// SORT
+// ============================================================
+function sortCards(sort) {
+  currentSort = sort;
+  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`[data-sort="${sort}"]`).classList.add('active');
+  renderCards();
+}
+
+// ============================================================
+// BUDGET CALCULATOR
+// ============================================================
+function initBudgetSelect() {
+  const sel = document.getElementById('budgetDest');
+  sel.innerHTML = destinations.map(d =>
+    `<option value="${d.id}">${d.flag} ${d.name} (${d.nameEn})</option>`
+  ).join('');
+  sel.addEventListener('change', updateBudget);
+  document.getElementById('budgetDays').addEventListener('input', updateBudget);
+}
+
+function updateBudget() {
+  const destId = document.getElementById('budgetDest').value;
+  const days = parseInt(document.getElementById('budgetDays').value) || 4;
+  const dest = destinations.find(d => d.id === destId);
+  if (!dest) return;
+
+  const nights = Math.max(days - 1, 1);
+  const flightPP = getFlightPrice(dest, currentMonthIdx);
+  const flights = flightPP * 2; // two people
+  const hotel = dest.hotelPerNight * nights;
+  const food = dest.foodCostPerDay * 2 * days; // two people
+  const total = flights + hotel + food;
+
+  document.getElementById('bFlights').textContent = `£${flights}`;
+  document.getElementById('bHotel').textContent = `£${hotel}`;
+  document.getElementById('bFood').textContent = `£${food}`;
+  document.getElementById('bTotal').textContent = `£${total}`;
+}
+
+// ============================================================
+// INIT
+// ============================================================
+renderCards();
+initBudgetSelect();
+updateBudget();
+</script>
+</body>
+</html>
