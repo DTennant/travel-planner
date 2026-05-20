@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🇮🇸 冰岛环岛自驾 · Iceland Ring Road 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root {
+  --bg-primary: #0a0e1a;
+  --bg-secondary: #111827;
+  --bg-card: #1a1f35;
+  --bg-card-hover: #222845;
+  --border: #2a3050;
+  --text-primary: #e8ecf4;
+  --text-secondary: #8b95b0;
+  --text-muted: #5a6380;
+  --accent-blue: #3b82f6;
+  --accent-purple: #8b5cf6;
+  --accent-pink: #ec4899;
+  --accent-cyan: #06b6d4;
+  --accent-green: #10b981;
+  --accent-orange: #f59e0b;
+  --accent-red: #ef4444;
+  --gradient-hero: linear-gradient(135deg, #0a0e1a 0%, #1a1040 50%, #0a0e1a 100%);
+  --gradient-card: linear-gradient(135deg, #1a1f35 0%, #1e2440 100%);
+  --shadow-card: 0 4px 24px rgba(0,0,0,0.3);
+  --shadow-glow: 0 0 30px rgba(59,130,246,0.15);
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) var(--bg-primary);
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ===== HERO ===== */
+.hero {
+  background: var(--gradient-hero);
+  padding: 60px 24px 40px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(ellipse at 30% 50%, rgba(139,92,246,0.08) 0%, transparent 60%),
+              radial-gradient(ellipse at 70% 50%, rgba(59,130,246,0.06) 0%, transparent 60%);
+  animation: aurora 20s ease-in-out infinite alternate;
+}
+@keyframes aurora {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  100% { transform: translate(-5%, 3%) rotate(3deg); }
+}
+.hero-content { position: relative; z-index: 1; max-width: 800px; margin: 0 auto; }
+.hero-flag { font-size: 64px; margin-bottom: 12px; animation: float 3s ease-in-out infinite; }
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 800;
+  background: linear-gradient(135deg, #e8ecf4, #8b5cf6, #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+}
+.hero-sub {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  font-weight: 300;
+}
+.hero-travelers {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 8px 20px;
+  background: rgba(139,92,246,0.15);
+  border: 1px solid rgba(139,92,246,0.3);
+  border-radius: 100px;
+  font-size: 0.95rem;
+  color: var(--accent-purple);
+  font-weight: 500;
+}
+
+/* ===== CONTAINER ===== */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ===== SECTION ===== */
+.section {
+  padding: 40px 0;
+}
+.section-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-title span { font-size: 1.8rem; }
+
+/* ===== CARDS GRID ===== */
+.cards-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+/* ===== FLIGHT CARD ===== */
+.flight-card {
+  background: var(--gradient-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow-card);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.flight-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow);
+}
+.flight-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+.flight-header .badge {
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.badge-out { background: rgba(16,185,129,0.15); color: var(--accent-green); }
+.badge-ret { background: rgba(239,68,68,0.15); color: var(--accent-red); }
+.flight-route {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 12px 0;
+}
+.flight-airport {
+  text-align: center;
+}
+.flight-airport .code {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+.flight-airport .time {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+.flight-airport .city {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+.flight-line {
+  flex: 1;
+  position: relative;
+  height: 2px;
+  background: var(--border);
+}
+.flight-line::before {
+  content: '✈️';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.2rem;
+}
+.flight-line::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--bg-card);
+  padding: 0 8px;
+  width: 40px;
+  height: 20px;
+}
+.flight-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 8px;
+}
+
+/* ===== CAR CARD ===== */
+.car-card {
+  background: var(--gradient-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.car-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow);
+}
+.car-icon { font-size: 2.5rem; }
+.car-name { font-size: 1.2rem; font-weight: 700; }
+.car-detail { font-size: 0.9rem; color: var(--text-secondary); }
+.car-price {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--accent-cyan);
+}
+.car-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: rgba(6,182,212,0.1);
+  border: 1px solid rgba(6,182,212,0.2);
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: var(--accent-cyan);
+  width: fit-content;
+}
+
+/* ===== MAP ===== */
+.map-section {
+  padding: 40px 0;
+}
+.map-wrapper {
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-card);
+}
+#map {
+  height: 550px;
+  width: 100%;
+  background: var(--bg-secondary);
+}
+.leaflet-popup-content-wrapper {
+  background: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+  border-radius: var(--radius-sm) !important;
+  box-shadow: var(--shadow-card) !important;
+  border: 1px solid var(--border) !important;
+}
+.leaflet-popup-tip { background: var(--bg-card) !important; }
+.leaflet-popup-content { font-family: 'Inter', sans-serif !important; font-size: 13px !important; line-height: 1.5 !important; }
+.leaflet-popup-content strong { color: var(--accent-blue); }
+.leaflet-control-zoom a {
+  background: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border) !important;
+}
+.map-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 16px;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border);
+  justify-content: center;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ===== ITINERARY ===== */
+.itinerary { padding: 40px 0; }
+
+.day-card {
+  background: var(--gradient-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  transition: transform 0.2s, box-shadow 0.2s;
+  animation: fadeSlideIn 0.5s ease-out both;
+}
+.day-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow);
+}
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.day-card:nth-child(1) { animation-delay: 0s; }
+.day-card:nth-child(2) { animation-delay: 0.05s; }
+.day-card:nth-child(3) { animation-delay: 0.1s; }
+.day-card:nth-child(4) { animation-delay: 0.15s; }
+.day-card:nth-child(5) { animation-delay: 0.2s; }
+.day-card:nth-child(6) { animation-delay: 0.25s; }
+.day-card:nth-child(7) { animation-delay: 0.3s; }
+.day-card:nth-child(8) { animation-delay: 0.35s; }
+.day-card:nth-child(9) { animation-delay: 0.4s; }
+.day-card:nth-child(10) { animation-delay: 0.45s; }
+
+.day-header {
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.day-header:hover { background: var(--bg-card-hover); }
+.day-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.day-num {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+.day-info h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.day-info .day-date {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+.day-meta {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.day-km {
+  padding: 4px 10px;
+  background: rgba(59,130,246,0.1);
+  border: 1px solid rgba(59,130,246,0.2);
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: var(--accent-blue);
+  font-weight: 500;
+}
+.day-expand {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.05);
+  color: var(--text-muted);
+  transition: transform 0.3s;
+  font-size: 0.8rem;
+}
+.day-card.open .day-expand { transform: rotate(180deg); }
+
+.day-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+.day-card.open .day-body { max-height: 800px; }
+.day-content {
+  padding: 0 24px 24px;
+  border-top: 1px solid var(--border);
+  padding-top: 20px;
+}
+.spot {
+  display: flex;
+  gap: 12px;
+  padding: 8px 0;
+  align-items: flex-start;
+}
+.spot-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 2px; }
+.spot-name { font-weight: 500; }
+.spot-desc { font-size: 0.85rem; color: var(--text-secondary); }
+.spot-star .spot-name { color: var(--accent-orange); font-weight: 600; }
+
+.day-stay {
+  margin-top: 16px;
+  padding: 12px 16px;
+  background: rgba(139,92,246,0.08);
+  border: 1px solid rgba(139,92,246,0.2);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+}
+.day-stay-icon { font-size: 1.3rem; }
+.day-charge {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: rgba(6,182,212,0.08);
+  border: 1px solid rgba(6,182,212,0.2);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  color: var(--accent-cyan);
+}
+
+/* ===== BUDGET ===== */
+.budget-card {
+  background: var(--gradient-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  box-shadow: var(--shadow-card);
+}
+.budget-items {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+.budget-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  background: rgba(255,255,255,0.03);
+  border-radius: var(--radius-sm);
+}
+.budget-item-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.95rem;
+}
+.budget-item-value {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+.budget-total {
+  margin-top: 16px;
+  padding: 16px;
+  background: linear-gradient(135deg, rgba(139,92,246,0.15), rgba(59,130,246,0.15));
+  border: 1px solid rgba(139,92,246,0.3);
+  border-radius: var(--radius-sm);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.budget-total-label {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+.budget-total-value {
+  font-size: 1.4rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ===== ACCOMMODATION CHECKLIST ===== */
+.checklist-card {
+  background: var(--gradient-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  box-shadow: var(--shadow-card);
+  margin-top: 20px;
+}
+.checklist-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-size: 0.92rem;
+}
+.checklist-item:last-child { border-bottom: none; }
+.checklist-item input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  transition: all 0.2s;
+  background: rgba(255,255,255,0.03);
+}
+.checklist-item input[type="checkbox"]:checked {
+  background: var(--accent-green);
+  border-color: var(--accent-green);
+}
+.checklist-item input[type="checkbox"]:checked::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+}
+.checklist-item input[type="checkbox"]:checked ~ .cl-text {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+.cl-night {
+  padding: 2px 8px;
+  background: rgba(139,92,246,0.15);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  color: var(--accent-purple);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* ===== NAV DOTS ===== */
+.nav-fab {
+  position: fixed;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 999;
+}
+.nav-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--border);
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  padding: 0;
+}
+.nav-dot:hover, .nav-dot.active {
+  background: var(--accent-purple);
+  transform: scale(1.3);
+}
+
+/* ===== FOOTER ===== */
+footer {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  border-top: 1px solid var(--border);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .hero { padding: 40px 16px 30px; }
+  .hero-flag { font-size: 48px; }
+  #map { height: 400px; }
+  .cards-row { grid-template-columns: 1fr; }
+  .nav-fab { display: none; }
+  .day-header { padding: 16px; }
+  .day-content { padding: 0 16px 20px; padding-top: 16px; }
+  .flight-route { gap: 8px; }
+  .flight-airport .code { font-size: 1.2rem; }
+  .section-title { font-size: 1.3rem; }
+  .container { padding: 0 12px; }
+}
+
+/* Map day-color markers */
+.custom-marker {
+  border-radius: 50%;
+  border: 3px solid white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  transition: transform 0.2s;
+}
+.custom-marker:hover { transform: scale(1.2); }
+
+/* Leaflet tile dark filter */
+.leaflet-tile-pane { filter: brightness(0.7) contrast(1.1) saturate(0.8); }
+</style>
+</head>
+<body>
+
+<!-- ===== HERO ===== -->
+<section class="hero" id="top">
+  <div class="hero-content">
+    <div class="hero-flag">🇮🇸</div>
+    <h1>冰岛环岛自驾之旅</h1>
+    <p class="hero-sub">Iceland Ring Road · 2026.07.03 — 07.12 · 10 Days</p>
+    <div class="hero-travelers">👫 Bingchen & Yue · 逆时针环岛</div>
+  </div>
+</section>
+
+<!-- ===== FLIGHTS & CAR ===== -->
+<div class="container">
+  <section class="section" id="flights">
+    <h2 class="section-title"><span>✈️</span> 航班 & 租车</h2>
+    <div class="cards-row">
+      <!-- Outbound -->
+      <div class="flight-card">
+        <div class="flight-header">
+          <span class="badge badge-out">去程</span> BA800 · 7月3日 周五
+        </div>
+        <div class="flight-route">
+          <div class="flight-airport">
+            <div class="code">LHR</div>
+            <div class="time">07:05</div>
+            <div class="city">伦敦</div>
+          </div>
+          <div class="flight-line"></div>
+          <div class="flight-airport">
+            <div class="code">KEF</div>
+            <div class="time">09:10</div>
+            <div class="city">雷克雅未克</div>
+          </div>
+        </div>
+        <div class="flight-meta">
+          <span>⏱ 3h05m 直飞 (UTC+1→UTC)</span>
+          <span>British Airways</span>
+        </div>
+      </div>
+      <!-- Return -->
+      <div class="flight-card">
+        <div class="flight-header">
+          <span class="badge badge-ret">回程</span> BA801 · 7月12日 周日
+        </div>
+        <div class="flight-route">
+          <div class="flight-airport">
+            <div class="code">KEF</div>
+            <div class="time">10:20</div>
+            <div class="city">雷克雅未克</div>
+          </div>
+          <div class="flight-line"></div>
+          <div class="flight-airport">
+            <div class="code">LHR</div>
+            <div class="time">14:30</div>
+            <div class="city">伦敦</div>
+          </div>
+        </div>
+        <div class="flight-meta">
+          <span>⏱ 3h10m 直飞 (UTC→UTC+1)</span>
+          <span>💷 待查价</span>
+        </div>
+      </div>
+      <!-- Car -->
+      <div class="car-card">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div class="car-icon">🚗</div>
+          <div>
+            <div class="car-name">Tesla Model Y</div>
+            <div class="car-detail">9天租期 · 7/3 — 7/12</div>
+          </div>
+        </div>
+        <div class="car-price">£789</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <div class="car-tag">⚡ 纯电动</div>
+          <div class="car-tag">🗺️ ~1,880km 总里程</div>
+          <div class="car-tag">🔋 充电约 £50</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ===== MAP ===== -->
+<div class="container">
+  <section class="map-section" id="map-section">
+    <h2 class="section-title"><span>🗺️</span> 路线地图</h2>
+    <div class="map-wrapper">
+      <div id="map"></div>
+      <div class="map-legend" id="map-legend"></div>
+    </div>
+  </section>
+</div>
+
+<!-- ===== ITINERARY ===== -->
+<div class="container">
+  <section class="itinerary" id="itinerary">
+    <h2 class="section-title"><span>📅</span> 每日行程</h2>
+    <div id="day-cards"></div>
+  </section>
+</div>
+
+<!-- ===== BUDGET ===== -->
+<div class="container">
+  <section class="section" id="budget">
+    <h2 class="section-title"><span>💰</span> 预算一览</h2>
+    <div class="budget-card">
+      <div class="budget-items">
+        <div class="budget-item">
+          <div class="budget-item-label">✈️ 机票 (2人往返)</div>
+          <div class="budget-item-value">待查</div>
+        </div>
+        <div class="budget-item">
+          <div class="budget-item-label">🚗 租车 (Tesla Model Y, 9天)</div>
+          <div class="budget-item-value">待查</div>
+        </div>
+        <div class="budget-item">
+          <div class="budget-item-label">🔋 充电费用</div>
+          <div class="budget-item-value">~£50</div>
+        </div>
+        <div class="budget-item">
+          <div class="budget-item-label">🏠 住宿 (9晚, £80-120/晚)</div>
+          <div class="budget-item-value">£720 — 1,080</div>
+        </div>
+        <div class="budget-item">
+          <div class="budget-item-label">🍽️ 餐饮 (10天)</div>
+          <div class="budget-item-value">£350 — 500</div>
+        </div>
+        <div class="budget-item">
+          <div class="budget-item-label">🎟️ 活动 & 门票</div>
+          <div class="budget-item-value">£250 — 350</div>
+        </div>
+      </div>
+      <div class="budget-total">
+        <div class="budget-total-label">💎 预估总费用</div>
+        <div class="budget-total-value">待确认机票+租车后更新</div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ===== ACCOMMODATION CHECKLIST ===== -->
+<div class="container">
+  <section class="section" id="checklist">
+    <h2 class="section-title"><span>🏠</span> 住宿清单</h2>
+    <div class="checklist-card">
+      <div class="checklist-item">
+        <input type="checkbox" id="acc1"><label class="cl-text" for="acc1">Day 1 · 7/3 Fri — Selfoss 塞尔福斯</label><span class="cl-night">1晚</span>
+      </div>
+      <div class="checklist-item">
+        <input type="checkbox" id="acc2"><label class="cl-text" for="acc2">Day 2 · 7/4 Sat — Vík 维克</label><span class="cl-night">1晚</span>
+      </div>
+      <div class="checklist-item">
+        <input type="checkbox" id="acc3"><label class="cl-text" for="acc3">Day 3 · 7/5 Sun — Höfn 赫本</label><span class="cl-night">1晚</span>
+      </div>
+      <div class="checklist-item">
+        <input type="checkbox" id="acc4"><label class="cl-text" for="acc4">Day 4 · 7/6 Mon — Egilsstaðir 埃伊尔斯塔济</label><span class="cl-night">1晚</span>
+      </div>
+      <div class="checklist-item">
+        <input type="checkbox" id="acc5"><label class="cl-text" for="acc5">Day 5 · 7/7 Tue — Mývatn 米湖</label><span class="cl-night">1晚</span>
+      </div>
+      <div class="checklist-item">
+        <input type="checkbox" id="acc6"><label class="cl-text" for="acc6">Day 6 · 7/8 Wed — Mývatn/Húsavík 米湖或胡萨维克</label><span class="cl-night">1晚</span>
+      </div>
+      <div class="checklist-item">
+        <input type="checkbox" id="acc7"><label class="cl-text" for="acc7">Day 7 · 7/9 Thu — Akureyri/Siglufjörður 阿克雷里</label><span class="cl-night">1晚</span>
+      </div>
+      <div class="checklist-item">
+        <input type="checkbox" id="acc8"><label class="cl-text" for="acc8">Day 8 · 7/10 Fri — Snæfellsnes 斯奈山半岛</label><span class="cl-night">1晚</span>
+      </div>
+      <div class="checklist-item">
+        <input type="checkbox" id="acc9"><label class="cl-text" for="acc9">Day 9 · 7/11 Sat — Reykjavík 雷克雅未克</label><span class="cl-night">1晚</span>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <p>🇮🇸 Bingchen & Yue · Iceland Ring Road 2026 · Made with ❤️</p>
+</footer>
+
+<!-- ===== NAV DOTS ===== -->
+<nav class="nav-fab">
+  <button class="nav-dot" onclick="document.getElementById('top').scrollIntoView({behavior:'smooth'})" title="Top"></button>
+  <button class="nav-dot" onclick="document.getElementById('flights').scrollIntoView({behavior:'smooth'})" title="Flights"></button>
+  <button class="nav-dot" onclick="document.getElementById('map-section').scrollIntoView({behavior:'smooth'})" title="Map"></button>
+  <button class="nav-dot" onclick="document.getElementById('itinerary').scrollIntoView({behavior:'smooth'})" title="Itinerary"></button>
+  <button class="nav-dot" onclick="document.getElementById('budget').scrollIntoView({behavior:'smooth'})" title="Budget"></button>
+  <button class="nav-dot" onclick="document.getElementById('checklist').scrollIntoView({behavior:'smooth'})" title="Checklist"></button>
+</nav>
+
+<script>
+// ===== DATA =====
+const dayColors = [
+  '#10b981', // Day 1 green
+  '#3b82f6', // Day 2 blue
+  '#8b5cf6', // Day 3 purple
+  '#ec4899', // Day 4 pink
+  '#f59e0b', // Day 5 amber
+  '#06b6d4', // Day 6 cyan
+  '#ef4444', // Day 7 red
+  '#f97316', // Day 8 orange
+  '#14b8a6', // Day 9 teal
+  '#6366f1', // Day 10 indigo
+];
+
+const days = [
+  {
+    num: 1, date: '7/3 周五', title: 'KEF → Golden Circle → Selfoss',
+    km: '~230km', emoji: '🌋',
+    spots: [
+      { icon: '🛬', name: 'KEF 机场取车', desc: '~09:30 到达，取 Tesla Model Y' },
+      { icon: '🏔️', name: 'Þingvellir 辛格维利尔国家公园', desc: 'UNESCO 世界遗产，欧美板块交界', star: false },
+      { icon: '♨️', name: 'Geysir 盖歇尔间歇泉', desc: '每 5-10 分钟喷发一次', star: false },
+      { icon: '💧', name: 'Gullfoss 黄金瀑布', desc: '冰岛最壮观瀑布之一', star: false },
+      { icon: '🕳️', name: 'Kerið 凯瑞斯火山口湖', desc: '可选，红色火山口+蓝绿湖水', star: false },
+    ],
+    stay: 'Selfoss 塞尔福斯', charge: null,
+    coords: [
+      [64.2559, -21.1290], [64.3103, -20.3023], [64.3271, -20.1199], [64.0412, -20.8852],
+    ],
+    stayCoord: [64.1539, -21.0028],
+    labels: ['Þingvellir', 'Geysir', 'Gullfoss', 'Kerið'],
+  },
+  {
+    num: 2, date: '7/4 周六', title: 'Selfoss → South Coast → Vík',
+    km: '~150km', emoji: '🏖️',
+    spots: [
+      { icon: '💧', name: 'Seljalandsfoss 塞里雅兰瀑布', desc: '可以走到瀑布后面！', star: false },
+      { icon: '💧', name: 'Skógafoss 斯科加瀑布', desc: '60米高，彩虹常现', star: false },
+      { icon: '✈️', name: 'Sólheimasandur 飞机残骸', desc: '可选，步行约 1 小时往返', star: false },
+      { icon: '🏖️', name: 'Reynisfjara 黑沙滩', desc: '玄武岩柱，注意大浪！', star: false },
+      { icon: '🌊', name: 'Dyrhólaey 迪霍拉里海蚀拱', desc: '壮观海岬，7月正是 puffin 旺季！', star: false },
+    ],
+    stay: 'Vík 维克', charge: null,
+    coords: [
+      [63.6156, -19.9886], [63.5321, -19.5112], [63.4053, -19.0714], [63.4019, -19.1285],
+    ],
+    stayCoord: [63.4186, -19.0060],
+    labels: ['Seljalandsfoss', 'Skógafoss', 'Reynisfjara', 'Dyrhólaey'],
+  },
+  {
+    num: 3, date: '7/5 周日', title: 'Vík → Jökulsárlón → Höfn',
+    km: '~270km', emoji: '🧊',
+    spots: [
+      { icon: '🏔️', name: 'Fjaðrárgljúfur 羽毛峡谷', desc: '蜿蜒 2 公里的美丽峡谷', star: false },
+      { icon: '🏔️', name: 'Skaftafell 冰川徒步', desc: 'Vatnajökull 国家公园内', star: false },
+      { icon: '⭐', name: 'Jökulsárlón 杰古沙龙冰河湖', desc: '必去！漂浮冰山，可坐船', star: true },
+      { icon: '💎', name: 'Diamond Beach 钻石沙滩', desc: '黑沙滩上的晶莹冰块', star: false },
+    ],
+    stay: 'Höfn 赫本 — 🦞 必吃龙虾！', charge: '🔋 在 Höfn 充满电',
+    coords: [
+      [63.7713, -18.1717], [64.0148, -16.9713], [64.0784, -16.2306], [64.0440, -16.1780],
+    ],
+    stayCoord: [64.2539, -15.2082],
+    labels: ['Fjaðrárgljúfur', 'Skaftafell', 'Jökulsárlón ⭐', 'Diamond Beach'],
+  },
+  {
+    num: 4, date: '7/6 周一', title: 'Höfn → East Fjords → Egilsstaðir',
+    km: '~250km', emoji: '🛣️',
+    spots: [
+      { icon: '🏔️', name: '东峡湾海岸公路', desc: '轻松一天，享受壮丽海岸风光', star: false },
+      { icon: '🏘️', name: 'Djúpivogur 都皮沃古尔', desc: '宁静渔村，Eggin í Gleðivík 雕塑', star: false },
+      { icon: '🏘️', name: 'Fáskrúðsfjörður', desc: '法国渔民历史小镇', star: false },
+    ],
+    stay: 'Egilsstaðir 埃伊尔斯塔济', charge: '🔋 必须充电！充电桩间距最长路段',
+    coords: [
+      [64.6509, -14.2622], [64.9292, -13.8642],
+    ],
+    stayCoord: [65.2531, -14.3948],
+    labels: ['Djúpivogur', 'Fáskrúðsfjörður'],
+  },
+  {
+    num: 5, date: '7/7 周二', title: 'Egilsstaðir → Dettifoss → Mývatn',
+    km: '~170km', emoji: '💨',
+    spots: [
+      { icon: '⭐', name: 'Dettifoss 黛提瀑布', desc: '欧洲水量最大瀑布！走东岸 862 公路', star: true },
+      { icon: '💧', name: 'Selfoss 瀑布 (北部)', desc: 'Dettifoss 上游，优美的马蹄形', star: false },
+      { icon: '♨️', name: 'Hverir 地热区', desc: '沸腾泥浆池和蒸汽口', star: false },
+      { icon: '🗿', name: 'Dimmuborgir 暗黑城堡', desc: '奇特熔岩迷宫', star: false },
+      { icon: '🏊', name: 'Grjótagjá 温泉洞穴', desc: 'GOT 取景地，可参观', star: false },
+    ],
+    stay: 'Mývatn 米湖地区', charge: null,
+    coords: [
+      [65.8147, -16.3844], [65.8080, -16.3887], [65.6410, -16.8098], [65.5901, -16.9114], [65.6264, -16.8826],
+    ],
+    stayCoord: [65.6035, -17.0000],
+    labels: ['Dettifoss ⭐', 'Selfoss (N)', 'Hverir', 'Dimmuborgir', 'Grjótagjá'],
+  },
+  {
+    num: 6, date: '7/8 周三', title: 'Mývatn + Húsavík 观鲸',
+    km: '~120km', emoji: '🐋',
+    spots: [
+      { icon: '♨️', name: 'Mývatn Nature Baths 米湖温泉', desc: '上午泡温泉，比蓝湖更本地', star: false },
+      { icon: '🌋', name: 'Skútustaðagígar 伪火山口', desc: '独特的假火山口群', star: false },
+      { icon: '🐋', name: 'Húsavík 观鲸', desc: '下午出海看鲸鱼！冰岛观鲸之都', star: true },
+    ],
+    stay: 'Mývatn 或 Húsavík', charge: null,
+    coords: [
+      [65.5710, -16.9833], [66.0449, -17.3383],
+    ],
+    stayCoord: [65.6035, -17.0000],
+    labels: ['Skútustaðagígar', 'Húsavík 🐋'],
+  },
+  {
+    num: 7, date: '7/9 周四', title: 'Mývatn → Akureyri → Siglufjörður',
+    km: '~170km', emoji: '🌊',
+    spots: [
+      { icon: '💧', name: 'Goðafoss 众神瀑布', desc: '环形瀑布，冰岛基督教化的象征', star: false },
+      { icon: '🏙️', name: 'Akureyri 阿克雷里', desc: '冰岛第二大城市，补给休整', star: false },
+      { icon: '🛣️', name: 'Tröllaskagi → Siglufjörður', desc: '巨人半岛海岸公路，绝美！', star: false },
+    ],
+    stay: 'Akureyri 或 Siglufjörður', charge: null,
+    coords: [
+      [65.6826, -17.5502], [65.6835, -18.0878], [66.1510, -18.9110],
+    ],
+    stayCoord: [65.6835, -18.0878],
+    labels: ['Goðafoss', 'Akureyri', 'Siglufjörður'],
+  },
+  {
+    num: 8, date: '7/10 周五', title: 'North → Snæfellsnes 斯奈山半岛',
+    km: '~300km', emoji: '⛰️',
+    spots: [
+      { icon: '🛣️', name: '北部到西部长途驾驶', desc: '今天路程最长，享受变换的风景', star: false },
+      { icon: '⭐', name: 'Kirkjufell 教堂山', desc: '冰岛最上镜的山，草帽山', star: true },
+      { icon: '⛪', name: 'Búðakirkja 黑教堂', desc: '荒野中的小黑教堂', star: false },
+      { icon: '🌊', name: 'Arnarstapi 海蚀崖', desc: '壮观的玄武岩悬崖海岸', star: false },
+    ],
+    stay: 'Snæfellsnes 斯奈山半岛', charge: null,
+    coords: [
+      [64.9426, -23.3061], [64.8204, -23.3836], [64.7667, -23.6250],
+    ],
+    stayCoord: [64.8500, -23.5000],
+    labels: ['Kirkjufell ⭐', 'Búðakirkja', 'Arnarstapi'],
+  },
+  {
+    num: 9, date: '7/11 周六', title: 'Snæfellsnes → Reykjavík',
+    km: '~200km', emoji: '🌃',
+    spots: [
+      { icon: '🏖️', name: 'Djúpalónssandur 黑珍珠沙滩', desc: '上午打卡，力量石挑战', star: false },
+      { icon: '⛪', name: 'Hallgrímskirkja 哈尔格林姆斯教堂', desc: '雷克雅未克地标', star: false },
+      { icon: '🌈', name: 'Rainbow Street 彩虹街', desc: '拍照打卡', star: false },
+      { icon: '🎵', name: 'Harpa 音乐厅', desc: '独特的玻璃外观建筑', star: false },
+      { icon: '♨️', name: 'Sky Lagoon / Blue Lagoon', desc: '温泉放松，旅途收尾', star: false },
+    ],
+    stay: 'Reykjavík 雷克雅未克', charge: null,
+    coords: [
+      [64.7513, -23.8972], [64.1466, -21.9426],
+    ],
+    stayCoord: [64.1466, -21.9426],
+    labels: ['Djúpalónssandur', 'Reykjavík'],
+  },
+  {
+    num: 10, date: '7/12 周日', title: '还车 → 飞回伦敦',
+    km: '~50km', emoji: '🛫',
+    spots: [
+      { icon: '🚗', name: 'KEF 机场还车', desc: '提前到达，办手续', star: false },
+      { icon: '✈️', name: 'BA801 KEF 10:20 → LHR 14:30', desc: '3h10m 直飞（UTC→BST），回家！', star: false },
+    ],
+    stay: null, charge: null,
+    coords: [[63.9850, -22.6056]],
+    stayCoord: null,
+    labels: ['KEF Airport'],
+  },
+];
+
+// ===== RENDER DAY CARDS =====
+const dayCardsEl = document.getElementById('day-cards');
+days.forEach((day, i) => {
+  const isOpen = i === 0 ? ' open' : '';
+  let spotsHTML = day.spots.map(s => `
+    <div class="spot${s.star ? ' spot-star' : ''}">
+      <div class="spot-icon">${s.icon}</div>
+      <div>
+        <div class="spot-name">${s.name}</div>
+        <div class="spot-desc">${s.desc}</div>
+      </div>
+    </div>
+  `).join('');
+
+  let stayHTML = day.stay ? `
+    <div class="day-stay">
+      <div class="day-stay-icon">🏠</div>
+      <div><strong>住宿：</strong>${day.stay}</div>
+    </div>` : '';
+
+  let chargeHTML = day.charge ? `<div class="day-charge">${day.charge}</div>` : '';
+
+  dayCardsEl.innerHTML += `
+    <div class="day-card${isOpen}" id="day-${day.num}">
+      <div class="day-header" onclick="toggleDay(${day.num})">
+        <div class="day-label">
+          <div class="day-num" style="background:${dayColors[i]};color:#fff;">
+            ${day.emoji}
+          </div>
+          <div class="day-info">
+            <h3>Day ${day.num} · ${day.title}</h3>
+            <div class="day-date">${day.date}</div>
+          </div>
+        </div>
+        <div class="day-meta">
+          <span class="day-km">${day.km}</span>
+          <div class="day-expand">▼</div>
+        </div>
+      </div>
+      <div class="day-body">
+        <div class="day-content">
+          ${spotsHTML}
+          ${stayHTML}
+          ${chargeHTML}
+        </div>
+      </div>
+    </div>
+  `;
+});
+
+function toggleDay(num) {
+  const card = document.getElementById('day-' + num);
+  card.classList.toggle('open');
+}
+
+// ===== MAP =====
+const map = L.map('map', {
+  center: [64.9, -18.5],
+  zoom: 6,
+  zoomControl: true,
+  scrollWheelZoom: true,
+});
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap contributors',
+  maxZoom: 18,
+}).addTo(map);
+
+// Route polyline (all stops in order, connecting the ring)
+const routePoints = [];
+
+// Collect all coords in trip order for the route line
+const routeOrder = [
+  [63.9850, -22.6056], // KEF
+  [64.2559, -21.1290], // Þingvellir
+  [64.3103, -20.3023], // Geysir
+  [64.3271, -20.1199], // Gullfoss
+  [64.0412, -20.8852], // Kerið
+  [64.1539, -21.0028], // Selfoss (stay)
+  [63.6156, -19.9886], // Seljalandsfoss
+  [63.5321, -19.5112], // Skógafoss
+  [63.4053, -19.0714], // Reynisfjara
+  [63.4019, -19.1285], // Dyrhólaey
+  [63.4186, -19.0060], // Vík (stay)
+  [63.7713, -18.1717], // Fjaðrárgljúfur
+  [64.0148, -16.9713], // Skaftafell
+  [64.0784, -16.2306], // Jökulsárlón
+  [64.0440, -16.1780], // Diamond Beach
+  [64.2539, -15.2082], // Höfn (stay)
+  [64.6509, -14.2622], // Djúpivogur
+  [64.9292, -13.8642], // Fáskrúðsfjörður
+  [65.2531, -14.3948], // Egilsstaðir (stay)
+  [65.8147, -16.3844], // Dettifoss
+  [65.8080, -16.3887], // Selfoss (N)
+  [65.6410, -16.8098], // Hverir
+  [65.5901, -16.9114], // Dimmuborgir
+  [65.6264, -16.8826], // Grjótagjá
+  [65.6035, -17.0000], // Mývatn (stay)
+  [65.5710, -16.9833], // Skútustaðagígar
+  [66.0449, -17.3383], // Húsavík
+  [65.6035, -17.0000], // Mývatn (stay Day 6)
+  [65.6826, -17.5502], // Goðafoss
+  [65.6835, -18.0878], // Akureyri
+  [66.1510, -18.9110], // Siglufjörður
+  [65.6835, -18.0878], // back through Akureyri
+  [64.9426, -23.3061], // Kirkjufell
+  [64.8204, -23.3836], // Búðakirkja
+  [64.7667, -23.6250], // Arnarstapi
+  [64.8500, -23.5000], // Snæfellsnes (stay)
+  [64.7513, -23.8972], // Djúpalónssandur
+  [64.1466, -21.9426], // Reykjavík
+  [63.9850, -22.6056], // KEF
+];
+
+L.polyline(routeOrder, {
+  color: '#8b5cf6',
+  weight: 3,
+  opacity: 0.6,
+  dashArray: '8, 6',
+  smoothFactor: 1.5,
+}).addTo(map);
+
+// Add markers for each day
+function createIcon(color, size) {
+  return L.divIcon({
+    className: 'custom-marker',
+    html: '',
+    iconSize: [size, size],
+    iconAnchor: [size/2, size/2],
+    popupAnchor: [0, -size/2],
+  });
+}
+
+// Create colored circle marker
+function addMarker(lat, lng, color, label, dayNum, isStay) {
+  const size = isStay ? 16 : 12;
+  const marker = L.circleMarker([lat, lng], {
+    radius: isStay ? 8 : 6,
+    fillColor: color,
+    color: '#fff',
+    weight: 2,
+    opacity: 1,
+    fillOpacity: 0.9,
+  }).addTo(map);
+
+  const prefix = isStay ? '🏠 住宿' : '📍 景点';
+  marker.bindPopup(`<div style="min-width:140px;">
+    <strong>Day ${dayNum}</strong> — ${label}<br>
+    <span style="color:#8b95b0;font-size:11px;">${prefix}</span>
+  </div>`);
+}
+
+days.forEach((day, i) => {
+  const color = dayColors[i];
+  // Spot markers
+  day.coords.forEach((c, j) => {
+    const label = day.labels[j] || `Stop ${j+1}`;
+    addMarker(c[0], c[1], color, label, day.num, false);
+  });
+  // Stay marker
+  if (day.stayCoord) {
+    addMarker(day.stayCoord[0], day.stayCoord[1], color, day.stay || 'Stay', day.num, true);
+  }
+});
+
+// Legend
+const legendEl = document.getElementById('map-legend');
+days.forEach((day, i) => {
+  legendEl.innerHTML += `
+    <div class="legend-item">
+      <div class="legend-dot" style="background:${dayColors[i]}"></div>
+      <span>D${day.num}</span>
+    </div>
+  `;
+});
+
+// ===== Save checkbox state to localStorage =====
+document.querySelectorAll('.checklist-item input[type="checkbox"]').forEach(cb => {
+  const key = 'iceland-jul-acc-' + cb.id;
+  // Restore
+  if (localStorage.getItem(key) === 'true') cb.checked = true;
+  // Save on change
+  cb.addEventListener('change', () => {
+    localStorage.setItem(key, cb.checked);
+  });
+});
+</script>
+
+</body>
+</html>
