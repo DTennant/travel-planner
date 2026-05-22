@@ -396,7 +396,7 @@ tr:hover td { background: rgba(59,130,246,0.05); }
               <input type="number" id="sippYears1" value="5" min="1" max="40" oninput="calculate()">
             </div>
           </div>
-          <div class="hint">💡 You pay 80%, provider auto-claims 20%. Higher/additional rate relief via Self Assessment. Good if employer doesn't offer SS or you want to top up beyond SS.</div>
+          <div class="hint">💡 Enter how much you transfer in. Provider auto-claims 25% top-up (e.g. you send £8k → pot gets £10k). Higher rate relief comes back via Self Assessment.</div>
         </div>
 
         <hr class="divider">
@@ -638,8 +638,9 @@ function calcUKTax(gross, ssAmount, sippAmount, studentLoan) {
   let taxableGross = gross - ssAmount;
   let niGross = gross - ssAmount;
 
-  // 2. Adjusted net income (for PA taper) = gross - SS - SIPP
-  let adjustedNetIncome = gross - ssAmount - sippAmount;
+  // 2. Adjusted net income (for PA taper) = gross - SS - SIPP_gross
+  let sippGross = sippAmount * 1.25; // gross contribution for PA purposes
+  let adjustedNetIncome = gross - ssAmount - sippGross;
 
   // 3. Personal Allowance (tapers above £100k: lose £1 for every £2 over)
   let pa = 12570;
@@ -685,35 +686,31 @@ function calcUKTax(gross, ssAmount, sippAmount, studentLoan) {
   if (studentLoan === 'plan4' && slGross > 31395) sl = (slGross - 31395) * 0.09;
   if (studentLoan === 'pg' && slGross > 21000) sl = (slGross - 21000) * 0.06;
 
-  // 7. SIPP: you pay 80% from net, provider claims 20% basic rate
-  //    SA refund = higher/additional rate relief on the SIPP amount + PA restoration if applicable
-  //    How it works: SIPP contribution of £X means provider claims £X*0.2 from HMRC (basic rate).
-  //    Via Self Assessment, you get back the difference between your marginal rate and 20%.
-  //    Effectively: tax you'd pay without SIPP minus tax you'd pay with SIPP (treating SIPP as reducing taxable income).
-  let sippFromNet = sippAmount * 0.80;
+  // 7. SIPP: sippAmount = what you actually transfer in (net payment)
+  //    Provider claims 20% basic rate top-up from HMRC → gross contribution = sippAmount * 1.25
+  //    SA refund = higher/additional rate relief on gross contribution (above the 20% already claimed)
+  let sippFromNet = sippAmount; // what you pay = what you entered
+  // sippGross already calculated above (sippAmount * 1.25)
+  let sippTopUp = sippGross - sippAmount; // the 20% provider claims
   let hmrcRefund = 0;
   if (sippAmount > 0) {
-    // Tax on income WITHOUT SIPP deduction (what PAYE actually collects)
-    let incomeWithoutSIPP = gross - ssAmount; // adjusted net income without SIPP
+    // Tax on income WITHOUT SIPP (what PAYE collects)
+    let incomeWithoutSIPP = gross - ssAmount;
     let taxWithoutSIPP = calcIncomeTax(taxableGross, incomeWithoutSIPP);
 
-    // Tax you SHOULD pay WITH SIPP deduction (SIPP reduces adjusted net income for tax purposes)
-    // SIPP effectively reduces your taxable income for relief calculation
-    let incomeWithSIPP = gross - ssAmount - sippAmount;
-    let taxShouldPay = calcIncomeTax(Math.max(0, taxableGross - sippAmount), incomeWithSIPP);
+    // Tax WITH SIPP (gross contribution reduces adjusted net income)
+    let incomeWithSIPP = gross - ssAmount - sippGross;
+    let taxShouldPay = calcIncomeTax(Math.max(0, taxableGross - sippGross), incomeWithSIPP);
 
-    // Total tax relief = taxWithoutSIPP - taxShouldPay
-    // Provider already claimed 20% basic rate (= sippAmount * 0.20)
-    // SA refund = total relief - basic rate already claimed
+    // Total relief = difference. Provider already claimed 20% (sippTopUp).
+    // SA refund = remaining higher/additional rate relief
     let totalRelief = taxWithoutSIPP - taxShouldPay;
-    let basicRateClaimed = sippAmount * 0.20;
-    hmrcRefund = Math.max(0, totalRelief - basicRateClaimed);
+    hmrcRefund = Math.max(0, totalRelief - sippTopUp);
 
-    // PAYE deducts based on income without SIPP
     tax = taxWithoutSIPP;
   }
 
-  // 8. Take-home = gross - SS - tax - NI - SL - SIPP_net + SA_refund
+  // 8. Take-home = gross - SS - tax - NI - SL - SIPP_transfer + SA_refund
   let takeHome = taxableGross - tax - ni - sl - sippFromNet + hmrcRefund;
 
   let totalDeductions = gross - takeHome;
@@ -721,7 +718,8 @@ function calcUKTax(gross, ssAmount, sippAmount, studentLoan) {
   return {
     gross, taxableGross, pa,
     tax: Math.round(tax), ni: Math.round(ni), sl: Math.round(sl),
-    ssAmount, sippAmount, totalPension: ssAmount + sippAmount,
+    ssAmount, sippAmount, sippGross: Math.round(sippGross), sippTopUp: Math.round(sippTopUp),
+    totalPension: ssAmount + Math.round(sippGross),
     sippFromNet: Math.round(sippFromNet),
     hmrcRefund: Math.round(hmrcRefund),
     takeHome: Math.round(takeHome),
@@ -782,7 +780,10 @@ function runProjection(params) {
     let ss2y = (y <= ss2Years) ? ss2 : 0;
     let ssEmp2y = (y <= ss2Years) ? ssEmp2 : 0;
     let sipp2y = (y <= sipp2Years) ? sipp2 : 0;
-    let penThisYear = ss1y + ssEmp1y + sipp1y + ss2y + ssEmp2y + sipp2y;
+    // SIPP: user enters net transfer, pot gets gross (× 1.25 for 20% top-up)
+    let sipp1Gross = sipp1y * 1.25;
+    let sipp2Gross = sipp2y * 1.25;
+    let penThisYear = ss1y + ssEmp1y + sipp1Gross + ss2y + ssEmp2y + sipp2Gross;
 
     // Recalc take-home if pension contributions changed from initial
     if (ss1y !== ss1 || sipp1y !== sipp1 || ss2y !== ss2 || sipp2y !== sipp2) {
@@ -904,9 +905,9 @@ function calculate() {
 
   let monthlyExpenses = expRent + expCar + expFood + expSubs + expOther;
 
-  // Check £60k pension limit per person (includes employer contributions)
-  let totalPen1 = ss1 + ssEmp1 + sipp1;
-  let totalPen2 = ss2 + ssEmp2 + sipp2;
+  // Check £60k pension limit per person (all contributions at gross level)
+  let totalPen1 = ss1 + ssEmp1 + sipp1 * 1.25;
+  let totalPen2 = ss2 + ssEmp2 + sipp2 * 1.25;
   let warningEl = document.getElementById('pensionWarning');
   let warnings = [];
   if (totalPen1 > 60000) warnings.push(`⚠️ Your pension £${fmt(totalPen1)} exceeds £60k!`);
@@ -930,9 +931,9 @@ function calculate() {
   let noteEl = document.getElementById('pensionNote');
   let noteLines = [];
   if (ss1 > 0) noteLines.push(`You SS: £${fmt(ss1)}/yr` + (ssEmp1 > 0 ? ` + employer £${fmt(ssEmp1)}` : '') + ` (${ss1Years}yr)`);
-  if (sipp1 > 0) noteLines.push(`You SIPP: £${fmt(tax1.sippFromNet)}/yr net, refund ~£${fmt(tax1.hmrcRefund)}/yr (${sipp1Years}yr)`);
+  if (sipp1 > 0) noteLines.push(`You SIPP: transfer £${fmt(sipp1)}/yr → pot gets £${fmt(tax1.sippGross)}/yr (incl. £${fmt(tax1.sippTopUp)} top-up). SA refund ~£${fmt(tax1.hmrcRefund)}/yr. (${sipp1Years}yr)`);
   if (ss2 > 0) noteLines.push(`Partner SS: £${fmt(ss2)}/yr` + (ssEmp2 > 0 ? ` + employer £${fmt(ssEmp2)}` : '') + ` (${ss2Years}yr)`);
-  if (sipp2 > 0) noteLines.push(`Partner SIPP: £${fmt(tax2.sippFromNet)}/yr net, refund ~£${fmt(tax2.hmrcRefund)}/yr (${sipp2Years}yr)`);
+  if (sipp2 > 0) noteLines.push(`Partner SIPP: transfer £${fmt(sipp2)}/yr → pot gets £${fmt(tax2.sippGross)}/yr (incl. £${fmt(tax2.sippTopUp)} top-up). SA refund ~£${fmt(tax2.hmrcRefund)}/yr. (${sipp2Years}yr)`);
   if (noteLines.length > 0) {
     noteLines.push(`Your PA: ${tax1.pa > 0 ? '£' + fmt(tax1.pa) : '£0'} · Partner PA: ${tax2.pa > 0 ? '£' + fmt(tax2.pa) : '£0'}`);
     noteEl.innerHTML = noteLines.join('<br>');
@@ -1027,8 +1028,9 @@ function renderTaxBreakdown(elId, tax) {
   rows.push(['National Insurance', '-£' + fmt(tax.ni), 'neg']);
   if (tax.sl > 0) rows.push(['Student Loan', '-£' + fmt(tax.sl), 'neg']);
   if (tax.sippAmount > 0) {
-    rows.push(['SIPP Payment (80%)', '-£' + fmt(tax.sippFromNet), 'neg']);
-    rows.push(['SA Refund (est.)', '+£' + fmt(tax.hmrcRefund), 'pos']);
+    rows.push(['SIPP Transfer', '-£' + fmt(tax.sippFromNet), 'neg']);
+    rows.push(['SIPP 20% Top-up', '+£' + fmt(tax.sippTopUp) + ' (to pot)', '']);
+    if (tax.hmrcRefund > 0) rows.push(['SA Refund (higher rate)', '+£' + fmt(tax.hmrcRefund), 'pos']);
   }
   rows.push(['TOTAL', null, 'total']);
   rows.push(['Annual Take-Home', '£' + fmt(tax.takeHome), 'pos']);
@@ -1136,9 +1138,9 @@ function renderMonthlyActions(tax1, tax2, expenses, expSharePct, isa1, isa2, ccM
 
   let actions = [];
   if (ss1 > 0) actions.push({ who: 'You', action: 'Salary Sacrifice', amount: ss1 / 12, note: `Auto-deducted (${ss1Years}yr)`, color: 'var(--purple)' });
-  if (sipp1 > 0) actions.push({ who: 'You', action: 'SIPP', amount: sipp1 * 0.8 / 12, note: `Pay 80% (${sipp1Years}yr)`, color: 'var(--purple)' });
+  if (sipp1 > 0) actions.push({ who: 'You', action: 'SIPP transfer', amount: sipp1 / 12, note: `→ pot gets £${fmt(Math.round(sipp1*1.25/12))}/mo (${sipp1Years}yr)`, color: 'var(--purple)' });
   if (ss2 > 0) actions.push({ who: 'Partner', action: 'Salary Sacrifice', amount: ss2 / 12, note: `Auto-deducted (${ss2Years}yr)`, color: 'var(--purple)' });
-  if (sipp2 > 0) actions.push({ who: 'Partner', action: 'SIPP', amount: sipp2 * 0.8 / 12, note: `Pay 80% (${sipp2Years}yr)`, color: 'var(--purple)' });
+  if (sipp2 > 0) actions.push({ who: 'Partner', action: 'SIPP transfer', amount: sipp2 / 12, note: `→ pot gets £${fmt(Math.round(sipp2*1.25/12))}/mo (${sipp2Years}yr)`, color: 'var(--purple)' });
   actions.push({ who: 'You', action: `Living expenses (${Math.round(expSharePct*100)}%)`, amount: yourExp, note: 'Rent + transport + food + bills', color: 'var(--red)' });
   if (isa1 > 0) actions.push({ who: 'You', action: 'ISA ⭐', amount: isa1/12, note: 'Tax-free — #1 priority', color: 'var(--accent)' });
   if (isa2 > 0) actions.push({ who: 'Partner', action: 'ISA ⭐', amount: isa2/12, note: 'Tax-free — #1 priority', color: 'var(--accent)' });
