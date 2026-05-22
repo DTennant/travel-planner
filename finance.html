@@ -755,6 +755,7 @@ function runProjection(params) {
 
   let years = [];
   let pension = 0, isa = 0, cc = existingInv || 0, cash = 0;
+  let penContribTotal = 0, isaContribTotal = 0, ccContribTotal = existingInv || 0, cashContribTotal = 0;
 
   let yourMonthly = tax1.monthlyTakeHome;
   let partnerMonthly = tax2.monthlyTakeHome;
@@ -791,6 +792,13 @@ function runProjection(params) {
     let ccContrib = ccMonthly * 12;
     let cashContrib = cashMonthly * 12;
 
+    // Accumulate contributions
+    penContribTotal += penThisYear;
+    isaContribTotal += isaContrib;
+    ccContribTotal += ccContrib;
+    cashContribTotal += cashContrib;
+
+    // Growth
     pension = (pension + penThisYear) * (1 + pensionGrowth / 100);
     isa = (isa + isaContrib) * (1 + isaGrowth / 100);
 
@@ -812,8 +820,16 @@ function runProjection(params) {
     let passiveTotal = passiveCCNet + passiveCash;
 
     let ageThen = currentAge + y;
-    let yearsTo55 = Math.max(0, 55 - ageThen);
-    let pensionAt55 = pension * Math.pow(1 + pensionGrowth / 100, yearsTo55);
+    let yearsTo57 = Math.max(0, 57 - ageThen);
+    let pensionAt57 = pension * Math.pow(1 + pensionGrowth / 100, yearsTo57);
+
+    // Growth = value - contributions
+    let penGrowth = Math.round(pension) - penContribTotal;
+    let isaGrowthAmt = Math.round(isa) - isaContribTotal;
+    let ccGrowthAmt = Math.round(cc) - ccContribTotal;
+    let cashGrowthAmt = Math.round(cash) - cashContribTotal;
+    let totalContrib = penContribTotal + isaContribTotal + ccContribTotal + cashContribTotal;
+    let totalGrowth = Math.round(total) - totalContrib;
 
     years.push({
       year: y, age: ageThen, pensionContrib: penThisYear,
@@ -822,9 +838,14 @@ function runProjection(params) {
       total: Math.round(total), usable: Math.round(usable),
       passiveMonthly: Math.round(passiveTotal / 12),
       passiveAnnual: Math.round(passiveTotal),
-      pensionAt55: Math.round(pensionAt55),
+      pensionAt57: Math.round(pensionAt57),
       totalInvestable: Math.round(totalInvestable),
-      isaContrib, ccContrib, cashContrib
+      // Contributions vs growth
+      penContrib: penContribTotal, penGrowth,
+      isaContrib: isaContribTotal, isaGrowth: isaGrowthAmt,
+      ccContrib: ccContribTotal, ccGrowth: ccGrowthAmt,
+      cashContrib: cashContribTotal, cashGrowth: cashGrowthAmt,
+      totalContrib, totalGrowth
     });
   }
   return years;
@@ -1082,14 +1103,25 @@ function renderChart(projection) {
 
 function renderTable(projection) {
   document.getElementById('projTableHead').innerHTML = `<tr>
-    <th>Year</th><th>Age</th><th>Pension 🔒</th><th>ISA</th><th>Investing</th><th>Cash</th>
-    <th>Total</th><th>Usable</th><th>Passive £/mo</th><th>Pension @55</th>
+    <th>Year</th><th>Age</th>
+    <th>Pension 🔒</th><th style="font-size:0.65rem;">↳ contrib / growth</th>
+    <th>ISA</th><th style="font-size:0.65rem;">↳ contrib / growth</th>
+    <th>Investing</th><th style="font-size:0.65rem;">↳ contrib / growth</th>
+    <th>Total</th><th style="font-size:0.65rem;">↳ contrib / growth</th>
+    <th>Passive £/mo</th><th>Pension @57</th>
   </tr>`;
   document.getElementById('projTableBody').innerHTML = projection.map(y => `<tr>
     <td>Y${y.year}</td><td>${y.age}</td>
-    <td>£${fmt(y.pension)}</td><td>£${fmt(y.isa)}</td><td>£${fmt(y.cc)}</td><td>£${fmt(y.cash)}</td>
-    <td><strong>£${fmt(y.total)}</strong></td><td class="num-pos">£${fmt(y.usable)}</td>
-    <td class="num-pos">£${fmt(y.passiveMonthly)}</td><td style="color:var(--purple)">£${fmt(y.pensionAt55)}</td>
+    <td>£${fmt(y.pension)}</td>
+    <td style="font-size:0.7rem;color:var(--text-dim);">£${fmt(y.penContrib)} / <span class="num-pos">£${fmt(y.penGrowth)}</span></td>
+    <td>£${fmt(y.isa)}</td>
+    <td style="font-size:0.7rem;color:var(--text-dim);">£${fmt(y.isaContrib)} / <span class="num-pos">£${fmt(y.isaGrowth)}</span></td>
+    <td>£${fmt(y.cc)}</td>
+    <td style="font-size:0.7rem;color:var(--text-dim);">£${fmt(y.ccContrib)} / <span class="num-pos">£${fmt(y.ccGrowth)}</span></td>
+    <td><strong>£${fmt(y.total)}</strong></td>
+    <td style="font-size:0.7rem;color:var(--text-dim);">£${fmt(y.totalContrib)} / <span class="num-pos">£${fmt(y.totalGrowth)}</span></td>
+    <td class="num-pos">£${fmt(y.passiveMonthly)}</td>
+    <td style="color:var(--purple)">£${fmt(y.pensionAt57)}</td>
   </tr>`).join('');
 }
 
@@ -1145,8 +1177,8 @@ function renderMonthlyActions(tax1, tax2, expenses, expSharePct, isa1, isa2, ccM
 
 function exportCSV() {
   if (!lastProjection) return;
-  let headers = ['Year','Age','Pension','ISA','Investing','Cash','Total','Usable','Passive £/mo','Passive £/yr','Pension @55'];
-  let rows = lastProjection.map(y => [y.year,y.age,y.pension,y.isa,y.cc,y.cash,y.total,y.usable,y.passiveMonthly,y.passiveAnnual,y.pensionAt55]);
+  let headers = ['Year','Age','Pension','Pen Contrib','Pen Growth','ISA','ISA Contrib','ISA Growth','Investing','Inv Contrib','Inv Growth','Cash','Total','Total Contrib','Total Growth','Usable','Passive £/mo','Passive £/yr','Pension @57'];
+  let rows = lastProjection.map(y => [y.year,y.age,y.pension,y.penContrib,y.penGrowth,y.isa,y.isaContrib,y.isaGrowth,y.cc,y.ccContrib,y.ccGrowth,y.cash,y.total,y.totalContrib,y.totalGrowth,y.usable,y.passiveMonthly,y.passiveAnnual,y.pensionAt57]);
   let csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
   let blob = new Blob([csv], { type: 'text/csv' });
   let url = URL.createObjectURL(blob);
