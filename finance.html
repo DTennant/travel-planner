@@ -1135,38 +1135,84 @@ function renderTable(projection) {
 function renderMonthlyActions(tax1, tax2, expenses, expSharePct, isa1, isa2, ccMonthly, cashMonthly, ss1, sipp1, ss1Years, sipp1Years, ss2, sipp2, ss2Years, sipp2Years) {
   let el = document.getElementById('monthlyActions');
   let yourExp = expenses * expSharePct;
+  let partnerExp = expenses - yourExp;
 
-  let actions = [];
-  if (ss1 > 0) actions.push({ who: 'You', action: 'Salary Sacrifice', amount: ss1 / 12, note: `Auto-deducted (${ss1Years}yr)`, color: 'var(--purple)' });
-  if (sipp1 > 0) actions.push({ who: 'You', action: 'SIPP transfer', amount: sipp1 / 12, note: `→ pot gets £${fmt(Math.round(sipp1*1.25/12))}/mo (${sipp1Years}yr)`, color: 'var(--purple)' });
-  if (ss2 > 0) actions.push({ who: 'Partner', action: 'Salary Sacrifice', amount: ss2 / 12, note: `Auto-deducted (${ss2Years}yr)`, color: 'var(--purple)' });
-  if (sipp2 > 0) actions.push({ who: 'Partner', action: 'SIPP transfer', amount: sipp2 / 12, note: `→ pot gets £${fmt(Math.round(sipp2*1.25/12))}/mo (${sipp2Years}yr)`, color: 'var(--purple)' });
-  actions.push({ who: 'You', action: `Living expenses (${Math.round(expSharePct*100)}%)`, amount: yourExp, note: 'Rent + transport + food + bills', color: 'var(--red)' });
-  if (isa1 > 0) actions.push({ who: 'You', action: 'ISA ⭐', amount: isa1/12, note: 'Tax-free — #1 priority', color: 'var(--accent)' });
-  if (isa2 > 0) actions.push({ who: 'Partner', action: 'ISA ⭐', amount: isa2/12, note: 'Tax-free — #1 priority', color: 'var(--accent)' });
-  if (ccMonthly > 0) actions.push({ who: 'You', action: 'General investing', amount: ccMonthly, note: 'Taxable account', color: 'var(--green)' });
-  if (cashMonthly > 0) actions.push({ who: 'Shared', action: 'Cash savings', amount: cashMonthly, note: 'Emergency fund / HYSA', color: 'var(--yellow)' });
+  // === YOUR ACCOUNT ===
+  let youIn = tax1.monthlyTakeHome; // SS already deducted from take-home
+  let youOut = [];
+  // SS is NOT an action — already deducted before take-home
+  if (sipp1 > 0) youOut.push({ action: 'SIPP transfer', amount: sipp1/12, note: `→ pot £${fmt(Math.round(sipp1*1.25/12))}/mo`, color: 'var(--purple)' });
+  youOut.push({ action: `Living expenses (${Math.round(expSharePct*100)}%)`, amount: yourExp, note: '', color: 'var(--red)' });
+  if (isa1 > 0) youOut.push({ action: 'ISA ⭐', amount: isa1/12, note: 'Tax-free', color: 'var(--accent)' });
+  if (ccMonthly > 0) youOut.push({ action: 'General investing', amount: ccMonthly, note: 'Taxable', color: 'var(--green)' });
+  if (cashMonthly > 0) youOut.push({ action: 'Cash savings', amount: cashMonthly/2, note: 'Shared', color: 'var(--yellow)' });
+  let youTotalOut = youOut.reduce((s, a) => s + a.amount, 0);
+  let youBalance = youIn - youTotalOut;
 
-  let totalOut = actions.reduce((s, a) => s + a.amount, 0);
-  let totalIn = tax1.monthlyTakeHome + tax2.monthlyTakeHome;
-  let diff = totalIn - totalOut;
+  // === PARTNER ACCOUNT ===
+  let partnerIn = tax2.monthlyTakeHome;
+  let partnerOut = [];
+  if (sipp2 > 0) partnerOut.push({ action: 'SIPP transfer', amount: sipp2/12, note: `→ pot £${fmt(Math.round(sipp2*1.25/12))}/mo`, color: 'var(--purple)' });
+  if (partnerExp > 0) partnerOut.push({ action: `Living expenses (${Math.round((1-expSharePct)*100)}%)`, amount: partnerExp, note: '', color: 'var(--red)' });
+  if (isa2 > 0) partnerOut.push({ action: 'ISA ⭐', amount: isa2/12, note: 'Tax-free', color: 'var(--accent)' });
+  if (cashMonthly > 0) partnerOut.push({ action: 'Cash savings', amount: cashMonthly/2, note: 'Shared', color: 'var(--yellow)' });
+  let partnerTotalOut = partnerOut.reduce((s, a) => s + a.amount, 0);
+  let partnerBalance = partnerIn - partnerTotalOut;
+
+  // Transfer needed?
+  let transferNote = '';
+  if (youBalance < 0 && partnerBalance > 0) {
+    let transfer = Math.min(-youBalance, partnerBalance);
+    transferNote = `<div style="margin:12px 0;padding:10px;background:rgba(234,179,8,0.1);border:1px solid rgba(234,179,8,0.3);border-radius:8px;font-size:0.85rem;color:var(--yellow);">
+      💸 Partner → You: £${fmt(Math.round(transfer))}/mo transfer needed (you're short £${fmt(Math.round(-youBalance))})
+    </div>`;
+  } else if (partnerBalance < 0 && youBalance > 0) {
+    let transfer = Math.min(-partnerBalance, youBalance);
+    transferNote = `<div style="margin:12px 0;padding:10px;background:rgba(234,179,8,0.1);border:1px solid rgba(234,179,8,0.3);border-radius:8px;font-size:0.85rem;color:var(--yellow);">
+      💸 You → Partner: £${fmt(Math.round(transfer))}/mo transfer needed (partner's short £${fmt(Math.round(-partnerBalance))})
+    </div>`;
+  }
+
+  let householdSurplus = youBalance + partnerBalance;
+
+  function renderAccount(title, emoji, income, outflows, balance, ssInfo) {
+    let ssNote = ssInfo > 0 ? `<div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:8px;">ℹ️ SS £${fmt(Math.round(ssInfo/12))}/mo auto-deducted before take-home (not shown as outflow)</div>` : '';
+    return `
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+          <strong>${emoji} ${title}</strong>
+          <span style="color:var(--accent);">Take-home: £${fmt(income)}/mo</span>
+        </div>
+        ${ssNote}
+        <table style="width:100%;font-size:0.82rem;">
+          ${outflows.map(a => `<tr>
+            <td style="color:${a.color}">${a.action}</td>
+            <td style="text-align:right;">-£${fmt(Math.round(a.amount))}</td>
+            <td style="padding-left:8px;color:var(--text-dim);font-size:0.75rem;">${a.note}</td>
+          </tr>`).join('')}
+          <tr style="border-top:1px solid var(--border);font-weight:700;">
+            <td>${balance >= 0 ? '✅ Balance' : '⚠️ Shortfall'}</td>
+            <td style="text-align:right;color:${balance >= 0 ? 'var(--green)' : 'var(--red)'}">£${fmt(Math.round(balance))}</td>
+            <td></td>
+          </tr>
+        </table>
+      </div>`;
+  }
 
   el.innerHTML = `
-    <div style="margin-bottom:16px;"><strong>Household Monthly Income:</strong> £${fmt(totalIn)}</div>
-    <table style="width:100%;font-size:0.85rem;">
-      <tr style="color:var(--text-dim);"><th style="text-align:left;">Who</th><th style="text-align:left;">Action</th><th style="text-align:right;">Amount</th><th style="text-align:left;padding-left:12px;">Note</th></tr>
-      ${actions.map(a => `<tr>
-        <td>${a.who}</td><td style="color:${a.color}">${a.action}</td>
-        <td style="text-align:right;">£${fmt(Math.round(a.amount))}</td>
-        <td style="padding-left:12px;color:var(--text-dim);font-size:0.78rem;">${a.note}</td>
-      </tr>`).join('')}
-      <tr style="border-top:1px solid var(--border);font-weight:700;">
-        <td colspan="2">${diff >= 0 ? '✅ Surplus' : '⚠️ Deficit'}</td>
-        <td style="text-align:right;color:${diff >= 0 ? 'var(--green)' : 'var(--red)'}">£${fmt(Math.round(Math.abs(diff)))}</td>
-        <td style="padding-left:12px;color:var(--text-dim);font-size:0.78rem;">${diff >= 0 ? 'Unallocated buffer' : 'Need to reduce allocation!'}</td>
-      </tr>
-    </table>
-    <div style="margin-top:20px;padding:14px;background:var(--bg);border-radius:8px;border:1px solid var(--border);">
+    ${renderAccount('Your Account', '👤', youIn, youOut, youBalance, ss1)}
+    ${renderAccount('Partner Account', '👥', partnerIn, partnerOut, partnerBalance, ss2)}
+    ${transferNote}
+    <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;">
+        <strong>🏠 Household Total</strong>
+        <span style="color:${householdSurplus >= 0 ? 'var(--green)' : 'var(--red)'}; font-weight:700;">
+          ${householdSurplus >= 0 ? '✅' : '⚠️'} £${fmt(Math.round(householdSurplus))}/mo surplus
+        </span>
+      </div>
+      <div style="font-size:0.78rem;color:var(--text-dim);margin-top:4px;">= £${fmt(Math.round(householdSurplus * 12))}/yr for travel, emergencies, extra investing</div>
+    </div>
+    <div style="margin-top:16px;padding:14px;background:var(--bg);border-radius:8px;border:1px solid var(--border);">
       <strong>📅 Annual Actions</strong>
       <ul style="margin-top:8px;padding-left:20px;font-size:0.82rem;color:var(--text-dim);">
         <li><strong>April:</strong> New tax year — reset ISA allowance, use full £20k per person</li>
