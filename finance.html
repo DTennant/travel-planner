@@ -798,6 +798,14 @@ function runProjection(params) {
     let ccContrib = ccMonthly * 12;
     let cashContrib = cashMonthly * 12;
 
+    // Calculate surplus and add to cash
+    // Surplus = total take-home - (SIPP transfers + expenses + ISA + investing + explicit cash)
+    // SS is already deducted from take-home, so not counted as outflow
+    let totalTakeHome = (totalInvestable + yourExpense + partnerExpense) * 12; // = (yourMonthly + partnerMonthly) * 12 effectively
+    let totalOutflows = (sipp1y + sipp2y) + (yourExpense + partnerExpense) * 12 + isaContrib + ccContrib + cashContrib;
+    let surplus = Math.max(0, totalTakeHome - totalOutflows);
+    cashContrib += surplus; // surplus goes into cash
+
     // Accumulate contributions
     penContribTotal += penThisYear;
     isaContribTotal += isaContrib;
