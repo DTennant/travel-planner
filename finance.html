@@ -685,26 +685,31 @@ function calcUKTax(gross, ssAmount, sippAmount, studentLoan) {
   if (studentLoan === 'plan4' && slGross > 31395) sl = (slGross - 31395) * 0.09;
   if (studentLoan === 'pg' && slGross > 21000) sl = (slGross - 21000) * 0.06;
 
-  // 7. SIPP: you pay 80% from net, provider claims 20%, SA refund for higher/additional rate + PA restoration
+  // 7. SIPP: you pay 80% from net, provider claims 20% basic rate
+  //    SA refund = higher/additional rate relief on the SIPP amount + PA restoration if applicable
+  //    How it works: SIPP contribution of £X means provider claims £X*0.2 from HMRC (basic rate).
+  //    Via Self Assessment, you get back the difference between your marginal rate and 20%.
+  //    Effectively: tax you'd pay without SIPP minus tax you'd pay with SIPP (treating SIPP as reducing taxable income).
   let sippFromNet = sippAmount * 0.80;
   let hmrcRefund = 0;
   if (sippAmount > 0) {
-    // PAYE tax is based on taxableGross with PA from adjustedNetIncome (HMRC may adjust tax code)
-    // But the PA taper relief from SIPP comes through SA refund
-    // Calculate: tax without SIPP PA benefit vs with
-    let taxWithoutSIPP = calcIncomeTax(taxableGross, gross - ssAmount); // PA based on income without SIPP
-    let taxWithSIPP = tax; // already calculated with SIPP affecting PA
-    hmrcRefund = taxWithoutSIPP - taxWithSIPP;
+    // Tax on income WITHOUT SIPP deduction (what PAYE actually collects)
+    let incomeWithoutSIPP = gross - ssAmount; // adjusted net income without SIPP
+    let taxWithoutSIPP = calcIncomeTax(taxableGross, incomeWithoutSIPP);
 
-    // Also higher rate relief on SIPP contribution itself
-    // The 20% basic rate is already claimed by provider
-    // We need to calculate marginal relief above basic rate
-    // Income after SS: taxableGross. SIPP contribution reduces this for relief purposes.
-    let taxOnFullIncome = calcIncomeTax(taxableGross, gross - ssAmount);
-    let taxOnReducedIncome = calcIncomeTax(taxableGross, adjustedNetIncome);
-    hmrcRefund = taxOnFullIncome - taxOnReducedIncome;
+    // Tax you SHOULD pay WITH SIPP deduction (SIPP reduces adjusted net income for tax purposes)
+    // SIPP effectively reduces your taxable income for relief calculation
+    let incomeWithSIPP = gross - ssAmount - sippAmount;
+    let taxShouldPay = calcIncomeTax(Math.max(0, taxableGross - sippAmount), incomeWithSIPP);
 
-    // Use the PAYE tax (without SIPP PA adjustment) for actual monthly deduction
+    // Total tax relief = taxWithoutSIPP - taxShouldPay
+    // Provider already claimed 20% basic rate (= sippAmount * 0.20)
+    // SA refund = total relief - basic rate already claimed
+    let totalRelief = taxWithoutSIPP - taxShouldPay;
+    let basicRateClaimed = sippAmount * 0.20;
+    hmrcRefund = Math.max(0, totalRelief - basicRateClaimed);
+
+    // PAYE deducts based on income without SIPP
     tax = taxWithoutSIPP;
   }
 
@@ -1220,7 +1225,7 @@ function loadFromURL() {
 
 // ========== HELPERS ==========
 
-function num(id) { return parseFloat(document.getElementById(id).value) || 0; }
+function num(id) { let el = document.getElementById(id); if (!el) return 0; let v = parseFloat(el.value); return isNaN(v) ? 0 : v; }
 function fmt(n) { return Math.round(n).toLocaleString('en-GB'); }
 
 // Pension checkboxes trigger calculate() directly via onchange
