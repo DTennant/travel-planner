@@ -260,7 +260,54 @@ tr:hover td { background: rgba(59,130,246,0.05); }
     <!-- LEFT: Inputs -->
     <div class="sidebar">
 
-      <!-- Income -->
+      <!-- 1. EXPENSES (first — fill this to know your budget) -->
+      <div class="card">
+        <h2><span class="icon">🏠</span> Monthly Expenses</h2>
+        <div class="hint" style="margin-bottom:12px;">Fill your actual monthly costs. UK averages shown as reference.</div>
+        <div class="field">
+          <label>Rent / Mortgage (£/month)</label>
+          <div class="input-group"><span class="prefix">£</span>
+            <input type="number" id="expRent" placeholder="London avg ~£1,800" oninput="calculate()">
+          </div>
+          <div class="hint">💡 UK avg £1,100 · London avg £1,800 · Biggest lever for savings</div>
+        </div>
+        <div class="field">
+          <label>Car / Transport (£/month)</label>
+          <div class="input-group"><span class="prefix">£</span>
+            <input type="number" id="expCar" placeholder="e.g. 300" oninput="calculate()">
+          </div>
+          <div class="hint">💡 Car finance+insurance+fuel ~£500 · Public transport ~£150 · Consider cycling</div>
+        </div>
+        <div class="field">
+          <label>Food / Groceries (£/month)</label>
+          <div class="input-group"><span class="prefix">£</span>
+            <input type="number" id="expFood" placeholder="e.g. 400" oninput="calculate()">
+          </div>
+          <div class="hint">💡 £250-350 budget · £400-600 normal · £800+ with regular dining out. Meal prep saves ~30%</div>
+        </div>
+        <div class="field">
+          <label>Subscriptions / Bills (£/month)</label>
+          <div class="input-group"><span class="prefix">£</span>
+            <input type="number" id="expSubs" placeholder="e.g. 200" oninput="calculate()">
+          </div>
+          <div class="hint">💡 Council tax, utilities, phone, broadband, streaming. Audit annually — avg household can cut £50+</div>
+        </div>
+        <div class="field">
+          <label>Other / Buffer (£/month)</label>
+          <div class="input-group"><span class="prefix">£</span>
+            <input type="number" id="expOther" placeholder="e.g. 300" oninput="calculate()">
+          </div>
+          <div class="hint">💡 Clothes, hobbies, unexpected. Keep 10-15% buffer for peace of mind</div>
+        </div>
+        <div class="field">
+          <label>Your share of expenses (%)</label>
+          <input type="number" id="expShare" value="100" min="0" max="100" step="5" oninput="calculate()">
+          <div class="hint">100% = you pay all, 50% = split equally, 0% = partner pays all</div>
+        </div>
+        <div id="expAdvice" class="priority-note" style="display:none;"></div>
+      </div>
+
+      <!-- 2. INCOME -->
       <div class="card">
         <h2><span class="icon">💰</span> Income</h2>
         <div class="field">
@@ -287,11 +334,16 @@ tr:hover td { background: rgba(59,130,246,0.05); }
             <option value="pg">Postgrad (6% above £21,000)</option>
           </select>
         </div>
+        <div class="field">
+          <label>Your Current Age</label>
+          <input type="number" id="currentAge" value="30" min="18" max="60" oninput="calculate()">
+        </div>
       </div>
 
-      <!-- Pension -->
+      <!-- 3. PENSION -->
       <div class="card">
         <h2><span class="icon">🏦</span> Pension</h2>
+        <div id="pensionAdvice" class="priority-note" style="display:none;"></div>
 
         <!-- You: Salary Sacrifice -->
         <div class="field" style="margin-bottom:8px;">
@@ -303,17 +355,25 @@ tr:hover td { background: rgba(59,130,246,0.05); }
         <div id="ssFields1" style="display:none;padding-left:8px;border-left:2px solid var(--accent);margin-bottom:14px;">
           <div class="field-row">
             <div class="field">
-              <label>Amount (£/yr)</label>
+              <label>Your SS (£/yr)</label>
               <div class="input-group"><span class="prefix">£</span>
                 <input type="number" id="ssAmount1" placeholder="e.g. 25000" oninput="calculate()">
               </div>
             </div>
             <div class="field">
+              <label>Employer match (£/yr)</label>
+              <div class="input-group"><span class="prefix">£</span>
+                <input type="number" id="ssEmployer1" placeholder="e.g. 5000" oninput="calculate()">
+              </div>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
               <label>Years</label>
               <input type="number" id="ssYears1" value="5" min="1" max="40" oninput="calculate()">
             </div>
           </div>
-          <div class="hint">Reduces gross for Income Tax + NI. Above £100k restores Personal Allowance.</div>
+          <div class="hint">💡 Your contribution reduces Income Tax + NI. Employer match is free money — always max it! If salary >£100k, SS to bring below £100k restores £12,570 Personal Allowance (effective 60% marginal rate zone).</div>
         </div>
 
         <!-- You: SIPP -->
@@ -336,7 +396,7 @@ tr:hover td { background: rgba(59,130,246,0.05); }
               <input type="number" id="sippYears1" value="5" min="1" max="40" oninput="calculate()">
             </div>
           </div>
-          <div class="hint">You pay 80%, provider claims 20%. Higher rate relief via SA.</div>
+          <div class="hint">💡 You pay 80%, provider auto-claims 20%. Higher/additional rate relief via Self Assessment. Good if employer doesn't offer SS or you want to top up beyond SS.</div>
         </div>
 
         <hr class="divider">
@@ -351,11 +411,19 @@ tr:hover td { background: rgba(59,130,246,0.05); }
         <div id="ssFields2" style="display:none;padding-left:8px;border-left:2px solid var(--accent);margin-bottom:14px;">
           <div class="field-row">
             <div class="field">
-              <label>Amount (£/yr)</label>
+              <label>Partner SS (£/yr)</label>
               <div class="input-group"><span class="prefix">£</span>
                 <input type="number" id="ssAmount2" placeholder="e.g. 10000" oninput="calculate()">
               </div>
             </div>
+            <div class="field">
+              <label>Employer match (£/yr)</label>
+              <div class="input-group"><span class="prefix">£</span>
+                <input type="number" id="ssEmployer2" placeholder="e.g. 3000" oninput="calculate()">
+              </div>
+            </div>
+          </div>
+          <div class="field-row">
             <div class="field">
               <label>Years</label>
               <input type="number" id="ssYears2" value="5" min="1" max="40" oninput="calculate()">
@@ -389,63 +457,24 @@ tr:hover td { background: rgba(59,130,246,0.05); }
         <div class="field">
           <label>Pension Growth Rate (%)</label>
           <input type="number" id="pensionGrowth" value="10" step="0.5" oninput="calculate()">
+          <div class="hint">💡 7% conservative (bonds+equity mix) · 10% aggressive (100% equity) · 5% very conservative</div>
         </div>
 
         <div class="pension-note" id="pensionNote">No pension contribution configured.</div>
         <div class="pension-note" id="pensionWarning" style="display:none;background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:var(--red);"></div>
       </div>
 
-      <!-- Expenses -->
-      <div class="card">
-        <h2><span class="icon">🏠</span> Monthly Expenses</h2>
-        <div class="field">
-          <label>Rent / Mortgage (£/month)</label>
-          <div class="input-group"><span class="prefix">£</span>
-            <input type="number" id="expRent" placeholder="e.g. 1500" oninput="calculate()">
-          </div>
-        </div>
-        <div class="field">
-          <label>Car / Transport (£/month)</label>
-          <div class="input-group"><span class="prefix">£</span>
-            <input type="number" id="expCar" placeholder="e.g. 300" oninput="calculate()">
-          </div>
-        </div>
-        <div class="field">
-          <label>Food / Groceries (£/month)</label>
-          <div class="input-group"><span class="prefix">£</span>
-            <input type="number" id="expFood" placeholder="e.g. 500" oninput="calculate()">
-          </div>
-        </div>
-        <div class="field">
-          <label>Subscriptions / Bills (£/month)</label>
-          <div class="input-group"><span class="prefix">£</span>
-            <input type="number" id="expSubs" placeholder="e.g. 200" oninput="calculate()">
-          </div>
-        </div>
-        <div class="field">
-          <label>Other / Buffer (£/month)</label>
-          <div class="input-group"><span class="prefix">£</span>
-            <input type="number" id="expOther" placeholder="e.g. 300" oninput="calculate()">
-          </div>
-        </div>
-        <div class="field">
-          <label>Your share of expenses (%)</label>
-          <input type="number" id="expShare" value="100" min="0" max="100" step="5" oninput="calculate()">
-          <div class="hint">100% = you pay all, 50% = split, 0% = partner pays all</div>
-        </div>
-      </div>
-
-      <!-- Investments -->
+      <!-- 4. INVESTMENTS -->
       <div class="card">
         <h2><span class="icon">📈</span> Investments</h2>
-        <div class="priority-note">💡 ISA is the #1 priority — tax-free growth, max £20k/yr per person. Fill ISA first before other investments.</div>
+        <div class="priority-note">💡 ISA is the #1 priority — tax-free growth, max £20k/yr per person. Fill ISA before taxable accounts.</div>
         <div class="field-row">
           <div class="field">
             <label>Your ISA (£/year)</label>
             <div class="input-group"><span class="prefix">£</span>
-              <input type="number" id="isa1" placeholder="e.g. 20000" max="20000" oninput="calculate()">
+              <input type="number" id="isa1" placeholder="max 20000" max="20000" oninput="calculate()">
             </div>
-            <div class="hint">Max £20k/yr</div>
+            <div class="hint">Max £20k/yr · S&S ISA recommended</div>
           </div>
           <div class="field">
             <label>Partner ISA (£/year)</label>
@@ -457,7 +486,7 @@ tr:hover td { background: rgba(59,130,246,0.05); }
         <div class="field">
           <label>ISA Growth Rate (%)</label>
           <input type="number" id="isaGrowth" value="10" step="0.5" oninput="calculate()">
-          <div class="hint">S&P 500 historical average ~10%</div>
+          <div class="hint">💡 S&P 500 avg ~10% · Global index ~8% · Conservative ~6%</div>
         </div>
         <hr class="divider">
         <div class="field">
@@ -465,11 +494,12 @@ tr:hover td { background: rgba(59,130,246,0.05); }
           <div class="input-group"><span class="prefix">£</span>
             <input type="number" id="ccMonthly" value="0" oninput="calculate()">
           </div>
-          <div class="hint">Taxable account — for covered calls, individual stocks, etc.</div>
+          <div class="hint">💡 Only after ISA is maxed. Covered calls, individual stocks, etc. Subject to CGT.</div>
         </div>
         <div class="field">
           <label>Expected Gross Return (%)</label>
           <input type="number" id="ccYield" value="12" step="0.5" oninput="calculate()">
+          <div class="hint">💡 Covered call premium ~12-18% · Index tracking ~10% · Dividend stocks ~4-6%</div>
         </div>
         <hr class="divider">
         <div class="field">
@@ -477,6 +507,7 @@ tr:hover td { background: rgba(59,130,246,0.05); }
           <div class="input-group"><span class="prefix">£</span>
             <input type="number" id="cashMonthly" value="0" oninput="calculate()">
           </div>
+          <div class="hint">💡 Build 3-6 months expenses as emergency fund first, then redirect to ISA</div>
         </div>
         <div class="field">
           <label>Cash Interest Rate (%)</label>
@@ -486,10 +517,6 @@ tr:hover td { background: rgba(59,130,246,0.05); }
         <div class="field">
           <label>Projection Years</label>
           <input type="number" id="projYears" value="10" min="1" max="40" oninput="calculate()">
-        </div>
-        <div class="field">
-          <label>Your Current Age</label>
-          <input type="number" id="currentAge" value="30" min="18" max="60" oninput="calculate()">
         </div>
         <div class="field">
           <label>Existing Investments (£)</label>
@@ -723,7 +750,7 @@ function runProjection(params) {
   const { tax1, tax2, monthlyExpenses, expSharePct,
           isa1Annual, isa2Annual, ccMonthly, cashMonthly,
           isaGrowth, ccYield, cashRate, pensionGrowth,
-          projYears, ss1, ss1Years, sipp1, sipp1Years, ss2, ss2Years, sipp2, sipp2Years,
+          projYears, ss1, ssEmp1, ss1Years, sipp1, sipp1Years, ss2, ssEmp2, ss2Years, sipp2, sipp2Years,
           existingInv, currentAge } = params;
 
   let years = [];
@@ -744,10 +771,12 @@ function runProjection(params) {
 
   for (let y = 1; y <= projYears; y++) {
     let ss1y = (y <= ss1Years) ? ss1 : 0;
+    let ssEmp1y = (y <= ss1Years) ? ssEmp1 : 0;
     let sipp1y = (y <= sipp1Years) ? sipp1 : 0;
     let ss2y = (y <= ss2Years) ? ss2 : 0;
+    let ssEmp2y = (y <= ss2Years) ? ssEmp2 : 0;
     let sipp2y = (y <= sipp2Years) ? sipp2 : 0;
-    let penThisYear = ss1y + sipp1y + ss2y + sipp2y;
+    let penThisYear = ss1y + ssEmp1y + sipp1y + ss2y + ssEmp2y + sipp2y;
 
     // Recalc take-home if pension contributions changed from initial
     if (ss1y !== ss1 || sipp1y !== sipp1 || ss2y !== ss2 || sipp2y !== sipp2) {
@@ -813,10 +842,12 @@ function calculate() {
 
   // Pension: SS and SIPP for each person independently
   let ss1 = document.getElementById('ssEnabled1').checked ? num('ssAmount1') : 0;
+  let ssEmp1 = document.getElementById('ssEnabled1').checked ? num('ssEmployer1') : 0;
   let ss1Years = document.getElementById('ssEnabled1').checked ? num('ssYears1') : 0;
   let sipp1 = document.getElementById('sippEnabled1').checked ? num('sippAmount1') : 0;
   let sipp1Years = document.getElementById('sippEnabled1').checked ? num('sippYears1') : 0;
   let ss2 = document.getElementById('ssEnabled2').checked ? num('ssAmount2') : 0;
+  let ssEmp2 = document.getElementById('ssEnabled2').checked ? num('ssEmployer2') : 0;
   let ss2Years = document.getElementById('ssEnabled2').checked ? num('ssYears2') : 0;
   let sipp2 = document.getElementById('sippEnabled2').checked ? num('sippAmount2') : 0;
   let sipp2Years = document.getElementById('sippEnabled2').checked ? num('sippYears2') : 0;
@@ -847,9 +878,9 @@ function calculate() {
 
   let monthlyExpenses = expRent + expCar + expFood + expSubs + expOther;
 
-  // Check £60k pension limit per person
-  let totalPen1 = ss1 + sipp1;
-  let totalPen2 = ss2 + sipp2;
+  // Check £60k pension limit per person (includes employer contributions)
+  let totalPen1 = ss1 + ssEmp1 + sipp1;
+  let totalPen2 = ss2 + ssEmp2 + sipp2;
   let warningEl = document.getElementById('pensionWarning');
   let warnings = [];
   if (totalPen1 > 60000) warnings.push(`⚠️ Your pension £${fmt(totalPen1)} exceeds £60k!`);
@@ -872,9 +903,9 @@ function calculate() {
   // Pension note
   let noteEl = document.getElementById('pensionNote');
   let noteLines = [];
-  if (ss1 > 0) noteLines.push(`You SS: £${fmt(ss1)}/yr (${ss1Years}yr)`);
+  if (ss1 > 0) noteLines.push(`You SS: £${fmt(ss1)}/yr` + (ssEmp1 > 0 ? ` + employer £${fmt(ssEmp1)}` : '') + ` (${ss1Years}yr)`);
   if (sipp1 > 0) noteLines.push(`You SIPP: £${fmt(tax1.sippFromNet)}/yr net, refund ~£${fmt(tax1.hmrcRefund)}/yr (${sipp1Years}yr)`);
-  if (ss2 > 0) noteLines.push(`Partner SS: £${fmt(ss2)}/yr (${ss2Years}yr)`);
+  if (ss2 > 0) noteLines.push(`Partner SS: £${fmt(ss2)}/yr` + (ssEmp2 > 0 ? ` + employer £${fmt(ssEmp2)}` : '') + ` (${ss2Years}yr)`);
   if (sipp2 > 0) noteLines.push(`Partner SIPP: £${fmt(tax2.sippFromNet)}/yr net, refund ~£${fmt(tax2.hmrcRefund)}/yr (${sipp2Years}yr)`);
   if (noteLines.length > 0) {
     noteLines.push(`Your PA: ${tax1.pa > 0 ? '£' + fmt(tax1.pa) : '£0'} · Partner PA: ${tax2.pa > 0 ? '£' + fmt(tax2.pa) : '£0'}`);
@@ -890,6 +921,41 @@ function calculate() {
   document.getElementById('sumExpensesSub').textContent = `You ${Math.round(expSharePct*100)}% · Partner ${Math.round((1-expSharePct)*100)}%`;
   document.getElementById('sumInvestable').textContent = '£' + fmt(totalInvestable);
   document.getElementById('sumInvestableSub').textContent = salary2 > 0 ? `You £${fmt(yourInvestable)} + Partner £${fmt(partnerInvestable)}` : '';
+
+  // Pension advice
+  let pensionAdvEl = document.getElementById('pensionAdvice');
+  let pAdvice = [];
+  if (salary1 > 100000 && (salary1 - ss1) > 100000 && ss1 === 0) {
+    pAdvice.push(`🔑 Your salary is £${fmt(salary1)}. SS of £${fmt(salary1 - 100000)} would bring you to £100k and restore £12,570 PA (saves ~${fmt(Math.min((salary1-100000), 25140) * 0.4)} in the 60% trap).`);
+  } else if (salary1 > 100000 && (salary1 - ss1) > 100000) {
+    let gap = salary1 - ss1 - 100000;
+    pAdvice.push(`📊 After SS, adjusted income is £${fmt(salary1 - ss1)}. Increase SS by £${fmt(gap)} to fully restore PA.`);
+  }
+  if (salary1 > 50270 && sipp1 === 0 && ss1 === 0) {
+    pAdvice.push(`💡 You're a higher rate (40%) taxpayer. Any pension contribution saves 40%+ tax.`);
+  }
+  if (salary2 > 50270 && sipp2 === 0 && ss2 === 0) {
+    pAdvice.push(`💡 Partner is a higher rate taxpayer. Consider partner pension contributions too.`);
+  }
+  pensionAdvEl.style.display = pAdvice.length ? 'block' : 'none';
+  pensionAdvEl.innerHTML = pAdvice.join('<br>');
+
+  // Expense advice
+  let expAdvEl = document.getElementById('expAdvice');
+  let eAdvice = [];
+  let totalExp = monthlyExpenses;
+  let totalTakeHome = tax1.monthlyTakeHome + tax2.monthlyTakeHome;
+  if (totalTakeHome > 0 && totalExp > totalTakeHome * 0.7) {
+    eAdvice.push(`⚠️ Expenses are ${Math.round(totalExp/totalTakeHome*100)}% of take-home. Target <50% for strong savings.`);
+  }
+  if (expRent > totalTakeHome * 0.35 && totalTakeHome > 0) {
+    eAdvice.push(`🏠 Rent is ${Math.round(expRent/totalTakeHome*100)}% of income (>35%). Consider housemates or cheaper area.`);
+  }
+  if (expFood > 800) {
+    eAdvice.push(`🍽️ Food £${fmt(expFood)}/mo is high. Meal prep + batch cooking can cut to £400-500.`);
+  }
+  expAdvEl.style.display = eAdvice.length ? 'block' : 'none';
+  expAdvEl.innerHTML = eAdvice.join('<br>');
 
   renderTaxBreakdown('taxBreakdown1', tax1);
   renderTaxBreakdown('taxBreakdown2', tax2);
@@ -1092,8 +1158,8 @@ function exportCSV() {
 function copyShareLink() {
   let params = new URLSearchParams();
   let fields = ['salary1','salary2','studentLoan',
-    'ssAmount1','ssYears1','sippAmount1','sippYears1',
-    'ssAmount2','ssYears2','sippAmount2','sippYears2','pensionGrowth',
+    'ssAmount1','ssEmployer1','ssYears1','sippAmount1','sippYears1',
+    'ssAmount2','ssEmployer2','ssYears2','sippAmount2','sippYears2','pensionGrowth',
     'expRent','expCar','expFood','expSubs','expOther','expShare',
     'isa1','isa2','isaGrowth','ccMonthly','ccYield','cashMonthly','cashRate',
     'projYears','currentAge','existingInv'];
@@ -1108,8 +1174,8 @@ function loadFromURL() {
   let params = new URLSearchParams(window.location.search);
   if (params.size === 0) return false;
   let fields = ['salary1','salary2','studentLoan',
-    'ssAmount1','ssYears1','sippAmount1','sippYears1',
-    'ssAmount2','ssYears2','sippAmount2','sippYears2','pensionGrowth',
+    'ssAmount1','ssEmployer1','ssYears1','sippAmount1','sippYears1',
+    'ssAmount2','ssEmployer2','ssYears2','sippAmount2','sippYears2','pensionGrowth',
     'expRent','expCar','expFood','expSubs','expOther','expShare',
     'isa1','isa2','isaGrowth','ccMonthly','ccYield','cashMonthly','cashRate',
     'projYears','currentAge','existingInv'];
