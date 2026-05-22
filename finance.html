@@ -38,33 +38,13 @@ header {
 header h1 { font-size: 2rem; font-weight: 700; margin-bottom: 4px; }
 header p { color: var(--text-dim); font-size: 0.95rem; }
 
-/* Preset bar */
-.presets {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin: 20px 0 30px;
-}
-.preset-btn {
-  padding: 8px 20px;
-  border: 1px solid var(--border);
-  background: var(--card);
-  color: var(--text);
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 0.85rem;
-  transition: all 0.2s;
-}
-.preset-btn:hover { border-color: var(--accent); background: var(--card-hover); }
-.preset-btn.active { border-color: var(--accent); background: var(--accent); color: #fff; }
-
 /* Layout */
 .grid {
   display: grid;
   grid-template-columns: 380px 1fr;
   gap: 24px;
   align-items: start;
+  margin-top: 24px;
 }
 @media (max-width: 900px) {
   .grid { grid-template-columns: 1fr; }
@@ -155,7 +135,6 @@ header p { color: var(--text-dim); font-size: 0.95rem; }
 .summary-card.blue .value { color: var(--accent); }
 .summary-card.purple .value { color: var(--purple); }
 .summary-card.orange .value { color: var(--orange); }
-.summary-card.yellow .value { color: var(--yellow); }
 
 /* Tax breakdown */
 .breakdown {
@@ -182,225 +161,124 @@ header p { color: var(--text-dim); font-size: 0.95rem; }
 .breakdown-row .pos { color: var(--green); }
 
 /* Table */
-.table-wrap {
-  overflow-x: auto;
-  margin-top: 16px;
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.8rem;
-}
+.table-wrap { overflow-x: auto; margin-top: 16px; }
+table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
 th {
-  text-align: left;
-  padding: 10px 12px;
-  background: var(--bg);
-  color: var(--text-dim);
-  font-weight: 600;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border-bottom: 1px solid var(--border);
-  white-space: nowrap;
+  text-align: left; padding: 10px 12px; background: var(--bg);
+  color: var(--text-dim); font-weight: 600; font-size: 0.75rem;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border); white-space: nowrap;
 }
-td {
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--border);
-  white-space: nowrap;
-}
+td { padding: 10px 12px; border-bottom: 1px solid var(--border); white-space: nowrap; }
 tr:hover td { background: rgba(59,130,246,0.05); }
 .num-pos { color: var(--green); }
 .num-neg { color: var(--red); }
 
 /* Chart */
-.chart-container {
-  position: relative;
-  height: 350px;
-  margin: 20px 0;
-}
+.chart-container { position: relative; height: 350px; margin: 20px 0; }
 
 /* Export */
-.export-bar {
-  display: flex;
-  gap: 10px;
-  margin-top: 16px;
-  flex-wrap: wrap;
-}
+.export-bar { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
 .export-btn {
-  padding: 8px 20px;
-  background: var(--accent);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.85rem;
-  transition: background 0.2s;
+  padding: 8px 20px; background: var(--accent); color: #fff; border: none;
+  border-radius: 8px; cursor: pointer; font-size: 0.85rem; transition: background 0.2s;
 }
 .export-btn:hover { background: var(--accent-hover); }
-.export-btn.secondary {
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text);
-}
+.export-btn.secondary { background: transparent; border: 1px solid var(--border); color: var(--text); }
 .export-btn.secondary:hover { background: var(--card-hover); }
 
 /* Monthly flow */
-.flow-bar {
-  display: flex;
-  height: 24px;
-  border-radius: 6px;
-  overflow: hidden;
-  margin: 8px 0;
-}
+.flow-bar { display: flex; height: 24px; border-radius: 6px; overflow: hidden; margin: 8px 0; }
 .flow-segment {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.65rem;
-  font-weight: 600;
-  color: #fff;
-  min-width: 20px;
-  transition: width 0.3s;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.65rem; font-weight: 600; color: #fff; min-width: 20px; transition: width 0.3s;
 }
 
 /* Tabs */
-.tabs {
-  display: flex;
-  gap: 0;
-  margin-bottom: 16px;
-  border-bottom: 1px solid var(--border);
-}
+.tabs { display: flex; gap: 0; margin-bottom: 16px; border-bottom: 1px solid var(--border); }
 .tab {
-  padding: 8px 20px;
-  background: none;
-  border: none;
-  color: var(--text-dim);
-  cursor: pointer;
-  font-size: 0.85rem;
-  border-bottom: 2px solid transparent;
-  transition: all 0.2s;
+  padding: 8px 20px; background: none; border: none; color: var(--text-dim);
+  cursor: pointer; font-size: 0.85rem; border-bottom: 2px solid transparent; transition: all 0.2s;
 }
-.tab.active {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
-}
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
 .tab-content { display: none; }
 .tab-content.active { display: block; }
 
-/* Collapsible sections */
-.collapse-header {
-  cursor: pointer;
-  user-select: none;
-}
-.collapse-header::after {
-  content: ' ▾';
-  font-size: 0.7rem;
+.pension-note {
+  background: rgba(234,179,8,0.1); border: 1px solid rgba(234,179,8,0.3);
+  border-radius: 8px; padding: 10px 12px; font-size: 0.78rem; color: var(--yellow); margin-bottom: 14px;
 }
 
-/* Print styles */
+.input-group { position: relative; }
+.input-group .prefix {
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  color: var(--text-dim); font-size: 0.85rem; pointer-events: none;
+}
+.input-group input { padding-left: 24px; }
+.divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+.fi-banner {
+  background: linear-gradient(135deg, rgba(34,197,94,0.15), rgba(59,130,246,0.15));
+  border: 1px solid rgba(34,197,94,0.3); border-radius: var(--radius);
+  padding: 20px; text-align: center; margin-bottom: 20px;
+}
+.fi-banner .big {
+  font-size: 2rem; font-weight: 800;
+  background: linear-gradient(135deg, var(--green), var(--accent));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.fi-banner .desc { color: var(--text-dim); font-size: 0.85rem; margin-top: 4px; }
+
+.priority-note {
+  background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.3);
+  border-radius: 8px; padding: 10px 12px; font-size: 0.78rem; color: var(--accent); margin-bottom: 14px;
+}
+
 @media print {
   body { background: #fff; color: #000; }
   .card { border-color: #ddd; background: #fff; }
   .summary-card { background: #f5f5f5; border-color: #ddd; }
   .breakdown { background: #f5f5f5; }
-  .preset-btn, .export-bar, .toggle-btn { display: none; }
+  .export-bar, .toggle-btn { display: none; }
   header { padding: 10px; }
   .grid { display: block; }
   .sidebar { display: none; }
   .summary-card .value { color: #000 !important; }
   .chart-container { height: 250px; }
 }
-
-.pension-note {
-  background: rgba(234,179,8,0.1);
-  border: 1px solid rgba(234,179,8,0.3);
-  border-radius: 8px;
-  padding: 10px 12px;
-  font-size: 0.78rem;
-  color: var(--yellow);
-  margin-bottom: 14px;
-}
-
-.input-group {
-  position: relative;
-}
-.input-group .prefix {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--text-dim);
-  font-size: 0.85rem;
-  pointer-events: none;
-}
-.input-group input {
-  padding-left: 24px;
-}
-
-.divider {
-  border: none;
-  border-top: 1px solid var(--border);
-  margin: 16px 0;
-}
-
-.fi-banner {
-  background: linear-gradient(135deg, rgba(34,197,94,0.15), rgba(59,130,246,0.15));
-  border: 1px solid rgba(34,197,94,0.3);
-  border-radius: var(--radius);
-  padding: 20px;
-  text-align: center;
-  margin-bottom: 20px;
-}
-.fi-banner .big {
-  font-size: 2rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, var(--green), var(--accent));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-.fi-banner .desc { color: var(--text-dim); font-size: 0.85rem; margin-top: 4px; }
 </style>
 </head>
 <body>
 
 <header>
   <h1>🇬🇧 UK Financial Planner</h1>
-  <p>英国财务自由计算器 · Tax, Pension, ISA, Covered Call 综合规划</p>
+  <p>Tax, Pension, ISA & Investment Projection Calculator</p>
 </header>
 
 <div class="container">
-  <!-- Presets -->
-  <div class="presets">
-    <button class="preset-btn" onclick="applyPreset('planA')">Plan A: Pension £25k</button>
-    <button class="preset-btn" onclick="applyPreset('planB')">Plan B: Pension £50k (3yr)</button>
-    <button class="preset-btn" onclick="applyPreset('maxGrowth')">Max Growth (No Pension)</button>
-    <button class="preset-btn" onclick="applyPreset('conservative')">Conservative</button>
-    <button class="preset-btn active" onclick="applyPreset('custom')">Custom</button>
-  </div>
-
   <div class="grid">
     <!-- LEFT: Inputs -->
     <div class="sidebar">
 
       <!-- Income -->
       <div class="card">
-        <h2><span class="icon">💰</span> Income 收入</h2>
+        <h2><span class="icon">💰</span> Income</h2>
         <div class="field">
-          <label>Your Gross Salary 你的税前年薪 (£)</label>
+          <label>Your Gross Salary (£/year)</label>
           <div class="input-group">
             <span class="prefix">£</span>
-            <input type="number" id="salary1" value="150000" oninput="calculate()">
+            <input type="number" id="salary1" placeholder="e.g. 60000" oninput="calculate()">
           </div>
         </div>
         <div class="field">
-          <label>Partner Gross Salary 伴侣税前年薪 (£)</label>
+          <label>Partner Gross Salary (£/year, 0 if single)</label>
           <div class="input-group">
             <span class="prefix">£</span>
-            <input type="number" id="salary2" value="85000" oninput="calculate()">
+            <input type="number" id="salary2" value="0" oninput="calculate()">
           </div>
         </div>
         <div class="field">
-          <label>Student Loan Plan 学贷计划</label>
+          <label>Student Loan Plan</label>
           <select id="studentLoan" onchange="calculate()">
             <option value="none">None</option>
             <option value="plan1">Plan 1 (9% above £24,990)</option>
@@ -413,136 +291,139 @@ tr:hover td { background: rgba(59,130,246,0.05); }
 
       <!-- Pension -->
       <div class="card">
-        <h2><span class="icon">🏦</span> Pension 养老金</h2>
+        <h2><span class="icon">🏦</span> Pension</h2>
         <div class="toggle-row">
-          <button class="toggle-btn active" id="penTypeSS" onclick="setPensionType('sacrifice')">Salary Sacrifice</button>
+          <button class="toggle-btn" id="penTypeSS" onclick="setPensionType('sacrifice')">Salary Sacrifice</button>
           <button class="toggle-btn" id="penTypeSIPP" onclick="setPensionType('sipp')">SIPP</button>
-          <button class="toggle-btn" id="penTypeNone" onclick="setPensionType('none')">None</button>
+          <button class="toggle-btn active" id="penTypeNone" onclick="setPensionType('none')">None</button>
         </div>
-        <div id="pensionFields">
+        <div id="pensionFields" style="display:none;">
           <div class="field">
-            <label>Annual Pension Contribution 年养老金 (£)</label>
+            <label>Annual Pension Contribution (£)</label>
             <div class="input-group">
               <span class="prefix">£</span>
-              <input type="number" id="pensionAmount" value="50000" oninput="calculate()">
+              <input type="number" id="pensionAmount" placeholder="e.g. 25000" oninput="calculate()">
             </div>
-            <div class="hint">Max £60k/year (or 100% of salary). £50k brings £150k salary to £100k, restoring PA.</div>
+            <div class="hint">Max £60k/year (or 100% of salary). Salary sacrifice above £100k restores Personal Allowance.</div>
           </div>
           <div class="field">
-            <label>Contribute for how many years? 交几年</label>
-            <input type="number" id="pensionYears" value="3" min="1" max="40" oninput="calculate()">
-            <div class="hint">After this, pension grows untouched until 55.</div>
+            <label>Contribute for how many years?</label>
+            <input type="number" id="pensionYears" value="5" min="1" max="40" oninput="calculate()">
+            <div class="hint">After this period, pension grows untouched until 55.</div>
           </div>
           <div class="field">
-            <label>Pension Growth Rate 养老金增长率 (%)</label>
+            <label>Pension Growth Rate (%)</label>
             <input type="number" id="pensionGrowth" value="10" step="0.5" oninput="calculate()">
           </div>
         </div>
-        <div class="pension-note" id="pensionNote"></div>
+        <div class="pension-note" id="pensionNote">No pension contribution configured.</div>
       </div>
 
       <!-- Expenses -->
       <div class="card">
-        <h2><span class="icon">🏠</span> Monthly Expenses 月度开销</h2>
+        <h2><span class="icon">🏠</span> Monthly Expenses</h2>
         <div class="field">
-          <label>Rent / Mortgage 房租/房贷 (£/月)</label>
+          <label>Rent / Mortgage (£/month)</label>
           <div class="input-group"><span class="prefix">£</span>
-            <input type="number" id="expRent" value="3085" oninput="calculate()">
+            <input type="number" id="expRent" placeholder="e.g. 1500" oninput="calculate()">
           </div>
         </div>
         <div class="field">
-          <label>Car / Transport 车贷/交通 (£/月)</label>
+          <label>Car / Transport (£/month)</label>
           <div class="input-group"><span class="prefix">£</span>
-            <input type="number" id="expCar" value="750" oninput="calculate()">
+            <input type="number" id="expCar" placeholder="e.g. 300" oninput="calculate()">
           </div>
         </div>
         <div class="field">
-          <label>Food / Groceries 伙食 (£/月)</label>
+          <label>Food / Groceries (£/month)</label>
           <div class="input-group"><span class="prefix">£</span>
-            <input type="number" id="expFood" value="800" oninput="calculate()">
+            <input type="number" id="expFood" placeholder="e.g. 500" oninput="calculate()">
           </div>
         </div>
         <div class="field">
-          <label>Subscriptions / Bills 订阅/账单 (£/月)</label>
+          <label>Subscriptions / Bills (£/month)</label>
           <div class="input-group"><span class="prefix">£</span>
-            <input type="number" id="expSubs" value="450" oninput="calculate()">
+            <input type="number" id="expSubs" placeholder="e.g. 200" oninput="calculate()">
           </div>
         </div>
         <div class="field">
-          <label>Other / Buffer 其他/预留 (£/月)</label>
+          <label>Other / Buffer (£/month)</label>
           <div class="input-group"><span class="prefix">£</span>
-            <input type="number" id="expOther" value="300" oninput="calculate()">
+            <input type="number" id="expOther" placeholder="e.g. 300" oninput="calculate()">
           </div>
         </div>
         <div class="field">
-          <label>Who pays? 谁出</label>
+          <label>Who pays expenses?</label>
           <select id="expWho" onchange="calculate()">
-            <option value="you">You only 你全出</option>
-            <option value="split">Split equally 对半分</option>
-            <option value="partner">Partner only 伴侣全出</option>
+            <option value="you">You only</option>
+            <option value="split">Split equally</option>
+            <option value="partner">Partner only</option>
           </select>
         </div>
       </div>
 
       <!-- Investments -->
       <div class="card">
-        <h2><span class="icon">📈</span> Investments 投资</h2>
+        <h2><span class="icon">📈</span> Investments</h2>
+        <div class="priority-note">💡 ISA is the #1 priority — tax-free growth, max £20k/yr per person. Fill ISA first before other investments.</div>
         <div class="field-row">
           <div class="field">
-            <label>Your ISA (£/yr)</label>
+            <label>Your ISA (£/year)</label>
             <div class="input-group"><span class="prefix">£</span>
-              <input type="number" id="isa1" value="12000" max="20000" oninput="calculate()">
+              <input type="number" id="isa1" placeholder="e.g. 20000" max="20000" oninput="calculate()">
             </div>
             <div class="hint">Max £20k/yr</div>
           </div>
           <div class="field">
-            <label>Partner ISA (£/yr)</label>
+            <label>Partner ISA (£/year)</label>
             <div class="input-group"><span class="prefix">£</span>
-              <input type="number" id="isa2" value="20000" max="20000" oninput="calculate()">
+              <input type="number" id="isa2" value="0" max="20000" oninput="calculate()">
             </div>
           </div>
         </div>
         <div class="field">
-          <label>ISA Growth Rate SP500 增长 (%)</label>
+          <label>ISA Growth Rate (%)</label>
           <input type="number" id="isaGrowth" value="10" step="0.5" oninput="calculate()">
+          <div class="hint">S&P 500 historical average ~10%</div>
         </div>
         <hr class="divider">
         <div class="field">
-          <label>Covered Call / IBKR 月投入 (£/月)</label>
+          <label>General Investing / IBKR (£/month)</label>
           <div class="input-group"><span class="prefix">£</span>
-            <input type="number" id="ccMonthly" value="2000" oninput="calculate()">
+            <input type="number" id="ccMonthly" value="0" oninput="calculate()">
           </div>
+          <div class="hint">Taxable account — for covered calls, individual stocks, etc.</div>
         </div>
         <div class="field">
-          <label>CC Gross Premium Yield CC 总收益率 (%)</label>
-          <input type="number" id="ccYield" value="15" step="0.5" oninput="calculate()">
+          <label>Expected Gross Return (%)</label>
+          <input type="number" id="ccYield" value="12" step="0.5" oninput="calculate()">
         </div>
         <hr class="divider">
         <div class="field">
-          <label>Cash Savings 现金储蓄 (£/月)</label>
+          <label>Cash Savings (£/month)</label>
           <div class="input-group"><span class="prefix">£</span>
-            <input type="number" id="cashMonthly" value="1000" oninput="calculate()">
+            <input type="number" id="cashMonthly" value="0" oninput="calculate()">
           </div>
         </div>
         <div class="field">
-          <label>Cash Interest Rate 现金利率 (%)</label>
+          <label>Cash Interest Rate (%)</label>
           <input type="number" id="cashRate" value="4" step="0.5" oninput="calculate()">
         </div>
         <hr class="divider">
         <div class="field">
-          <label>Projection Years 预测年数</label>
+          <label>Projection Years</label>
           <input type="number" id="projYears" value="10" min="1" max="40" oninput="calculate()">
         </div>
         <div class="field">
-          <label>Your Current Age 你的年龄</label>
-          <input type="number" id="currentAge" value="28" min="18" max="60" oninput="calculate()">
+          <label>Your Current Age</label>
+          <input type="number" id="currentAge" value="30" min="18" max="60" oninput="calculate()">
         </div>
         <div class="field">
-          <label>Existing Investments 现有投资 (£)</label>
+          <label>Existing Investments (£)</label>
           <div class="input-group"><span class="prefix">£</span>
-            <input type="number" id="existingInv" value="24000" oninput="calculate()">
+            <input type="number" id="existingInv" value="0" oninput="calculate()">
           </div>
-          <div class="hint">Trading 212, IBKR etc. — treated as CC bucket</div>
+          <div class="hint">Current portfolio value — counted in taxable bucket</div>
         </div>
       </div>
 
@@ -553,29 +434,29 @@ tr:hover td { background: rgba(59,130,246,0.05); }
 
       <!-- FI Banner -->
       <div class="fi-banner" id="fiBanner">
-        <div class="big" id="fiTotal">—</div>
-        <div class="desc" id="fiDesc">Total assets after projection period</div>
+        <div class="big" id="fiTotal">£0</div>
+        <div class="desc" id="fiDesc">Enter your income and expenses to see projections</div>
       </div>
 
       <!-- Summary cards -->
       <div class="summary-grid">
         <div class="summary-card blue">
-          <div class="label">Monthly Take-Home 月到手</div>
+          <div class="label">Monthly Take-Home</div>
           <div class="value" id="sumTakeHome">—</div>
           <div class="sub" id="sumTakeHomeSub"></div>
         </div>
         <div class="summary-card orange">
-          <div class="label">Monthly Expenses 月开销</div>
+          <div class="label">Monthly Expenses</div>
           <div class="value" id="sumExpenses">—</div>
           <div class="sub" id="sumExpensesSub"></div>
         </div>
         <div class="summary-card green">
-          <div class="label">Monthly Investable 月可投</div>
+          <div class="label">Monthly Investable</div>
           <div class="value" id="sumInvestable">—</div>
           <div class="sub" id="sumInvestableSub"></div>
         </div>
         <div class="summary-card purple">
-          <div class="label">Passive Income 被动收入/月</div>
+          <div class="label">Passive Income /mo</div>
           <div class="value" id="sumPassive">—</div>
           <div class="sub" id="sumPassiveSub"></div>
         </div>
@@ -583,14 +464,14 @@ tr:hover td { background: rgba(59,130,246,0.05); }
 
       <!-- Tax Breakdown -->
       <div class="card">
-        <h2><span class="icon">📋</span> Tax Breakdown 税务明细</h2>
+        <h2><span class="icon">📋</span> Tax Breakdown</h2>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
           <div class="breakdown">
-            <h3>You 你</h3>
+            <h3>You</h3>
             <div id="taxBreakdown1"></div>
           </div>
           <div class="breakdown">
-            <h3>Partner 伴侣</h3>
+            <h3>Partner</h3>
             <div id="taxBreakdown2"></div>
           </div>
         </div>
@@ -598,10 +479,9 @@ tr:hover td { background: rgba(59,130,246,0.05); }
 
       <!-- Monthly Flow -->
       <div class="card">
-        <h2><span class="icon">💸</span> Monthly Cash Flow 每月现金流</h2>
+        <h2><span class="icon">💸</span> Monthly Cash Flow</h2>
         <div class="flow-bar" id="flowBar"></div>
         <div id="flowLegend" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:8px;font-size:0.75rem;"></div>
-        <div id="flowDetails" style="margin-top:12px;"></div>
       </div>
 
       <!-- Tabs: Chart / Table -->
@@ -643,50 +523,51 @@ tr:hover td { background: rgba(59,130,246,0.05); }
 </div>
 
 <script>
-// ========== UK TAX CALCULATOR ==========
+// ========== UK TAX CALCULATOR (2025/26 rates) ==========
 
 function calcUKTax(gross, pensionContrib, pensionType, studentLoan) {
+  if (!gross || gross <= 0) return {
+    gross: 0, taxableGross: 0, pa: 12570, tax: 0, ni: 0, sl: 0,
+    pensionContrib: 0, pensionType, pensionFromNet: 0, hmrcRefund: 0,
+    takeHome: 0, effectiveRate: '0.0', monthlyTakeHome: 0, taxBands: []
+  };
+
   let taxableGross = gross;
   let niGross = gross;
-  let pensionFromNet = 0; // how much you physically pay from take-home (SIPP)
-  let hmrcRefund = 0; // SA refund for SIPP higher rate
+  let pensionFromNet = 0;
+  let hmrcRefund = 0;
 
   if (pensionType === 'sacrifice') {
     taxableGross = gross - pensionContrib;
     niGross = gross - pensionContrib;
   }
 
-  // Adjusted net income (for PA calculation)
   let adjustedNetIncome = taxableGross;
   if (pensionType === 'sipp') {
-    adjustedNetIncome = gross - pensionContrib; // SIPP reduces adjusted net income
+    adjustedNetIncome = gross - pensionContrib;
   }
 
-  // Personal Allowance
+  // Personal Allowance (tapers above £100k)
   let pa = 12570;
   if (adjustedNetIncome > 100000) {
     pa = Math.max(0, 12570 - Math.floor((adjustedNetIncome - 100000) / 2));
   }
 
-  // Income Tax (on taxableGross)
+  // Income Tax
   let tax = 0;
   let taxBands = [];
   let remaining = Math.max(0, taxableGross - pa);
 
-  // Basic: 20% up to 37,700
   let basic = Math.min(remaining, 37700);
   tax += basic * 0.20;
   taxBands.push({ name: 'Basic (20%)', amount: basic, tax: basic * 0.20 });
   remaining -= basic;
 
-  // Higher: 40% up to 125,140 (so 125140 - 12570 - 37700 = 74870)
-  // Actually: higher band = 50271 to 125140 = 74870 of taxable
   let higher = Math.min(remaining, 74870);
   tax += higher * 0.40;
   taxBands.push({ name: 'Higher (40%)', amount: higher, tax: higher * 0.40 });
   remaining -= higher;
 
-  // Additional: 45% above 125,140
   if (remaining > 0) {
     tax += remaining * 0.45;
     taxBands.push({ name: 'Additional (45%)', amount: remaining, tax: remaining * 0.45 });
@@ -695,7 +576,7 @@ function calcUKTax(gross, pensionContrib, pensionType, studentLoan) {
   // National Insurance
   let ni = 0;
   if (niGross > 12570) {
-    let niBand1 = Math.min(niGross - 12570, 50270 - 12570); // 37700
+    let niBand1 = Math.min(niGross - 12570, 50270 - 12570);
     ni += niBand1 * 0.08;
     if (niGross > 50270) {
       ni += (niGross - 50270) * 0.02;
@@ -711,60 +592,11 @@ function calcUKTax(gross, pensionContrib, pensionType, studentLoan) {
 
   // SIPP handling
   if (pensionType === 'sipp') {
-    // You pay 80% of contribution from net income (provider claims 20%)
     pensionFromNet = pensionContrib * 0.80;
-
-    // Calculate tax WITHOUT pension (for refund calculation)
-    let taxWithout = calcTaxOnly(gross, gross); // no pension adjustment
-    let taxWith = tax; // already calculated with SIPP PA adjustment
-
-    // Wait, SIPP doesn't change PAYE tax directly. The PA change + higher rate relief
-    // comes through Self Assessment. Let me recalculate:
-    // Under PAYE: employer uses whatever tax code HMRC gives. With SIPP, if you notify HMRC,
-    // they can adjust your tax code. But typically you claim via SA.
-
-    // For modeling: tax is calculated on gross income, but adjusted PA from SIPP.
-    // The difference between "no pension" tax and "with pension adjusted PA" tax = the SA refund.
-    // But we also need higher rate relief on the SIPP contribution itself.
-
-    // Actually, let me simplify:
-    // 1. PAYE deducts: income tax (based on standard PA for gross, so effectively PA = 0 for £150k)
-    //    + NI + student loan
-    // 2. You pay SIPP provider 80% of contribution
-    // 3. SIPP provider claims 20% from HMRC (basic rate relief)
-    // 4. Via SA, you claim: (a) higher rate relief on pension contribution
-    //    + (b) PA restoration if adjusted net income < £125,140
-    //
-    // The model should calculate final annual take-home as:
-    // gross - income_tax_at_PAYE - NI - SL - SIPP_net_payment + SA_refund
-
-    // Recalculate tax without any pension consideration (what PAYE actually deducts)
-    // Then SA refund = what you'd get back
-    let payeTax = calcTaxOnly(gross, gross); // PA taper based on gross
-    let payeNI = ni; // NI not affected by SIPP
-
-    // Tax you SHOULD pay (with SIPP adjusting PA)
-    let correctTax = tax; // already calculated above with adjusted PA
-
-    // Higher rate relief on contribution
-    // The portion of contribution in higher rate band
-    let higherRateRelief = 0;
-    // Basic rate relief already handled by provider (20%)
-    // You need relief for 40% and 45% portions
-
-    // Marginal rate on pension contribution
-    // Contribution reduces income from gross down to (gross - pensionContrib)
-    // The bands crossed determine the relief rate
-    let topIncome = gross;
-    let bottomIncome = gross - pensionContrib;
-
-    // Calculate tax saved by pension contribution
     let taxAtGross = calcTaxOnly(gross, gross);
     let taxAtReduced = calcTaxOnly(gross, adjustedNetIncome);
     hmrcRefund = taxAtGross - taxAtReduced;
-
-    // For take-home: use PAYE tax (what's actually deducted monthly)
-    tax = payeTax;
+    tax = calcTaxOnly(gross, gross); // PAYE deducts based on gross
   }
 
   let takeHome = gross - tax - ni - sl;
@@ -775,30 +607,23 @@ function calcUKTax(gross, pensionContrib, pensionType, studentLoan) {
     takeHome = gross - tax - ni - sl - pensionFromNet + hmrcRefund;
   }
 
-  // Effective tax rate
   let totalDeductions = gross - takeHome;
   if (pensionType === 'sacrifice') totalDeductions = tax + ni + sl;
   if (pensionType === 'sipp') totalDeductions = tax + ni + sl + pensionFromNet - hmrcRefund;
 
   return {
-    gross,
-    taxableGross,
-    pa,
-    tax: Math.round(tax),
-    ni: Math.round(ni),
-    sl: Math.round(sl),
-    pensionContrib,
-    pensionType,
+    gross, taxableGross, pa,
+    tax: Math.round(tax), ni: Math.round(ni), sl: Math.round(sl),
+    pensionContrib, pensionType,
     pensionFromNet: Math.round(pensionFromNet),
     hmrcRefund: Math.round(hmrcRefund),
     takeHome: Math.round(takeHome),
-    effectiveRate: ((totalDeductions / gross) * 100).toFixed(1),
+    effectiveRate: gross > 0 ? ((totalDeductions / gross) * 100).toFixed(1) : '0.0',
     monthlyTakeHome: Math.round(takeHome / 12),
     taxBands
   };
 }
 
-// Helper: calculate just income tax given gross and adjusted net income (for PA)
 function calcTaxOnly(gross, adjustedNetIncome) {
   let pa = 12570;
   if (adjustedNetIncome > 100000) {
@@ -816,25 +641,6 @@ function calcTaxOnly(gross, adjustedNetIncome) {
   return tax;
 }
 
-// For salary sacrifice, calcTaxOnly needs to work on reduced gross
-function calcTaxOnlyFull(taxableGross, adjustedNetIncome) {
-  let pa = 12570;
-  if (adjustedNetIncome > 100000) {
-    pa = Math.max(0, 12570 - Math.floor((adjustedNetIncome - 100000) / 2));
-  }
-  let remaining = Math.max(0, taxableGross - pa);
-  let tax = 0;
-  let basic = Math.min(remaining, 37700);
-  tax += basic * 0.20;
-  remaining -= basic;
-  let higher = Math.min(remaining, 74870);
-  tax += higher * 0.40;
-  remaining -= higher;
-  if (remaining > 0) tax += remaining * 0.45;
-  return tax;
-}
-
-
 // ========== PROJECTION ENGINE ==========
 
 function runProjection(params) {
@@ -845,113 +651,84 @@ function runProjection(params) {
           existingInv, currentAge } = params;
 
   let years = [];
-  let pension = 0;
-  let isa = 0;
-  let cc = existingInv || 0;
-  let cash = 0;
+  let pension = 0, isa = 0, cc = existingInv || 0, cash = 0;
 
-  // Monthly take-home
   let yourMonthly = tax1.monthlyTakeHome;
   let partnerMonthly = tax2.monthlyTakeHome;
 
-  // Expenses
   let yourExpense = monthlyExpenses;
   if (expShare === 'split') yourExpense = monthlyExpenses / 2;
   if (expShare === 'partner') yourExpense = 0;
   let partnerExpense = monthlyExpenses - yourExpense;
 
-  // Monthly investable
   let yourInvestable = yourMonthly - yourExpense;
   let partnerInvestable = partnerMonthly - partnerExpense;
   let totalInvestable = yourInvestable + partnerInvestable;
 
-  // Monthly allocations
-  let isaMonthly = (isa1Annual + isa2Annual) / 12;
-  let totalMonthlyInv = isaMonthly + ccMonthly + cashMonthly;
-
-  // CGT on CC: 20% rate, £3000 annual exempt
   let cgtRate = 0.20;
   let cgtExempt = 3000;
 
   for (let y = 1; y <= projYears; y++) {
-    // Pension contribution this year
     let penThisYear = (y <= pensionYears && pensionType !== 'none') ? pensionContrib : 0;
 
-    // If pension stops, take-home changes
+    // Recalc take-home if pension stops
     let adjYourMonthly = yourMonthly;
     if (penThisYear === 0 && pensionType !== 'none' && y > pensionYears) {
-      // Recalculate take-home without pension
       let noPenTax = calcUKTax(tax1.gross, 0, 'none', document.getElementById('studentLoan').value);
       adjYourMonthly = noPenTax.monthlyTakeHome;
       yourInvestable = adjYourMonthly - yourExpense;
       totalInvestable = yourInvestable + partnerInvestable;
     }
 
-    // Annual contributions
     let isaContrib = isa1Annual + isa2Annual;
     let ccContrib = ccMonthly * 12;
     let cashContrib = cashMonthly * 12;
 
-    // Growth
     pension = (pension + penThisYear) * (1 + pensionGrowth / 100);
     isa = (isa + isaContrib) * (1 + isaGrowth / 100);
 
-    // CC: growth + premium income, minus CGT
     let ccGrossIncome = cc * (ccYield / 100);
     let ccTaxable = Math.max(0, ccGrossIncome - cgtExempt);
     let ccTax = ccTaxable * cgtRate;
     let ccNetIncome = ccGrossIncome - ccTax;
-    cc = cc + ccContrib + ccNetIncome; // reinvest net premium
+    cc = cc + ccContrib + ccNetIncome;
 
     cash = (cash + cashContrib) * (1 + cashRate / 100);
 
     let total = pension + isa + cc + cash;
     let usable = isa + cc + cash;
 
-    // Passive income at this point
     let passiveCCGross = cc * (ccYield / 100);
     let passiveCCTax = Math.max(0, passiveCCGross - cgtExempt) * cgtRate;
     let passiveCCNet = passiveCCGross - passiveCCTax;
     let passiveCash = cash * (cashRate / 100);
     let passiveTotal = passiveCCNet + passiveCash;
 
-    // Pension at 55
     let ageThen = currentAge + y;
     let yearsTo55 = Math.max(0, 55 - ageThen);
     let pensionAt55 = pension * Math.pow(1 + pensionGrowth / 100, yearsTo55);
 
     years.push({
-      year: y,
-      age: ageThen,
-      pensionContrib: penThisYear,
-      pension: Math.round(pension),
-      isa: Math.round(isa),
-      cc: Math.round(cc),
-      cash: Math.round(cash),
-      total: Math.round(total),
-      usable: Math.round(usable),
+      year: y, age: ageThen, pensionContrib: penThisYear,
+      pension: Math.round(pension), isa: Math.round(isa),
+      cc: Math.round(cc), cash: Math.round(cash),
+      total: Math.round(total), usable: Math.round(usable),
       passiveMonthly: Math.round(passiveTotal / 12),
       passiveAnnual: Math.round(passiveTotal),
       pensionAt55: Math.round(pensionAt55),
       totalInvestable: Math.round(totalInvestable),
-      isaContrib,
-      ccContrib,
-      cashContrib
+      isaContrib, ccContrib, cashContrib
     });
   }
-
   return years;
 }
-
 
 // ========== UI UPDATE ==========
 
 let chart = null;
 let lastProjection = null;
-let lastParams = null;
 
 function calculate() {
-  // Read inputs
   let salary1 = num('salary1');
   let salary2 = num('salary2');
   let sl = document.getElementById('studentLoan').value;
@@ -977,14 +754,11 @@ function calculate() {
   let existingInv = num('existingInv');
 
   let monthlyExpenses = expRent + expCar + expFood + expSubs + expOther;
-
   if (pensionType === 'none') pensionAmount = 0;
 
-  // Tax calculations
   let tax1 = calcUKTax(salary1, pensionAmount, pensionType, sl);
   let tax2 = calcUKTax(salary2, 0, 'none', 'none');
 
-  // Monthly take-home
   let yourExpense = monthlyExpenses;
   if (expWho === 'split') yourExpense = monthlyExpenses / 2;
   if (expWho === 'partner') yourExpense = 0;
@@ -994,36 +768,31 @@ function calculate() {
   let partnerInvestable = tax2.monthlyTakeHome - partnerExpense;
   let totalInvestable = yourInvestable + partnerInvestable;
 
-  // Update pension note
+  // Pension note
   let noteEl = document.getElementById('pensionNote');
   if (pensionType === 'sacrifice') {
-    noteEl.innerHTML = `Salary Sacrifice: 税前扣 £${fmt(pensionAmount)}/yr, PA ${tax1.pa > 0 ? '✅ restored £' + fmt(tax1.pa) : '❌ not restored'}. NI also reduced.`;
+    noteEl.innerHTML = `Salary Sacrifice: £${fmt(pensionAmount)}/yr pre-tax. PA ${tax1.pa > 0 ? '✅ restored to £' + fmt(tax1.pa) : '❌ tapered to £' + fmt(tax1.pa)}. NI also reduced.`;
   } else if (pensionType === 'sipp') {
-    noteEl.innerHTML = `SIPP: 你实付 £${fmt(tax1.pensionFromNet)}/yr (80%), provider claims 20%. SA refund ~£${fmt(tax1.hmrcRefund)}/yr. PA ${tax1.pa > 0 ? '✅ restored' : '❌ not restored'}.`;
+    noteEl.innerHTML = `SIPP: You pay £${fmt(tax1.pensionFromNet)}/yr (80%), provider claims 20%. SA refund ~£${fmt(tax1.hmrcRefund)}/yr.`;
   } else {
-    noteEl.innerHTML = 'No pension contribution.';
+    noteEl.innerHTML = 'No pension contribution configured.';
   }
 
-  // Update summary cards
+  // Summary
   document.getElementById('sumTakeHome').textContent = '£' + fmt(tax1.monthlyTakeHome + tax2.monthlyTakeHome);
-  document.getElementById('sumTakeHomeSub').textContent = `You £${fmt(tax1.monthlyTakeHome)} + Partner £${fmt(tax2.monthlyTakeHome)}`;
+  document.getElementById('sumTakeHomeSub').textContent = `You £${fmt(tax1.monthlyTakeHome)}` + (salary2 > 0 ? ` + Partner £${fmt(tax2.monthlyTakeHome)}` : '');
   document.getElementById('sumExpenses').textContent = '£' + fmt(monthlyExpenses);
   document.getElementById('sumExpensesSub').textContent = expWho === 'you' ? 'You pay all' : expWho === 'split' ? 'Split equally' : 'Partner pays all';
   document.getElementById('sumInvestable').textContent = '£' + fmt(totalInvestable);
-  document.getElementById('sumInvestableSub').textContent = `You £${fmt(yourInvestable)} + Partner £${fmt(partnerInvestable)}`;
+  document.getElementById('sumInvestableSub').textContent = salary2 > 0 ? `You £${fmt(yourInvestable)} + Partner £${fmt(partnerInvestable)}` : '';
 
-  // Check if investable covers allocations
-  let monthlyAllocTotal = isa1/12 + isa2/12 + ccMonthly + cashMonthly;
-  let surplus = totalInvestable - monthlyAllocTotal;
-
-  // Tax breakdown
   renderTaxBreakdown('taxBreakdown1', tax1);
   renderTaxBreakdown('taxBreakdown2', tax2);
 
-  // Monthly flow bar
+  let monthlyAllocTotal = isa1/12 + isa2/12 + ccMonthly + cashMonthly;
+  let surplus = totalInvestable - monthlyAllocTotal;
   renderFlowBar(tax1, tax2, monthlyExpenses, expWho, isa1, isa2, ccMonthly, cashMonthly, pensionAmount, pensionType, surplus);
 
-  // Run projection
   let params = {
     tax1, tax2, monthlyExpenses, expShare: expWho,
     isa1Annual: isa1, isa2Annual: isa2, ccMonthly, cashMonthly,
@@ -1033,19 +802,16 @@ function calculate() {
   };
   let projection = runProjection(params);
   lastProjection = projection;
-  lastParams = params;
 
-  // FI banner
-  let final = projection[projection.length - 1];
-  document.getElementById('fiTotal').textContent = '£' + fmt(final.total);
-  document.getElementById('fiDesc').textContent =
-    `Total at age ${final.age} · Usable £${fmt(final.usable)} · Pension 🔒 £${fmt(final.pension)} · Passive £${fmt(final.passiveMonthly)}/mo`;
+  let final = projection.length > 0 ? projection[projection.length - 1] : null;
+  if (final) {
+    document.getElementById('fiTotal').textContent = '£' + fmt(final.total);
+    document.getElementById('fiDesc').textContent =
+      `Total at age ${final.age} · Usable £${fmt(final.usable)} · Pension 🔒 £${fmt(final.pension)} · Passive £${fmt(final.passiveMonthly)}/mo`;
+    document.getElementById('sumPassive').textContent = '£' + fmt(final.passiveMonthly);
+    document.getElementById('sumPassiveSub').textContent = `£${fmt(final.passiveAnnual)}/yr at year ${final.year}`;
+  }
 
-  // Passive income (final year)
-  document.getElementById('sumPassive').textContent = '£' + fmt(final.passiveMonthly);
-  document.getElementById('sumPassiveSub').textContent = `£${fmt(final.passiveAnnual)}/yr at year ${final.year}`;
-
-  // Render chart and table
   renderChart(projection);
   renderTable(projection);
   renderMonthlyActions(tax1, tax2, monthlyExpenses, expWho, isa1, isa2, ccMonthly, cashMonthly, pensionAmount, pensionType, pensionYears);
@@ -1053,9 +819,8 @@ function calculate() {
 
 function renderTaxBreakdown(elId, tax) {
   let el = document.getElementById(elId);
-  let rows = [
-    ['Gross Income', '£' + fmt(tax.gross), ''],
-  ];
+  if (!tax.gross) { el.innerHTML = '<div style="color:var(--text-dim);font-size:0.85rem;">No income entered</div>'; return; }
+  let rows = [['Gross Income', '£' + fmt(tax.gross), '']];
   if (tax.pensionType === 'sacrifice' && tax.pensionContrib > 0) {
     rows.push(['Salary Sacrifice', '-£' + fmt(tax.pensionContrib), 'neg']);
     rows.push(['Taxable Income', '£' + fmt(tax.taxableGross), '']);
@@ -1068,7 +833,7 @@ function renderTaxBreakdown(elId, tax) {
     rows.push(['SIPP Payment (80%)', '-£' + fmt(tax.pensionFromNet), 'neg']);
     rows.push(['SA Refund (est.)', '+£' + fmt(tax.hmrcRefund), 'pos']);
   }
-  rows.push(['TOTAL', null, 'total']); // separator
+  rows.push(['TOTAL', null, 'total']);
   rows.push(['Annual Take-Home', '£' + fmt(tax.takeHome), 'pos']);
   rows.push(['Monthly Take-Home', '£' + fmt(tax.monthlyTakeHome), 'pos']);
   rows.push(['Effective Tax Rate', tax.effectiveRate + '%', '']);
@@ -1084,24 +849,18 @@ function renderFlowBar(tax1, tax2, expenses, expWho, isa1, isa2, ccMonthly, cash
   if (totalIncome <= 0) return;
 
   let segments = [];
-  let yourExp = expenses;
-  if (expWho === 'split') yourExp = expenses / 2;
-  if (expWho === 'partner') yourExp = 0;
-
   segments.push({ label: 'Expenses', value: expenses, color: '#ef4444' });
-  if (pensionType !== 'none' && pensionType === 'sipp') {
-    segments.push({ label: 'SIPP', value: pensionAmount / 12, color: '#8b5cf6' });
-  }
+  if (pensionType === 'sipp') segments.push({ label: 'SIPP', value: pensionAmount / 12, color: '#8b5cf6' });
   segments.push({ label: 'ISA', value: (isa1 + isa2) / 12, color: '#3b82f6' });
-  segments.push({ label: 'CC/IBKR', value: ccMonthly, color: '#22c55e' });
-  segments.push({ label: 'Cash', value: cashMonthly, color: '#eab308' });
+  if (ccMonthly > 0) segments.push({ label: 'Investing', value: ccMonthly, color: '#22c55e' });
+  if (cashMonthly > 0) segments.push({ label: 'Cash', value: cashMonthly, color: '#eab308' });
   if (surplus > 0) segments.push({ label: 'Surplus', value: surplus, color: '#6b7280' });
   if (surplus < 0) segments.push({ label: 'Deficit!', value: -surplus, color: '#dc2626' });
 
   let total = segments.reduce((s, seg) => s + seg.value, 0);
+  if (total <= 0) return;
 
-  let bar = document.getElementById('flowBar');
-  bar.innerHTML = segments.map(seg => {
+  document.getElementById('flowBar').innerHTML = segments.map(seg => {
     let pct = (seg.value / total * 100);
     if (pct < 2) return '';
     return `<div class="flow-segment" style="width:${pct}%;background:${seg.color}" title="${seg.label}: £${fmt(Math.round(seg.value))}/mo">
@@ -1109,8 +868,7 @@ function renderFlowBar(tax1, tax2, expenses, expWho, isa1, isa2, ccMonthly, cash
     </div>`;
   }).join('');
 
-  let legend = document.getElementById('flowLegend');
-  legend.innerHTML = segments.map(seg =>
+  document.getElementById('flowLegend').innerHTML = segments.map(seg =>
     `<span style="display:flex;align-items:center;gap:4px;">
       <span style="width:10px;height:10px;border-radius:50%;background:${seg.color};display:inline-block;"></span>
       ${seg.label}: £${fmt(Math.round(seg.value))}/mo
@@ -1120,117 +878,47 @@ function renderFlowBar(tax1, tax2, expenses, expWho, isa1, isa2, ccMonthly, cash
 
 function renderChart(projection) {
   let ctx = document.getElementById('projChart').getContext('2d');
-
   if (chart) chart.destroy();
-
-  let labels = projection.map(y => `Y${y.year} (${y.age})`);
+  if (!projection.length) return;
 
   chart = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels,
+      labels: projection.map(y => `Y${y.year} (${y.age})`),
       datasets: [
-        {
-          label: 'Pension 🔒',
-          data: projection.map(y => y.pension),
-          backgroundColor: 'rgba(168,85,247,0.7)',
-          stack: 'stack',
-          order: 4
-        },
-        {
-          label: 'ISA (tax-free)',
-          data: projection.map(y => y.isa),
-          backgroundColor: 'rgba(59,130,246,0.7)',
-          stack: 'stack',
-          order: 3
-        },
-        {
-          label: 'Covered Call',
-          data: projection.map(y => y.cc),
-          backgroundColor: 'rgba(34,197,94,0.7)',
-          stack: 'stack',
-          order: 2
-        },
-        {
-          label: 'Cash',
-          data: projection.map(y => y.cash),
-          backgroundColor: 'rgba(234,179,8,0.7)',
-          stack: 'stack',
-          order: 1
-        },
-        {
-          label: 'Passive Income (£/yr)',
-          data: projection.map(y => y.passiveAnnual),
-          type: 'line',
-          borderColor: '#f97316',
-          backgroundColor: 'rgba(249,115,22,0.1)',
-          yAxisID: 'y1',
-          tension: 0.3,
-          pointRadius: 4,
-          order: 0
-        }
+        { label: 'Pension 🔒', data: projection.map(y => y.pension), backgroundColor: 'rgba(168,85,247,0.7)', stack: 'stack', order: 4 },
+        { label: 'ISA (tax-free)', data: projection.map(y => y.isa), backgroundColor: 'rgba(59,130,246,0.7)', stack: 'stack', order: 3 },
+        { label: 'Investing', data: projection.map(y => y.cc), backgroundColor: 'rgba(34,197,94,0.7)', stack: 'stack', order: 2 },
+        { label: 'Cash', data: projection.map(y => y.cash), backgroundColor: 'rgba(234,179,8,0.7)', stack: 'stack', order: 1 },
+        { label: 'Passive Income (£/yr)', data: projection.map(y => y.passiveAnnual), type: 'line', borderColor: '#f97316', backgroundColor: 'rgba(249,115,22,0.1)', yAxisID: 'y1', tension: 0.3, pointRadius: 4, order: 0 }
       ]
     },
     options: {
-      responsive: true,
-      maintainAspectRatio: false,
+      responsive: true, maintainAspectRatio: false,
       interaction: { mode: 'index', intersect: false },
       plugins: {
-        legend: {
-          labels: { color: '#94a3b8', font: { size: 11 } }
-        },
-        tooltip: {
-          callbacks: {
-            label: ctx => `${ctx.dataset.label}: £${ctx.parsed.y?.toLocaleString() || 0}`
-          }
-        }
+        legend: { labels: { color: '#94a3b8', font: { size: 11 } } },
+        tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: £${ctx.parsed.y?.toLocaleString() || 0}` } }
       },
       scales: {
-        x: {
-          ticks: { color: '#64748b' },
-          grid: { color: 'rgba(51,65,85,0.3)' }
-        },
-        y: {
-          stacked: true,
-          ticks: {
-            color: '#64748b',
-            callback: v => '£' + (v >= 1000 ? Math.round(v/1000) + 'k' : v)
-          },
-          grid: { color: 'rgba(51,65,85,0.3)' }
-        },
-        y1: {
-          position: 'right',
-          ticks: {
-            color: '#f97316',
-            callback: v => '£' + (v >= 1000 ? Math.round(v/1000) + 'k' : v)
-          },
-          grid: { display: false }
-        }
+        x: { ticks: { color: '#64748b' }, grid: { color: 'rgba(51,65,85,0.3)' } },
+        y: { stacked: true, ticks: { color: '#64748b', callback: v => '£' + (v >= 1000 ? Math.round(v/1000) + 'k' : v) }, grid: { color: 'rgba(51,65,85,0.3)' } },
+        y1: { position: 'right', ticks: { color: '#f97316', callback: v => '£' + (v >= 1000 ? Math.round(v/1000) + 'k' : v) }, grid: { display: false } }
       }
     }
   });
 }
 
 function renderTable(projection) {
-  let head = document.getElementById('projTableHead');
-  head.innerHTML = `<tr>
-    <th>Year</th><th>Age</th>
-    <th>Pension 🔒</th><th>ISA</th><th>CC/IBKR</th><th>Cash</th>
+  document.getElementById('projTableHead').innerHTML = `<tr>
+    <th>Year</th><th>Age</th><th>Pension 🔒</th><th>ISA</th><th>Investing</th><th>Cash</th>
     <th>Total</th><th>Usable</th><th>Passive £/mo</th><th>Pension @55</th>
   </tr>`;
-
-  let body = document.getElementById('projTableBody');
-  body.innerHTML = projection.map(y => `<tr>
-    <td>Y${y.year}</td>
-    <td>${y.age}</td>
-    <td>£${fmt(y.pension)}</td>
-    <td>£${fmt(y.isa)}</td>
-    <td>£${fmt(y.cc)}</td>
-    <td>£${fmt(y.cash)}</td>
-    <td><strong>£${fmt(y.total)}</strong></td>
-    <td class="num-pos">£${fmt(y.usable)}</td>
-    <td class="num-pos">£${fmt(y.passiveMonthly)}</td>
-    <td style="color:var(--purple)">£${fmt(y.pensionAt55)}</td>
+  document.getElementById('projTableBody').innerHTML = projection.map(y => `<tr>
+    <td>Y${y.year}</td><td>${y.age}</td>
+    <td>£${fmt(y.pension)}</td><td>£${fmt(y.isa)}</td><td>£${fmt(y.cc)}</td><td>£${fmt(y.cash)}</td>
+    <td><strong>£${fmt(y.total)}</strong></td><td class="num-pos">£${fmt(y.usable)}</td>
+    <td class="num-pos">£${fmt(y.passiveMonthly)}</td><td style="color:var(--purple)">£${fmt(y.pensionAt55)}</td>
   </tr>`).join('');
 }
 
@@ -1240,17 +928,14 @@ function renderMonthlyActions(tax1, tax2, expenses, expWho, isa1, isa2, ccMonthl
   if (expWho === 'split') yourExp = expenses / 2;
   if (expWho === 'partner') yourExp = 0;
 
-  let pensionMonthly = pensionAmount / 12;
-  let pensionMethod = pensionType === 'sacrifice' ? 'Auto-deducted from payslip 工资单自动扣' : pensionType === 'sipp' ? 'Transfer to SIPP provider' : 'N/A';
-
   let actions = [];
-  if (pensionType !== 'none') {
-    actions.push({ who: 'You', action: `Pension (${pensionType})`, amount: pensionMonthly, note: pensionMethod + ` (first ${pensionYears} yrs)`, color: 'var(--purple)' });
+  if (pensionType !== 'none' && pensionAmount > 0) {
+    actions.push({ who: 'You', action: `Pension (${pensionType})`, amount: pensionAmount / 12, note: pensionType === 'sacrifice' ? 'Auto-deducted from payslip' : 'Transfer to SIPP provider', color: 'var(--purple)' });
   }
-  actions.push({ who: 'You', action: 'Living expenses', amount: yourExp, note: '房租+车贷+伙食+杂费', color: 'var(--red)' });
-  if (isa1 > 0) actions.push({ who: 'You', action: 'ISA → S&P 500', amount: isa1/12, note: 'Standing order / manual', color: 'var(--accent)' });
-  if (isa2 > 0) actions.push({ who: 'Partner', action: 'ISA → S&P 500', amount: isa2/12, note: 'Standing order', color: 'var(--accent)' });
-  if (ccMonthly > 0) actions.push({ who: expWho === 'you' ? 'Partner' : 'You', action: 'Transfer to IBKR', amount: ccMonthly, note: 'Covered call capital', color: 'var(--green)' });
+  actions.push({ who: expWho === 'partner' ? 'Partner' : 'You', action: 'Living expenses', amount: yourExp, note: 'Rent + transport + food + bills', color: 'var(--red)' });
+  if (isa1 > 0) actions.push({ who: 'You', action: 'ISA ⭐', amount: isa1/12, note: 'Tax-free — #1 priority', color: 'var(--accent)' });
+  if (isa2 > 0) actions.push({ who: 'Partner', action: 'ISA ⭐', amount: isa2/12, note: 'Tax-free — #1 priority', color: 'var(--accent)' });
+  if (ccMonthly > 0) actions.push({ who: 'You', action: 'General investing', amount: ccMonthly, note: 'Taxable account', color: 'var(--green)' });
   if (cashMonthly > 0) actions.push({ who: 'Shared', action: 'Cash savings', amount: cashMonthly, note: 'Emergency fund / HYSA', color: 'var(--yellow)' });
 
   let totalOut = actions.reduce((s, a) => s + a.amount, 0);
@@ -1258,14 +943,11 @@ function renderMonthlyActions(tax1, tax2, expenses, expWho, isa1, isa2, ccMonthl
   let diff = totalIn - totalOut;
 
   el.innerHTML = `
-    <div style="margin-bottom:16px;">
-      <strong>Household Monthly Income:</strong> £${fmt(totalIn)}
-    </div>
+    <div style="margin-bottom:16px;"><strong>Household Monthly Income:</strong> £${fmt(totalIn)}</div>
     <table style="width:100%;font-size:0.85rem;">
       <tr style="color:var(--text-dim);"><th style="text-align:left;">Who</th><th style="text-align:left;">Action</th><th style="text-align:right;">Amount</th><th style="text-align:left;padding-left:12px;">Note</th></tr>
       ${actions.map(a => `<tr>
-        <td>${a.who}</td>
-        <td style="color:${a.color}">${a.action}</td>
+        <td>${a.who}</td><td style="color:${a.color}">${a.action}</td>
         <td style="text-align:right;">£${fmt(Math.round(a.amount))}</td>
         <td style="padding-left:12px;color:var(--text-dim);font-size:0.78rem;">${a.note}</td>
       </tr>`).join('')}
@@ -1275,165 +957,59 @@ function renderMonthlyActions(tax1, tax2, expenses, expWho, isa1, isa2, ccMonthl
         <td style="padding-left:12px;color:var(--text-dim);font-size:0.78rem;">${diff >= 0 ? 'Unallocated buffer' : 'Need to reduce allocation!'}</td>
       </tr>
     </table>
-
     <div style="margin-top:20px;padding:14px;background:var(--bg);border-radius:8px;border:1px solid var(--border);">
-      <strong>📅 Annual Actions 每年要做的事</strong>
+      <strong>📅 Annual Actions</strong>
       <ul style="margin-top:8px;padding-left:20px;font-size:0.82rem;color:var(--text-dim);">
-        <li><strong>April:</strong> New tax year — reset ISA allowance, confirm £20k × 2 used</li>
-        <li><strong>Monthly:</strong> IBKR — sell covered calls, roll at expiry</li>
-        <li><strong>Jan 31:</strong> Self-Assessment deadline${pensionType === 'sipp' ? ' — claim SIPP higher rate relief + PA restoration' : ' — report CC capital gains (CGT)'}</li>
+        <li><strong>April:</strong> New tax year — reset ISA allowance, use full £20k per person</li>
+        <li><strong>Jan 31:</strong> Self-Assessment deadline${pensionType === 'sipp' ? ' — claim SIPP higher rate relief' : ''}</li>
         <li><strong>Quarterly:</strong> Review portfolio allocation, rebalance if needed</li>
-        ${pensionType !== 'none' ? `<li><strong>Year ${pensionYears}:</strong> Stop pension contributions — take-home increases, redirect to CC/ISA</li>` : ''}
+        ${pensionType !== 'none' && pensionAmount > 0 ? `<li><strong>Year ${pensionYears}:</strong> Stop pension contributions — take-home increases, redirect to ISA/investing</li>` : ''}
       </ul>
-    </div>
-  `;
+    </div>`;
 }
-
-
-// ========== PRESETS ==========
-
-const presets = {
-  planA: {
-    name: 'Plan A',
-    salary1: 150000, salary2: 85000,
-    pensionType: 'sacrifice', pensionAmount: 25000, pensionYears: 5, pensionGrowth: 10,
-    expRent: 3085, expCar: 750, expFood: 800, expSubs: 450, expOther: 300, expWho: 'you',
-    isa1: 20000, isa2: 20000, isaGrowth: 10,
-    ccMonthly: 2500, ccYield: 15, cashMonthly: 500, cashRate: 4,
-    projYears: 10, currentAge: 28, existingInv: 24000, studentLoan: 'none'
-  },
-  planB: {
-    name: 'Plan B',
-    salary1: 150000, salary2: 85000,
-    pensionType: 'sacrifice', pensionAmount: 50000, pensionYears: 3, pensionGrowth: 10,
-    expRent: 3085, expCar: 750, expFood: 800, expSubs: 450, expOther: 300, expWho: 'you',
-    isa1: 20000, isa2: 20000, isaGrowth: 10,
-    ccMonthly: 1000, ccYield: 15, cashMonthly: 500, cashRate: 4,
-    projYears: 10, currentAge: 28, existingInv: 24000, studentLoan: 'none'
-  },
-  maxGrowth: {
-    name: 'Max Growth',
-    salary1: 150000, salary2: 85000,
-    pensionType: 'none', pensionAmount: 0, pensionYears: 0, pensionGrowth: 10,
-    expRent: 3085, expCar: 750, expFood: 800, expSubs: 450, expOther: 300, expWho: 'you',
-    isa1: 20000, isa2: 20000, isaGrowth: 10,
-    ccMonthly: 3000, ccYield: 15, cashMonthly: 500, cashRate: 4,
-    projYears: 10, currentAge: 28, existingInv: 24000, studentLoan: 'none'
-  },
-  conservative: {
-    name: 'Conservative',
-    salary1: 150000, salary2: 85000,
-    pensionType: 'sacrifice', pensionAmount: 50000, pensionYears: 5, pensionGrowth: 7,
-    expRent: 3085, expCar: 750, expFood: 800, expSubs: 450, expOther: 300, expWho: 'split',
-    isa1: 20000, isa2: 20000, isaGrowth: 7,
-    ccMonthly: 0, ccYield: 12, cashMonthly: 2000, cashRate: 4,
-    projYears: 10, currentAge: 28, existingInv: 24000, studentLoan: 'none'
-  }
-};
-
-function applyPreset(name) {
-  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
-  if (name === 'custom') { calculate(); return; }
-  let p = presets[name];
-  if (!p) return;
-
-  document.getElementById('salary1').value = p.salary1;
-  document.getElementById('salary2').value = p.salary2;
-  document.getElementById('studentLoan').value = p.studentLoan;
-  setPensionType(p.pensionType);
-  document.getElementById('pensionAmount').value = p.pensionAmount;
-  document.getElementById('pensionYears').value = p.pensionYears;
-  document.getElementById('pensionGrowth').value = p.pensionGrowth;
-  document.getElementById('expRent').value = p.expRent;
-  document.getElementById('expCar').value = p.expCar;
-  document.getElementById('expFood').value = p.expFood;
-  document.getElementById('expSubs').value = p.expSubs;
-  document.getElementById('expOther').value = p.expOther;
-  document.getElementById('expWho').value = p.expWho;
-  document.getElementById('isa1').value = p.isa1;
-  document.getElementById('isa2').value = p.isa2;
-  document.getElementById('isaGrowth').value = p.isaGrowth;
-  document.getElementById('ccMonthly').value = p.ccMonthly;
-  document.getElementById('ccYield').value = p.ccYield;
-  document.getElementById('cashMonthly').value = p.cashMonthly;
-  document.getElementById('cashRate').value = p.cashRate;
-  document.getElementById('projYears').value = p.projYears;
-  document.getElementById('currentAge').value = p.currentAge;
-  document.getElementById('existingInv').value = p.existingInv;
-
-  calculate();
-}
-
 
 // ========== EXPORT ==========
 
 function exportCSV() {
   if (!lastProjection) return;
-  let headers = ['Year', 'Age', 'Pension', 'ISA', 'CC/IBKR', 'Cash', 'Total', 'Usable', 'Passive £/mo', 'Passive £/yr', 'Pension @55'];
-  let rows = lastProjection.map(y => [
-    y.year, y.age, y.pension, y.isa, y.cc, y.cash, y.total, y.usable, y.passiveMonthly, y.passiveAnnual, y.pensionAt55
-  ]);
+  let headers = ['Year','Age','Pension','ISA','Investing','Cash','Total','Usable','Passive £/mo','Passive £/yr','Pension @55'];
+  let rows = lastProjection.map(y => [y.year,y.age,y.pension,y.isa,y.cc,y.cash,y.total,y.usable,y.passiveMonthly,y.passiveAnnual,y.pensionAt55]);
   let csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
   let blob = new Blob([csv], { type: 'text/csv' });
   let url = URL.createObjectURL(blob);
   let a = document.createElement('a');
-  a.href = url;
-  a.download = 'financial-plan.csv';
-  a.click();
+  a.href = url; a.download = 'financial-plan.csv'; a.click();
   URL.revokeObjectURL(url);
 }
 
 function copyShareLink() {
-  // Encode current settings into URL params
   let params = new URLSearchParams();
   let fields = ['salary1','salary2','studentLoan','pensionAmount','pensionYears','pensionGrowth',
     'expRent','expCar','expFood','expSubs','expOther','expWho',
     'isa1','isa2','isaGrowth','ccMonthly','ccYield','cashMonthly','cashRate',
     'projYears','currentAge','existingInv'];
-  fields.forEach(f => {
-    let el = document.getElementById(f);
-    params.set(f, el.value);
-  });
+  fields.forEach(f => params.set(f, document.getElementById(f).value));
   params.set('pensionType', getCurrentPensionType());
-
   let url = window.location.origin + window.location.pathname + '?' + params.toString();
-  navigator.clipboard.writeText(url).then(() => {
-    alert('Link copied to clipboard! 链接已复制');
-  }).catch(() => {
-    prompt('Copy this link:', url);
-  });
+  navigator.clipboard.writeText(url).then(() => alert('Link copied!')).catch(() => prompt('Copy this link:', url));
 }
 
 function loadFromURL() {
   let params = new URLSearchParams(window.location.search);
   if (params.size === 0) return false;
-
   let fields = ['salary1','salary2','studentLoan','pensionAmount','pensionYears','pensionGrowth',
     'expRent','expCar','expFood','expSubs','expOther','expWho',
     'isa1','isa2','isaGrowth','ccMonthly','ccYield','cashMonthly','cashRate',
     'projYears','currentAge','existingInv'];
-  fields.forEach(f => {
-    if (params.has(f)) {
-      document.getElementById(f).value = params.get(f);
-    }
-  });
-  if (params.has('pensionType')) {
-    setPensionType(params.get('pensionType'));
-  }
+  fields.forEach(f => { if (params.has(f)) document.getElementById(f).value = params.get(f); });
+  if (params.has('pensionType')) setPensionType(params.get('pensionType'));
   return true;
 }
 
-
 // ========== HELPERS ==========
 
-function num(id) {
-  return parseFloat(document.getElementById(id).value) || 0;
-}
-
-function fmt(n) {
-  return Math.round(n).toLocaleString('en-GB');
-}
+function num(id) { return parseFloat(document.getElementById(id).value) || 0; }
+function fmt(n) { return Math.round(n).toLocaleString('en-GB'); }
 
 function getCurrentPensionType() {
   if (document.getElementById('penTypeSS').classList.contains('active')) return 'sacrifice';
@@ -1456,17 +1032,14 @@ function switchTab(name) {
   document.getElementById('tab-' + name).classList.add('active');
 }
 
-
 // ========== INIT ==========
 window.addEventListener('DOMContentLoaded', () => {
   if (!loadFromURL()) {
-    // Default: Plan B
-    applyPreset('planB');
+    calculate(); // Start with empty/default values
   } else {
     calculate();
   }
 });
-
 </script>
 </body>
 </html>
