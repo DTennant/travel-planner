@@ -293,45 +293,95 @@ tr:hover td { background: rgba(59,130,246,0.05); }
       <div class="card">
         <h2><span class="icon">🏦</span> Pension</h2>
 
-        <!-- Salary Sacrifice -->
+        <!-- You: Salary Sacrifice -->
         <div class="field" style="margin-bottom:8px;">
           <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
-            <input type="checkbox" id="ssEnabled" onchange="calculate()" style="width:auto;">
-            <strong>Salary Sacrifice</strong> (via employer)
+            <input type="checkbox" id="ssEnabled1" onchange="calculate()" style="width:auto;">
+            <strong>Your Salary Sacrifice</strong>
           </label>
         </div>
-        <div id="ssFields" style="display:none;padding-left:8px;border-left:2px solid var(--accent);margin-bottom:14px;">
-          <div class="field">
-            <label>SS Amount (£/year)</label>
-            <div class="input-group"><span class="prefix">£</span>
-              <input type="number" id="ssAmount" placeholder="e.g. 25000" oninput="calculate()">
+        <div id="ssFields1" style="display:none;padding-left:8px;border-left:2px solid var(--accent);margin-bottom:14px;">
+          <div class="field-row">
+            <div class="field">
+              <label>Amount (£/yr)</label>
+              <div class="input-group"><span class="prefix">£</span>
+                <input type="number" id="ssAmount1" placeholder="e.g. 25000" oninput="calculate()">
+              </div>
             </div>
-            <div class="hint">Reduces gross for Income Tax + NI. Above £100k restores Personal Allowance.</div>
+            <div class="field">
+              <label>Years</label>
+              <input type="number" id="ssYears1" value="5" min="1" max="40" oninput="calculate()">
+            </div>
           </div>
-          <div class="field">
-            <label>SS for how many years?</label>
-            <input type="number" id="ssYears" value="5" min="1" max="40" oninput="calculate()">
+          <div class="hint">Reduces gross for Income Tax + NI. Above £100k restores Personal Allowance.</div>
+        </div>
+
+        <!-- You: SIPP -->
+        <div class="field" style="margin-bottom:8px;">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+            <input type="checkbox" id="sippEnabled1" onchange="calculate()" style="width:auto;">
+            <strong>Your SIPP</strong>
+          </label>
+        </div>
+        <div id="sippFields1" style="display:none;padding-left:8px;border-left:2px solid var(--purple);margin-bottom:14px;">
+          <div class="field-row">
+            <div class="field">
+              <label>Amount (£/yr)</label>
+              <div class="input-group"><span class="prefix">£</span>
+                <input type="number" id="sippAmount1" placeholder="e.g. 10000" oninput="calculate()">
+              </div>
+            </div>
+            <div class="field">
+              <label>Years</label>
+              <input type="number" id="sippYears1" value="5" min="1" max="40" oninput="calculate()">
+            </div>
+          </div>
+          <div class="hint">You pay 80%, provider claims 20%. Higher rate relief via SA.</div>
+        </div>
+
+        <hr class="divider">
+
+        <!-- Partner: Salary Sacrifice -->
+        <div class="field" style="margin-bottom:8px;">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+            <input type="checkbox" id="ssEnabled2" onchange="calculate()" style="width:auto;">
+            <strong>Partner Salary Sacrifice</strong>
+          </label>
+        </div>
+        <div id="ssFields2" style="display:none;padding-left:8px;border-left:2px solid var(--accent);margin-bottom:14px;">
+          <div class="field-row">
+            <div class="field">
+              <label>Amount (£/yr)</label>
+              <div class="input-group"><span class="prefix">£</span>
+                <input type="number" id="ssAmount2" placeholder="e.g. 10000" oninput="calculate()">
+              </div>
+            </div>
+            <div class="field">
+              <label>Years</label>
+              <input type="number" id="ssYears2" value="5" min="1" max="40" oninput="calculate()">
+            </div>
           </div>
         </div>
 
-        <!-- SIPP -->
+        <!-- Partner: SIPP -->
         <div class="field" style="margin-bottom:8px;">
           <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
-            <input type="checkbox" id="sippEnabled" onchange="calculate()" style="width:auto;">
-            <strong>SIPP</strong> (personal, from net pay)
+            <input type="checkbox" id="sippEnabled2" onchange="calculate()" style="width:auto;">
+            <strong>Partner SIPP</strong>
           </label>
         </div>
-        <div id="sippFields" style="display:none;padding-left:8px;border-left:2px solid var(--purple);margin-bottom:14px;">
-          <div class="field">
-            <label>SIPP Amount (£/year)</label>
-            <div class="input-group"><span class="prefix">£</span>
-              <input type="number" id="sippAmount" placeholder="e.g. 10000" oninput="calculate()">
+        <div id="sippFields2" style="display:none;padding-left:8px;border-left:2px solid var(--purple);margin-bottom:14px;">
+          <div class="field-row">
+            <div class="field">
+              <label>Amount (£/yr)</label>
+              <div class="input-group"><span class="prefix">£</span>
+                <input type="number" id="sippAmount2" placeholder="e.g. 5000" oninput="calculate()">
+              </div>
             </div>
-            <div class="hint">You pay 80%, provider claims 20% basic rate. Higher rate relief via Self Assessment.</div>
-          </div>
-          <div class="field">
-            <label>SIPP for how many years?</label>
-            <input type="number" id="sippYears" value="5" min="1" max="40" oninput="calculate()">
+            <div class="field">
+              <label>Years</label>
+              <input type="number" id="sippYears2" value="5" min="1" max="40" oninput="calculate()">
+            </div>
           </div>
         </div>
 
@@ -673,7 +723,7 @@ function runProjection(params) {
   const { tax1, tax2, monthlyExpenses, expSharePct,
           isa1Annual, isa2Annual, ccMonthly, cashMonthly,
           isaGrowth, ccYield, cashRate, pensionGrowth,
-          projYears, ssAmount, ssYears, sippAmount, sippYears,
+          projYears, ss1, ss1Years, sipp1, sipp1Years, ss2, ss2Years, sipp2, sipp2Years,
           existingInv, currentAge } = params;
 
   let years = [];
@@ -693,14 +743,18 @@ function runProjection(params) {
   let cgtExempt = 3000;
 
   for (let y = 1; y <= projYears; y++) {
-    let ssThisYear = (y <= ssYears) ? ssAmount : 0;
-    let sippThisYear = (y <= sippYears) ? sippAmount : 0;
-    let penThisYear = ssThisYear + sippThisYear;
+    let ss1y = (y <= ss1Years) ? ss1 : 0;
+    let sipp1y = (y <= sipp1Years) ? sipp1 : 0;
+    let ss2y = (y <= ss2Years) ? ss2 : 0;
+    let sipp2y = (y <= sipp2Years) ? sipp2 : 0;
+    let penThisYear = ss1y + sipp1y + ss2y + sipp2y;
 
-    // Recalc take-home if any pension contribution changes
-    if (ssThisYear !== ssAmount || sippThisYear !== sippAmount) {
-      let adjTax = calcUKTax(tax1.gross, ssThisYear, sippThisYear, document.getElementById('studentLoan').value);
-      yourInvestable = adjTax.monthlyTakeHome - yourExpense;
+    // Recalc take-home if pension contributions changed from initial
+    if (ss1y !== ss1 || sipp1y !== sipp1 || ss2y !== ss2 || sipp2y !== sipp2) {
+      let adjTax1 = calcUKTax(tax1.gross, ss1y, sipp1y, document.getElementById('studentLoan').value);
+      let adjTax2 = calcUKTax(tax2.gross, ss2y, sipp2y, 'none');
+      yourInvestable = adjTax1.monthlyTakeHome - yourExpense;
+      partnerInvestable = adjTax2.monthlyTakeHome - partnerExpense;
       totalInvestable = yourInvestable + partnerInvestable;
     }
 
@@ -757,18 +811,22 @@ function calculate() {
   let salary2 = num('salary2');
   let sl = document.getElementById('studentLoan').value;
 
-  // Pension: SS and SIPP are independent
-  let ssEnabled = document.getElementById('ssEnabled').checked;
-  let sippEnabled = document.getElementById('sippEnabled').checked;
-  let ssAmount = ssEnabled ? num('ssAmount') : 0;
-  let sippAmount = sippEnabled ? num('sippAmount') : 0;
-  let ssYears = ssEnabled ? num('ssYears') : 0;
-  let sippYears = sippEnabled ? num('sippYears') : 0;
+  // Pension: SS and SIPP for each person independently
+  let ss1 = document.getElementById('ssEnabled1').checked ? num('ssAmount1') : 0;
+  let ss1Years = document.getElementById('ssEnabled1').checked ? num('ssYears1') : 0;
+  let sipp1 = document.getElementById('sippEnabled1').checked ? num('sippAmount1') : 0;
+  let sipp1Years = document.getElementById('sippEnabled1').checked ? num('sippYears1') : 0;
+  let ss2 = document.getElementById('ssEnabled2').checked ? num('ssAmount2') : 0;
+  let ss2Years = document.getElementById('ssEnabled2').checked ? num('ssYears2') : 0;
+  let sipp2 = document.getElementById('sippEnabled2').checked ? num('sippAmount2') : 0;
+  let sipp2Years = document.getElementById('sippEnabled2').checked ? num('sippYears2') : 0;
   let pensionGrowth = num('pensionGrowth');
 
   // Show/hide fields
-  document.getElementById('ssFields').style.display = ssEnabled ? 'block' : 'none';
-  document.getElementById('sippFields').style.display = sippEnabled ? 'block' : 'none';
+  document.getElementById('ssFields1').style.display = document.getElementById('ssEnabled1').checked ? 'block' : 'none';
+  document.getElementById('sippFields1').style.display = document.getElementById('sippEnabled1').checked ? 'block' : 'none';
+  document.getElementById('ssFields2').style.display = document.getElementById('ssEnabled2').checked ? 'block' : 'none';
+  document.getElementById('sippFields2').style.display = document.getElementById('sippEnabled2').checked ? 'block' : 'none';
 
   let expRent = num('expRent');
   let expCar = num('expCar');
@@ -789,21 +847,20 @@ function calculate() {
 
   let monthlyExpenses = expRent + expCar + expFood + expSubs + expOther;
 
-  // Check £60k pension limit
-  let totalPension = ssAmount + sippAmount;
+  // Check £60k pension limit per person
+  let totalPen1 = ss1 + sipp1;
+  let totalPen2 = ss2 + sipp2;
   let warningEl = document.getElementById('pensionWarning');
-  if (totalPension > 60000) {
-    warningEl.style.display = 'block';
-    warningEl.innerHTML = `⚠️ Total pension (SS £${fmt(ssAmount)} + SIPP £${fmt(sippAmount)} = £${fmt(totalPension)}) exceeds £60k annual allowance!`;
-  } else if (totalPension > salary1 && salary1 > 0) {
-    warningEl.style.display = 'block';
-    warningEl.innerHTML = `⚠️ Total pension £${fmt(totalPension)} exceeds your salary £${fmt(salary1)}!`;
-  } else {
-    warningEl.style.display = 'none';
-  }
+  let warnings = [];
+  if (totalPen1 > 60000) warnings.push(`⚠️ Your pension £${fmt(totalPen1)} exceeds £60k!`);
+  if (totalPen2 > 60000) warnings.push(`⚠️ Partner pension £${fmt(totalPen2)} exceeds £60k!`);
+  if (totalPen1 > salary1 && salary1 > 0) warnings.push(`⚠️ Your pension £${fmt(totalPen1)} > salary £${fmt(salary1)}!`);
+  if (totalPen2 > salary2 && salary2 > 0) warnings.push(`⚠️ Partner pension £${fmt(totalPen2)} > salary £${fmt(salary2)}!`);
+  warningEl.style.display = warnings.length ? 'block' : 'none';
+  warningEl.innerHTML = warnings.join('<br>');
 
-  let tax1 = calcUKTax(salary1, ssAmount, sippAmount, sl);
-  let tax2 = calcUKTax(salary2, 0, 0, 'none');
+  let tax1 = calcUKTax(salary1, ss1, sipp1, sl);
+  let tax2 = calcUKTax(salary2, ss2, sipp2, 'none');
 
   let yourExpense = monthlyExpenses * expSharePct;
   let partnerExpense = monthlyExpenses - yourExpense;
@@ -815,10 +872,12 @@ function calculate() {
   // Pension note
   let noteEl = document.getElementById('pensionNote');
   let noteLines = [];
-  if (ssAmount > 0) noteLines.push(`SS: £${fmt(ssAmount)}/yr pre-tax (${ssYears}yr). NI saved.`);
-  if (sippAmount > 0) noteLines.push(`SIPP: Pay £${fmt(tax1.sippFromNet)}/yr (80%), SA refund ~£${fmt(tax1.hmrcRefund)}/yr (${sippYears}yr).`);
+  if (ss1 > 0) noteLines.push(`You SS: £${fmt(ss1)}/yr (${ss1Years}yr)`);
+  if (sipp1 > 0) noteLines.push(`You SIPP: £${fmt(tax1.sippFromNet)}/yr net, refund ~£${fmt(tax1.hmrcRefund)}/yr (${sipp1Years}yr)`);
+  if (ss2 > 0) noteLines.push(`Partner SS: £${fmt(ss2)}/yr (${ss2Years}yr)`);
+  if (sipp2 > 0) noteLines.push(`Partner SIPP: £${fmt(tax2.sippFromNet)}/yr net, refund ~£${fmt(tax2.hmrcRefund)}/yr (${sipp2Years}yr)`);
   if (noteLines.length > 0) {
-    noteLines.push(`PA ${tax1.pa > 0 ? '✅ £' + fmt(tax1.pa) : '❌ £0'} · Total pension: £${fmt(totalPension)}/yr`);
+    noteLines.push(`Your PA: ${tax1.pa > 0 ? '£' + fmt(tax1.pa) : '£0'} · Partner PA: ${tax2.pa > 0 ? '£' + fmt(tax2.pa) : '£0'}`);
     noteEl.innerHTML = noteLines.join('<br>');
   } else {
     noteEl.innerHTML = 'No pension contribution configured.';
@@ -837,13 +896,13 @@ function calculate() {
 
   let monthlyAllocTotal = isa1/12 + isa2/12 + ccMonthly + cashMonthly;
   let surplus = totalInvestable - monthlyAllocTotal;
-  renderFlowBar(tax1, tax2, monthlyExpenses, expSharePct, isa1, isa2, ccMonthly, cashMonthly, ssAmount, sippAmount, surplus);
+  renderFlowBar(tax1, tax2, monthlyExpenses, expSharePct, isa1, isa2, ccMonthly, cashMonthly, sipp1, sipp2, surplus);
 
   let params = {
     tax1, tax2, monthlyExpenses, expSharePct,
     isa1Annual: isa1, isa2Annual: isa2, ccMonthly, cashMonthly,
     isaGrowth, ccYield, cashRate, pensionGrowth,
-    projYears, ssAmount, ssYears, sippAmount, sippYears,
+    projYears, ss1, ss1Years, sipp1, sipp1Years, ss2, ss2Years, sipp2, sipp2Years,
     existingInv, currentAge
   };
   let projection = runProjection(params);
@@ -860,7 +919,7 @@ function calculate() {
 
   renderChart(projection);
   renderTable(projection);
-  renderMonthlyActions(tax1, tax2, monthlyExpenses, expSharePct, isa1, isa2, ccMonthly, cashMonthly, ssAmount, sippAmount, ssYears, sippYears);
+  renderMonthlyActions(tax1, tax2, monthlyExpenses, expSharePct, isa1, isa2, ccMonthly, cashMonthly, ss1, sipp1, ss1Years, sipp1Years, ss2, sipp2, ss2Years, sipp2Years);
 }
 
 function renderTaxBreakdown(elId, tax) {
@@ -890,13 +949,13 @@ function renderTaxBreakdown(elId, tax) {
   }).join('');
 }
 
-function renderFlowBar(tax1, tax2, expenses, expSharePct, isa1, isa2, ccMonthly, cashMonthly, ssAmount, sippAmount, surplus) {
+function renderFlowBar(tax1, tax2, expenses, expSharePct, isa1, isa2, ccMonthly, cashMonthly, sipp1, sipp2, surplus) {
   let totalIncome = tax1.monthlyTakeHome + tax2.monthlyTakeHome;
   if (totalIncome <= 0) return;
 
   let segments = [];
   segments.push({ label: 'Expenses', value: expenses, color: '#ef4444' });
-  if (sippAmount > 0) segments.push({ label: 'SIPP', value: sippAmount / 12, color: '#8b5cf6' });
+  if (sipp1 + sipp2 > 0) segments.push({ label: 'SIPP', value: (sipp1 + sipp2) / 12, color: '#8b5cf6' });
   segments.push({ label: 'ISA', value: (isa1 + isa2) / 12, color: '#3b82f6' });
   if (ccMonthly > 0) segments.push({ label: 'Investing', value: ccMonthly, color: '#22c55e' });
   if (cashMonthly > 0) segments.push({ label: 'Cash', value: cashMonthly, color: '#eab308' });
@@ -968,17 +1027,15 @@ function renderTable(projection) {
   </tr>`).join('');
 }
 
-function renderMonthlyActions(tax1, tax2, expenses, expSharePct, isa1, isa2, ccMonthly, cashMonthly, ssAmount, sippAmount, ssYears, sippYears) {
+function renderMonthlyActions(tax1, tax2, expenses, expSharePct, isa1, isa2, ccMonthly, cashMonthly, ss1, sipp1, ss1Years, sipp1Years, ss2, sipp2, ss2Years, sipp2Years) {
   let el = document.getElementById('monthlyActions');
   let yourExp = expenses * expSharePct;
 
   let actions = [];
-  if (ssAmount > 0) {
-    actions.push({ who: 'You', action: 'Salary Sacrifice', amount: ssAmount / 12, note: `Auto-deducted (${ssYears}yr)`, color: 'var(--purple)' });
-  }
-  if (sippAmount > 0) {
-    actions.push({ who: 'You', action: 'SIPP', amount: sippAmount * 0.8 / 12, note: `Pay 80%, provider claims 20% (${sippYears}yr)`, color: 'var(--purple)' });
-  }
+  if (ss1 > 0) actions.push({ who: 'You', action: 'Salary Sacrifice', amount: ss1 / 12, note: `Auto-deducted (${ss1Years}yr)`, color: 'var(--purple)' });
+  if (sipp1 > 0) actions.push({ who: 'You', action: 'SIPP', amount: sipp1 * 0.8 / 12, note: `Pay 80% (${sipp1Years}yr)`, color: 'var(--purple)' });
+  if (ss2 > 0) actions.push({ who: 'Partner', action: 'Salary Sacrifice', amount: ss2 / 12, note: `Auto-deducted (${ss2Years}yr)`, color: 'var(--purple)' });
+  if (sipp2 > 0) actions.push({ who: 'Partner', action: 'SIPP', amount: sipp2 * 0.8 / 12, note: `Pay 80% (${sipp2Years}yr)`, color: 'var(--purple)' });
   actions.push({ who: 'You', action: `Living expenses (${Math.round(expSharePct*100)}%)`, amount: yourExp, note: 'Rent + transport + food + bills', color: 'var(--red)' });
   if (isa1 > 0) actions.push({ who: 'You', action: 'ISA ⭐', amount: isa1/12, note: 'Tax-free — #1 priority', color: 'var(--accent)' });
   if (isa2 > 0) actions.push({ who: 'Partner', action: 'ISA ⭐', amount: isa2/12, note: 'Tax-free — #1 priority', color: 'var(--accent)' });
@@ -1008,10 +1065,12 @@ function renderMonthlyActions(tax1, tax2, expenses, expSharePct, isa1, isa2, ccM
       <strong>📅 Annual Actions</strong>
       <ul style="margin-top:8px;padding-left:20px;font-size:0.82rem;color:var(--text-dim);">
         <li><strong>April:</strong> New tax year — reset ISA allowance, use full £20k per person</li>
-        <li><strong>Jan 31:</strong> Self-Assessment deadline${sippAmount > 0 ? ' — claim SIPP higher rate relief' : ''}</li>
+        <li><strong>Jan 31:</strong> Self-Assessment deadline${sipp1 + sipp2 > 0 ? ' — claim SIPP higher rate relief' : ''}</li>
         <li><strong>Quarterly:</strong> Review portfolio allocation, rebalance if needed</li>
-        ${ssAmount > 0 ? `<li><strong>Year ${ssYears}:</strong> Stop salary sacrifice — take-home increases</li>` : ''}
-        ${sippAmount > 0 ? `<li><strong>Year ${sippYears}:</strong> Stop SIPP contributions</li>` : ''}
+        ${ss1 > 0 ? `<li><strong>Year ${ss1Years}:</strong> Stop your salary sacrifice</li>` : ''}
+        ${sipp1 > 0 ? `<li><strong>Year ${sipp1Years}:</strong> Stop your SIPP</li>` : ''}
+        ${ss2 > 0 ? `<li><strong>Year ${ss2Years}:</strong> Stop partner salary sacrifice</li>` : ''}
+        ${sipp2 > 0 ? `<li><strong>Year ${sipp2Years}:</strong> Stop partner SIPP</li>` : ''}
       </ul>
     </div>`;
 }
@@ -1032,13 +1091,15 @@ function exportCSV() {
 
 function copyShareLink() {
   let params = new URLSearchParams();
-  let fields = ['salary1','salary2','studentLoan','ssAmount','ssYears','sippAmount','sippYears','pensionGrowth',
+  let fields = ['salary1','salary2','studentLoan',
+    'ssAmount1','ssYears1','sippAmount1','sippYears1',
+    'ssAmount2','ssYears2','sippAmount2','sippYears2','pensionGrowth',
     'expRent','expCar','expFood','expSubs','expOther','expShare',
     'isa1','isa2','isaGrowth','ccMonthly','ccYield','cashMonthly','cashRate',
     'projYears','currentAge','existingInv'];
   fields.forEach(f => { let el = document.getElementById(f); if (el) params.set(f, el.value); });
-  params.set('ssEnabled', document.getElementById('ssEnabled').checked ? '1' : '0');
-  params.set('sippEnabled', document.getElementById('sippEnabled').checked ? '1' : '0');
+  ['ssEnabled1','sippEnabled1','ssEnabled2','sippEnabled2'].forEach(id =>
+    params.set(id, document.getElementById(id).checked ? '1' : '0'));
   let url = window.location.origin + window.location.pathname + '?' + params.toString();
   navigator.clipboard.writeText(url).then(() => alert('Link copied!')).catch(() => prompt('Copy this link:', url));
 }
@@ -1046,13 +1107,16 @@ function copyShareLink() {
 function loadFromURL() {
   let params = new URLSearchParams(window.location.search);
   if (params.size === 0) return false;
-  let fields = ['salary1','salary2','studentLoan','ssAmount','ssYears','sippAmount','sippYears','pensionGrowth',
+  let fields = ['salary1','salary2','studentLoan',
+    'ssAmount1','ssYears1','sippAmount1','sippYears1',
+    'ssAmount2','ssYears2','sippAmount2','sippYears2','pensionGrowth',
     'expRent','expCar','expFood','expSubs','expOther','expShare',
     'isa1','isa2','isaGrowth','ccMonthly','ccYield','cashMonthly','cashRate',
     'projYears','currentAge','existingInv'];
   fields.forEach(f => { if (params.has(f)) { let el = document.getElementById(f); if (el) el.value = params.get(f); } });
-  if (params.get('ssEnabled') === '1') document.getElementById('ssEnabled').checked = true;
-  if (params.get('sippEnabled') === '1') document.getElementById('sippEnabled').checked = true;
+  ['ssEnabled1','sippEnabled1','ssEnabled2','sippEnabled2'].forEach(id => {
+    if (params.get(id) === '1') document.getElementById(id).checked = true;
+  });
   return true;
 }
 
