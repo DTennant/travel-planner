@@ -379,12 +379,9 @@ tr:hover td { background: rgba(59,130,246,0.05); }
           </div>
         </div>
         <div class="field">
-          <label>Who pays expenses?</label>
-          <select id="expWho" onchange="calculate()">
-            <option value="you">You only</option>
-            <option value="split">Split equally</option>
-            <option value="partner">Partner only</option>
-          </select>
+          <label>Your share of expenses (%)</label>
+          <input type="number" id="expShare" value="100" min="0" max="100" step="5" oninput="calculate()">
+          <div class="hint">100% = you pay all, 50% = split, 0% = partner pays all</div>
         </div>
       </div>
 
@@ -673,7 +670,7 @@ function calcIncomeTax(taxableGross, adjustedNetIncome) {
 // ========== PROJECTION ENGINE ==========
 
 function runProjection(params) {
-  const { tax1, tax2, monthlyExpenses, expShare,
+  const { tax1, tax2, monthlyExpenses, expSharePct,
           isa1Annual, isa2Annual, ccMonthly, cashMonthly,
           isaGrowth, ccYield, cashRate, pensionGrowth,
           projYears, ssAmount, ssYears, sippAmount, sippYears,
@@ -685,9 +682,7 @@ function runProjection(params) {
   let yourMonthly = tax1.monthlyTakeHome;
   let partnerMonthly = tax2.monthlyTakeHome;
 
-  let yourExpense = monthlyExpenses;
-  if (expShare === 'split') yourExpense = monthlyExpenses / 2;
-  if (expShare === 'partner') yourExpense = 0;
+  let yourExpense = monthlyExpenses * expSharePct;
   let partnerExpense = monthlyExpenses - yourExpense;
 
   let yourInvestable = yourMonthly - yourExpense;
@@ -780,7 +775,7 @@ function calculate() {
   let expFood = num('expFood');
   let expSubs = num('expSubs');
   let expOther = num('expOther');
-  let expWho = document.getElementById('expWho').value;
+  let expSharePct = num('expShare') / 100;
   let isa1 = Math.min(num('isa1'), 20000);
   let isa2 = Math.min(num('isa2'), 20000);
   let isaGrowth = num('isaGrowth');
@@ -810,9 +805,7 @@ function calculate() {
   let tax1 = calcUKTax(salary1, ssAmount, sippAmount, sl);
   let tax2 = calcUKTax(salary2, 0, 0, 'none');
 
-  let yourExpense = monthlyExpenses;
-  if (expWho === 'split') yourExpense = monthlyExpenses / 2;
-  if (expWho === 'partner') yourExpense = 0;
+  let yourExpense = monthlyExpenses * expSharePct;
   let partnerExpense = monthlyExpenses - yourExpense;
 
   let yourInvestable = tax1.monthlyTakeHome - yourExpense;
@@ -835,7 +828,7 @@ function calculate() {
   document.getElementById('sumTakeHome').textContent = '£' + fmt(tax1.monthlyTakeHome + tax2.monthlyTakeHome);
   document.getElementById('sumTakeHomeSub').textContent = `You £${fmt(tax1.monthlyTakeHome)}` + (salary2 > 0 ? ` + Partner £${fmt(tax2.monthlyTakeHome)}` : '');
   document.getElementById('sumExpenses').textContent = '£' + fmt(monthlyExpenses);
-  document.getElementById('sumExpensesSub').textContent = expWho === 'you' ? 'You pay all' : expWho === 'split' ? 'Split equally' : 'Partner pays all';
+  document.getElementById('sumExpensesSub').textContent = `You ${Math.round(expSharePct*100)}% · Partner ${Math.round((1-expSharePct)*100)}%`;
   document.getElementById('sumInvestable').textContent = '£' + fmt(totalInvestable);
   document.getElementById('sumInvestableSub').textContent = salary2 > 0 ? `You £${fmt(yourInvestable)} + Partner £${fmt(partnerInvestable)}` : '';
 
@@ -844,10 +837,10 @@ function calculate() {
 
   let monthlyAllocTotal = isa1/12 + isa2/12 + ccMonthly + cashMonthly;
   let surplus = totalInvestable - monthlyAllocTotal;
-  renderFlowBar(tax1, tax2, monthlyExpenses, expWho, isa1, isa2, ccMonthly, cashMonthly, ssAmount, sippAmount, surplus);
+  renderFlowBar(tax1, tax2, monthlyExpenses, expSharePct, isa1, isa2, ccMonthly, cashMonthly, ssAmount, sippAmount, surplus);
 
   let params = {
-    tax1, tax2, monthlyExpenses, expShare: expWho,
+    tax1, tax2, monthlyExpenses, expSharePct,
     isa1Annual: isa1, isa2Annual: isa2, ccMonthly, cashMonthly,
     isaGrowth, ccYield, cashRate, pensionGrowth,
     projYears, ssAmount, ssYears, sippAmount, sippYears,
@@ -867,7 +860,7 @@ function calculate() {
 
   renderChart(projection);
   renderTable(projection);
-  renderMonthlyActions(tax1, tax2, monthlyExpenses, expWho, isa1, isa2, ccMonthly, cashMonthly, ssAmount, sippAmount, ssYears, sippYears);
+  renderMonthlyActions(tax1, tax2, monthlyExpenses, expSharePct, isa1, isa2, ccMonthly, cashMonthly, ssAmount, sippAmount, ssYears, sippYears);
 }
 
 function renderTaxBreakdown(elId, tax) {
@@ -897,7 +890,7 @@ function renderTaxBreakdown(elId, tax) {
   }).join('');
 }
 
-function renderFlowBar(tax1, tax2, expenses, expWho, isa1, isa2, ccMonthly, cashMonthly, ssAmount, sippAmount, surplus) {
+function renderFlowBar(tax1, tax2, expenses, expSharePct, isa1, isa2, ccMonthly, cashMonthly, ssAmount, sippAmount, surplus) {
   let totalIncome = tax1.monthlyTakeHome + tax2.monthlyTakeHome;
   if (totalIncome <= 0) return;
 
@@ -975,11 +968,9 @@ function renderTable(projection) {
   </tr>`).join('');
 }
 
-function renderMonthlyActions(tax1, tax2, expenses, expWho, isa1, isa2, ccMonthly, cashMonthly, ssAmount, sippAmount, ssYears, sippYears) {
+function renderMonthlyActions(tax1, tax2, expenses, expSharePct, isa1, isa2, ccMonthly, cashMonthly, ssAmount, sippAmount, ssYears, sippYears) {
   let el = document.getElementById('monthlyActions');
-  let yourExp = expenses;
-  if (expWho === 'split') yourExp = expenses / 2;
-  if (expWho === 'partner') yourExp = 0;
+  let yourExp = expenses * expSharePct;
 
   let actions = [];
   if (ssAmount > 0) {
@@ -988,7 +979,7 @@ function renderMonthlyActions(tax1, tax2, expenses, expWho, isa1, isa2, ccMonthl
   if (sippAmount > 0) {
     actions.push({ who: 'You', action: 'SIPP', amount: sippAmount * 0.8 / 12, note: `Pay 80%, provider claims 20% (${sippYears}yr)`, color: 'var(--purple)' });
   }
-  actions.push({ who: expWho === 'partner' ? 'Partner' : 'You', action: 'Living expenses', amount: yourExp, note: 'Rent + transport + food + bills', color: 'var(--red)' });
+  actions.push({ who: 'You', action: `Living expenses (${Math.round(expSharePct*100)}%)`, amount: yourExp, note: 'Rent + transport + food + bills', color: 'var(--red)' });
   if (isa1 > 0) actions.push({ who: 'You', action: 'ISA ⭐', amount: isa1/12, note: 'Tax-free — #1 priority', color: 'var(--accent)' });
   if (isa2 > 0) actions.push({ who: 'Partner', action: 'ISA ⭐', amount: isa2/12, note: 'Tax-free — #1 priority', color: 'var(--accent)' });
   if (ccMonthly > 0) actions.push({ who: 'You', action: 'General investing', amount: ccMonthly, note: 'Taxable account', color: 'var(--green)' });
@@ -1042,7 +1033,7 @@ function exportCSV() {
 function copyShareLink() {
   let params = new URLSearchParams();
   let fields = ['salary1','salary2','studentLoan','ssAmount','ssYears','sippAmount','sippYears','pensionGrowth',
-    'expRent','expCar','expFood','expSubs','expOther','expWho',
+    'expRent','expCar','expFood','expSubs','expOther','expShare',
     'isa1','isa2','isaGrowth','ccMonthly','ccYield','cashMonthly','cashRate',
     'projYears','currentAge','existingInv'];
   fields.forEach(f => { let el = document.getElementById(f); if (el) params.set(f, el.value); });
@@ -1056,7 +1047,7 @@ function loadFromURL() {
   let params = new URLSearchParams(window.location.search);
   if (params.size === 0) return false;
   let fields = ['salary1','salary2','studentLoan','ssAmount','ssYears','sippAmount','sippYears','pensionGrowth',
-    'expRent','expCar','expFood','expSubs','expOther','expWho',
+    'expRent','expCar','expFood','expSubs','expOther','expShare',
     'isa1','isa2','isaGrowth','ccMonthly','ccYield','cashMonthly','cashRate',
     'projYears','currentAge','existingInv'];
   fields.forEach(f => { if (params.has(f)) { let el = document.getElementById(f); if (el) el.value = params.get(f); } });
