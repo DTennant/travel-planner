@@ -236,7 +236,7 @@ footer { text-align: center; padding: 40px 20px; color: var(--text-muted); font-
         <div class="car-price">£789</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <div class="car-tag">⚡ 纯电动</div>
-          <div class="car-tag">🗺️ ~1,880km 总里程</div>
+          <div class="car-tag">🗺️ ~1,870km 总里程</div>
           <div class="car-tag">🔋 充电约 £50</div>
         </div>
       </div>
@@ -278,13 +278,13 @@ footer { text-align: center; padding: 40px 20px; color: var(--text-muted); font-
       <a class="booking-link" href="https://icelagoon.is" target="_blank">icelagoon.is →</a>
     </div>
     <div class="booking-card recommend">
-      <div><div class="booking-name">🐋 Húsavík 观鲸</div><div class="booking-day">Day 6 · 8/27</div></div>
+      <div><div class="booking-name">🐋 Húsavík 观鲸</div><div class="booking-day">Day 6 · 8/27 (上午)</div></div>
       <div class="booking-price">~£110-140/2人</div>
       <span class="booking-status yellow">建议预约</span>
       <a class="booking-link" href="https://husavikadventures.is" target="_blank">husavikadventures.is →</a>
     </div>
     <div class="booking-card walkin">
-      <div><div class="booking-name">♨️ Mývatn Nature Baths</div><div class="booking-day">Day 6 · 8/27</div></div>
+      <div><div class="booking-name">♨️ Mývatn Nature Baths</div><div class="booking-day">Day 6 · 8/27 (早晨)</div></div>
       <div class="booking-price">~£60-80/2人</div>
       <span class="booking-status green">可现场买</span>
       <span style="font-size:0.8rem;color:var(--text-muted)">5,000-6,900 ISK/人</span>
@@ -335,8 +335,8 @@ footer { text-align: center; padding: 40px 20px; color: var(--text-muted); font-
       <div class="checklist-item"><input type="checkbox" id="acc3"><label class="cl-text" for="acc3">Day 3 · 8/24 Mon — Höfn 赫本</label><span class="cl-price">£90-130/晚</span><span class="cl-night">1晚</span></div>
       <div class="checklist-item"><input type="checkbox" id="acc4"><label class="cl-text" for="acc4">Day 4 · 8/25 Tue — Egilsstaðir 埃伊尔斯塔济</label><span class="cl-price">£80-110/晚</span><span class="cl-night">1晚</span></div>
       <div class="checklist-item"><input type="checkbox" id="acc5"><label class="cl-text" for="acc5">Day 5 · 8/26 Wed — Mývatn 米湖 (选择少)</label><span class="cl-price">£90-140/晚</span><span class="cl-night">1晚</span></div>
-      <div class="checklist-item"><input type="checkbox" id="acc6"><label class="cl-text" for="acc6">Day 6 · 8/27 Thu — Mývatn/Húsavík</label><span class="cl-price">£80-120/晚</span><span class="cl-night">1晚</span></div>
-      <div class="checklist-item"><input type="checkbox" id="acc7"><label class="cl-text" for="acc7">Day 7 · 8/28 Fri — Akureyri/Siglufjörður</label><span class="cl-price">£80-120/晚</span><span class="cl-night">1晚</span></div>
+      <div class="checklist-item"><input type="checkbox" id="acc6"><label class="cl-text" for="acc6">Day 6 · 8/27 Thu — Blönduós 布伦迪欧斯</label><span class="cl-price">£70-100/晚</span><span class="cl-night">1晚</span></div>
+      <div class="checklist-item"><input type="checkbox" id="acc7"><label class="cl-text" for="acc7">Day 7 · 8/28 Fri — Grundarfjörður/Stykkishólmur (Snæfellsnes)</label><span class="cl-price">£80-120/晚</span><span class="cl-night">1晚</span></div>
       <div class="checklist-item"><input type="checkbox" id="acc8"><label class="cl-text" for="acc8">Day 8 · 8/29 Sat — Reykjavík 雷克雅未克</label><span class="cl-price">£80-130/晚</span><span class="cl-night">1晚</span></div>
       <div class="checklist-subtotal"><span>8晚合计估算</span><span style="color:var(--accent-cyan)">~£680 — 1,010</span></div>
     </div>
@@ -473,44 +473,44 @@ const days = [
     labels:['Dettifoss ⭐','Selfoss (N)','Hverir','Dimmuborgir','Grjótagjá'],
   },
   {
-    num:6, date:'8/27 周四', title:'Mývatn + Húsavík 观鲸', km:'~120km', emoji:'🐋',
+    num:6, date:'8/27 周四', title:'Mývatn → Húsavík → Akureyri → Blönduós', km:'~320km', emoji:'🐋',
     spots: [
       {icon:'♨️',name:'Mývatn Nature Baths 米湖温泉',desc:'上午泡温泉，比蓝湖更本地'},
       {icon:'🌋',name:'Skútustaðagígar 伪火山口',desc:'独特的假火山口群'},
       {icon:'🐋',name:'Húsavík 观鲸',desc:'冰岛观鲸之都 ⚠️ 提前预约',star:true},
-    ],
-    stay:'Mývatn 或 Húsavík', charge:null,
-    coords:[[65.5710,-16.9833],[66.0449,-17.3383]],
-    stayCoord:[65.6035,-17.0000],
-    labels:['Skútustaðagígar','Húsavík 🐋'],
-  },
-  {
-    num:7, date:'8/28 周五', title:'Mývatn → Akureyri → Siglufjörður', km:'~170km', emoji:'🌊',
-    spots: [
       {icon:'💧',name:'Goðafoss 众神瀑布',desc:'环形瀑布，冰岛基督教化的象征'},
-      {icon:'🏙️',name:'Akureyri 阿克雷里',desc:'冰岛第二大城市，补给休整'},
-      {icon:'🛣️',name:'Tröllaskagi → Siglufjörður',desc:'巨人半岛海岸公路，绝美！'},
+      {icon:'🏙️',name:'Akureyri 阿克雷里',desc:'冰岛第二大城市，快速补给+充电'},
     ],
-    stay:'Akureyri 或 Siglufjörður', charge:null,
-    coords:[[65.6826,-17.5502],[65.6835,-18.0878],[66.1510,-18.9110]],
-    stayCoord:[65.6835,-18.0878],
-    labels:['Goðafoss','Akureyri','Siglufjörður'],
+    stay:'Blönduós 布伦迪欧斯', charge:'🔋 在 Akureyri 充电',
+    coords:[[65.5710,-16.9833],[66.0449,-17.3383],[65.6826,-17.5502],[65.6835,-18.0878]],
+    stayCoord:[65.6594,-20.2911],
+    labels:['Skútustaðagígar','Húsavík 🐋','Goðafoss','Akureyri'],
   },
   {
-    num:8, date:'8/29 周六', title:'North → Snæfellsnes → Reykjavík', km:'~400km', emoji:'⛰️',
+    num:7, date:'8/28 周五', title:'Blönduós → Snæfellsnes 半岛', km:'~250km', emoji:'⛰️',
     spots: [
-      {icon:'🛣️',name:'北部到西部长途驾驶',desc:'今天路程最长，早点出发'},
+      {icon:'🛣️',name:'西行沿 1 号公路',desc:'穿越冰岛西北部，沿途荒野风光'},
       {icon:'⭐',name:'Kirkjufell 教堂山',desc:'冰岛最上镜的山，草帽山',star:true},
       {icon:'⛪',name:'Búðakirkja 黑教堂',desc:'荒野中的小黑教堂'},
       {icon:'🌊',name:'Arnarstapi 海蚀崖',desc:'壮观的玄武岩悬崖海岸'},
+    ],
+    stay:'Grundarfjörður 或 Stykkishólmur', charge:null,
+    coords:[[64.9426,-23.3061],[64.8204,-23.3836],[64.7667,-23.6250]],
+    stayCoord:[64.9250,-23.2500],
+    labels:['Kirkjufell ⭐','Búðakirkja','Arnarstapi'],
+  },
+  {
+    num:8, date:'8/29 周六', title:'Snæfellsnes → Reykjavík', km:'~180km', emoji:'🌈',
+    spots: [
+      {icon:'🛣️',name:'Snæfellsnes 上午补遗',desc:'半岛没看完的景点可以早上补'},
       {icon:'⛪',name:'Hallgrímskirkja 教堂',desc:'雷克雅未克地标'},
       {icon:'🌈',name:'Rainbow Street 彩虹街',desc:'拍照打卡'},
       {icon:'♨️',name:'Sky Lagoon',desc:'温泉放松，旅途收尾 ⚠️ 必须预约'},
     ],
     stay:'Reykjavík 雷克雅未克', charge:null,
-    coords:[[64.9426,-23.3061],[64.8204,-23.3836],[64.7667,-23.6250],[64.1466,-21.9426]],
+    coords:[[64.1466,-21.9426]],
     stayCoord:[64.1466,-21.9426],
-    labels:['Kirkjufell ⭐','Búðakirkja','Arnarstapi','Reykjavík'],
+    labels:['Reykjavík'],
   },
   {
     num:9, date:'8/30 周日', title:'还车 → 飞回伦敦', km:'~50km', emoji:'🛫',
@@ -572,9 +572,8 @@ const routeOrder = [
   [63.7713,-18.1717],[64.0148,-16.9713],[64.0784,-16.2306],[64.0440,-16.1780],[64.2539,-15.2082],
   [64.6509,-14.2622],[64.9292,-13.8642],[65.2531,-14.3948],
   [65.8147,-16.3844],[65.8080,-16.3887],[65.6410,-16.8098],[65.5901,-16.9114],[65.6264,-16.8826],[65.6035,-17.0000],
-  [65.5710,-16.9833],[66.0449,-17.3383],[65.6035,-17.0000],
-  [65.6826,-17.5502],[65.6835,-18.0878],[66.1510,-18.9110],[65.6835,-18.0878],
-  [64.9426,-23.3061],[64.8204,-23.3836],[64.7667,-23.6250],
+  [65.5710,-16.9833],[66.0449,-17.3383],[65.6826,-17.5502],[65.6835,-18.0878],[65.6594,-20.2911],
+  [64.9426,-23.3061],[64.8204,-23.3836],[64.7667,-23.6250],[64.9250,-23.2500],
   [64.1466,-21.9426],[63.9850,-22.6056],
 ];
 
