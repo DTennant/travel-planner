@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>From RL First Principles to Learned Value Functions for Coding Agents</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {
+    delimiters: [
+      {left: '$$', right: '$$', display: true},
+      {left: '$', right: '$', display: false}
+    ],
+    throwOnError: false
+  });"></script>
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #12121a;
+  --surface2: #1a1a26;
+  --border: #2a2a3a;
+  --text: #e4e4ef;
+  --text-dim: #8888a0;
+  --accent: #6c8cff;
+  --accent2: #a78bfa;
+  --accent3: #34d399;
+  --warn: #f59e0b;
+  --red: #ef4444;
+  --code-bg: #0f0f18;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.75;
+  font-size: 16px;
+}
+
+.container {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 6rem;
+}
+
+/* Header */
+header {
+  text-align: center;
+  padding: 4rem 0 3rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 3rem;
+}
+
+header h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  line-height: 1.3;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+header .subtitle {
+  color: var(--text-dim);
+  font-size: 1.05rem;
+  font-weight: 300;
+}
+
+header .date {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  margin-top: 0.75rem;
+  opacity: 0.7;
+}
+
+/* TOC */
+.toc {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+  margin-bottom: 3rem;
+}
+
+.toc h3 {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+  margin-bottom: 1rem;
+}
+
+.toc ol {
+  list-style: none;
+  counter-reset: toc-counter;
+}
+
+.toc ol li {
+  counter-increment: toc-counter;
+  margin-bottom: 0.4rem;
+}
+
+.toc ol li::before {
+  content: counter(toc-counter) ".";
+  color: var(--accent);
+  font-weight: 600;
+  margin-right: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.toc a {
+  color: var(--text);
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: color 0.2s;
+}
+
+.toc a:hover { color: var(--accent); }
+
+/* Sections */
+section {
+  margin-bottom: 3.5rem;
+}
+
+h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 1.2rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--border);
+  color: var(--text);
+}
+
+h2 .num {
+  color: var(--accent);
+  margin-right: 0.3rem;
+}
+
+h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 2rem 0 0.8rem;
+  color: var(--accent2);
+}
+
+h4 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 1.5rem 0 0.6rem;
+  color: var(--accent3);
+}
+
+p {
+  margin-bottom: 1rem;
+  color: var(--text);
+}
+
+ul, ol {
+  margin: 0.5rem 0 1rem 1.5rem;
+}
+
+li {
+  margin-bottom: 0.4rem;
+}
+
+strong {
+  color: #fff;
+  font-weight: 600;
+}
+
+/* Definition / key concept boxes */
+.def-box {
+  background: var(--surface);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  padding: 1.2rem 1.5rem;
+  margin: 1.2rem 0;
+}
+
+.def-box.warn {
+  border-left-color: var(--warn);
+}
+
+.def-box.green {
+  border-left-color: var(--accent3);
+}
+
+.def-box.red {
+  border-left-color: var(--red);
+}
+
+.def-box .label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.def-box.warn .label { color: var(--warn); }
+.def-box.green .label { color: var(--accent3); }
+.def-box.red .label { color: var(--red); }
+
+/* Equation blocks */
+.eq-block {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.2rem 1.5rem;
+  margin: 1rem 0;
+  overflow-x: auto;
+  text-align: center;
+}
+
+/* Comparison table */
+.comparison {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.comparison .col {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.2rem;
+}
+
+.comparison .col h4 {
+  margin-top: 0;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .comparison { grid-template-columns: 1fr; }
+}
+
+/* Diagram-like boxes */
+.diagram {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  overflow-x: auto;
+  white-space: pre;
+  color: var(--text-dim);
+}
+
+.diagram .highlight { color: var(--accent); font-weight: 500; }
+.diagram .green { color: var(--accent3); }
+.diagram .purple { color: var(--accent2); }
+.diagram .yellow { color: var(--warn); }
+.diagram .red { color: var(--red); }
+
+/* Inline code */
+code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.88em;
+  background: var(--surface2);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  color: var(--accent2);
+}
+
+/* Takeaway / summary boxes */
+.takeaway {
+  background: linear-gradient(135deg, rgba(108,140,255,0.08), rgba(167,139,250,0.08));
+  border: 1px solid rgba(108,140,255,0.2);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 2rem 0;
+}
+
+.takeaway h4 {
+  color: var(--accent);
+  margin-top: 0;
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  padding-top: 3rem;
+  border-top: 1px solid var(--border);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* Flow arrow connectors */
+.flow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 1.5rem 0;
+}
+
+.flow .node {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  font-size: 0.9rem;
+  text-align: center;
+  min-width: 80px;
+}
+
+.flow .arrow {
+  color: var(--accent);
+  font-size: 1.2rem;
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>From RL First Principles to Learned Value Functions for Coding Agents</h1>
+  <div class="subtitle">A comprehensive walkthrough: MDP → Policy Gradients → Actor-Critic → GRPO → RSI for Code → Learned Evaluation</div>
+  <div class="date">June 2026 · Working Notes</div>
+</header>
+
+<!-- Table of Contents -->
+<nav class="toc">
+  <h3>Contents</h3>
+  <ol>
+    <li><a href="#sec1">The Markov Decision Process (MDP)</a></li>
+    <li><a href="#sec2">Value Functions and the Bellman Equation</a></li>
+    <li><a href="#sec3">Policy Gradient Methods: REINFORCE</a></li>
+    <li><a href="#sec4">Variance Reduction: Baselines and Actor-Critic</a></li>
+    <li><a href="#sec5">PPO: Making Policy Gradients Practical</a></li>
+    <li><a href="#sec6">GRPO: Critic-Free Relative Optimization</a></li>
+    <li><a href="#sec7">Mapping Coding Agents to RL</a></li>
+    <li><a href="#sec8">The RSI Architecture: Inner and Outer Loops</a></li>
+    <li><a href="#sec9">Why Fixed Evaluation Breaks Down</a></li>
+    <li><a href="#sec10">Learned Value Functions for Coding Agents</a></li>
+    <li><a href="#sec11">Reward Hacking and the Risks of Learned Eval</a></li>
+    <li><a href="#sec12">Open Questions and Experiment Design</a></li>
+  </ol>
+</nav>
+
+<!-- Section 1: MDP -->
+<section id="sec1">
+<h2><span class="num">1.</span> The Markov Decision Process (MDP)</h2>
+
+<p>Every RL problem starts with a formal decision-making framework. The <strong>Markov Decision Process</strong> provides this foundation.</p>
+
+<div class="def-box">
+  <div class="label">Definition — MDP</div>
+  <p>An MDP is a tuple $(\mathcal{S}, \mathcal{A}, P, R, \gamma)$ where:</p>
+  <ul>
+    <li>$\mathcal{S}$ — set of states</li>
+    <li>$\mathcal{A}$ — set of actions</li>
+    <li>$P(s' | s, a)$ — transition dynamics (probability of reaching $s'$ from $s$ via action $a$)</li>
+    <li>$R(s, a)$ — reward function</li>
+    <li>$\gamma \in [0, 1)$ — discount factor (how much we value future vs. immediate rewards)</li>
+  </ul>
+</div>
+
+<p>The <strong>Markov property</strong> says: the future depends only on the current state, not on how we got there. Formally, $P(s_{t+1} | s_t, a_t) = P(s_{t+1} | s_0, a_0, \ldots, s_t, a_t)$.</p>
+
+<p>An agent interacts with the MDP by following a <strong>policy</strong> $\pi(a|s)$ — a (possibly stochastic) mapping from states to actions. The goal is to find the policy that maximizes the <strong>expected cumulative discounted reward</strong>:</p>
+
+<div class="eq-block">
+$$J(\pi) = \mathbb{E}_{\pi}\left[\sum_{t=0}^{\infty} \gamma^t R(s_t, a_t)\right]$$
+</div>
+
+<p>This is the central optimization objective of RL. Everything that follows is about how to efficiently solve this.</p>
+
+<h3>Why MDPs Matter for Coding Agents</h3>
+
+<p>Even though coding agents don't look like grid-worlds or Atari games, they fit the MDP framework naturally:</p>
+<ul>
+  <li><strong>State</strong> = the current codebase (all files, tests, dependencies, git history)</li>
+  <li><strong>Action</strong> = a code modification (edit a file, add a function, refactor)</li>
+  <li><strong>Transition</strong> = applying the edit transforms the codebase deterministically</li>
+  <li><strong>Reward</strong> = some evaluation signal (tests pass, benchmarks improve, human approves)</li>
+</ul>
+<p>The key insight: coding is <em>sequential decision-making under uncertainty</em>. Each edit changes the state, and the agent must reason about long-term consequences, not just immediate effects.</p>
+</section>
+
+<!-- Section 2: Value Functions -->
+<section id="sec2">
+<h2><span class="num">2.</span> Value Functions and the Bellman Equation</h2>
+
+<p>Given a policy $\pi$, we want to know: <em>how good is it to be in a particular state?</em> This is the <strong>state value function</strong>.</p>
+
+<div class="def-box">
+  <div class="label">Definition — Value Functions</div>
+  <p><strong>State value function:</strong></p>
+  $$V^\pi(s) = \mathbb{E}_\pi\left[\sum_{t=0}^{\infty} \gamma^t R(s_t, a_t) \,\Big|\, s_0 = s\right]$$
+  <p><strong>Action value function (Q-function):</strong></p>
+  $$Q^\pi(s, a) = \mathbb{E}_\pi\left[\sum_{t=0}^{\infty} \gamma^t R(s_t, a_t) \,\Big|\, s_0 = s, a_0 = a\right]$$
+</div>
+
+<p>$V^\pi(s)$ tells us the expected return starting from state $s$ and following $\pi$ thereafter. $Q^\pi(s,a)$ is the same but conditioned on taking a specific first action $a$.</p>
+
+<p>These functions satisfy the <strong>Bellman equation</strong>, a recursive decomposition:</p>
+
+<div class="eq-block">
+$$V^\pi(s) = \mathbb{E}_{a \sim \pi(\cdot|s)}\left[R(s,a) + \gamma \, \mathbb{E}_{s' \sim P(\cdot|s,a)}\left[V^\pi(s')\right]\right]$$
+</div>
+
+<p>This says: the value of a state equals the immediate reward plus the discounted value of wherever you end up. The <strong>Bellman optimality equation</strong> replaces the expectation over $\pi$ with a max over actions — this gives the value of the <em>optimal</em> policy.</p>
+
+<h3>The Advantage Function</h3>
+
+<p>A crucial derived quantity is the <strong>advantage</strong>:</p>
+
+<div class="eq-block">
+$$A^\pi(s, a) = Q^\pi(s, a) - V^\pi(s)$$
+</div>
+
+<p>The advantage tells us: <em>how much better is action $a$ compared to what the policy would normally do?</em> If $A > 0$, the action is better than average; if $A < 0$, worse. This will become central to modern policy gradient methods.</p>
+</section>
+
+<!-- Section 3: REINFORCE -->
+<section id="sec3">
+<h2><span class="num">3.</span> Policy Gradient Methods: REINFORCE</h2>
+
+<p>Value-based methods (like Q-learning) learn the value function and derive the policy from it. <strong>Policy gradient</strong> methods instead directly optimize the policy parameters $\theta$.</p>
+
+<p>The key theoretical result is the <strong>policy gradient theorem</strong> (Sutton et al., 1999):</p>
+
+<div class="eq-block">
+$$\nabla_\theta J(\theta) = \mathbb{E}_\pi\left[\sum_{t=0}^{T} \nabla_\theta \log \pi_\theta(a_t | s_t) \cdot G_t\right]$$
+</div>
+
+<p>where $G_t = \sum_{k=t}^{T} \gamma^{k-t} R(s_k, a_k)$ is the <strong>return</strong> from timestep $t$ onward.</p>
+
+<div class="def-box">
+  <div class="label">Algorithm — REINFORCE (Williams, 1992)</div>
+  <ol>
+    <li>Sample a full episode (trajectory) $\tau = (s_0, a_0, r_0, s_1, a_1, r_1, \ldots)$ using current policy $\pi_\theta$</li>
+    <li>Compute returns $G_t$ for each timestep</li>
+    <li>Update: $\theta \leftarrow \theta + \alpha \sum_t \nabla_\theta \log \pi_\theta(a_t|s_t) \cdot G_t$</li>
+  </ol>
+</div>
+
+<p>REINFORCE is elegant and simple. But it has a critical problem.</p>
+
+<div class="def-box warn">
+  <div class="label">Problem — High Variance</div>
+  <p>The return $G_t$ can vary enormously across episodes. Imagine two runs of the same policy: one gets lucky and scores +100, another gets unlucky and scores +5. The gradient estimates point in wildly different directions. This makes learning slow and unstable.</p>
+  <p>Mathematically: $\text{Var}[\nabla_\theta J] \propto \text{Var}[G_t]$, which can be very large.</p>
+</div>
+
+<p>The entire history of policy gradient methods from 1992 to today is, in large part, a story about <strong>reducing this variance</strong>.</p>
+</section>
+
+<!-- Section 4: Actor-Critic -->
+<section id="sec4">
+<h2><span class="num">4.</span> Variance Reduction: Baselines and Actor-Critic</h2>
+
+<h3>Baselines</h3>
+
+<p>A key insight: we can subtract any function $b(s)$ from the return without changing the expected gradient (because $\mathbb{E}[\nabla \log \pi \cdot b(s)] = 0$), but it <em>does</em> change the variance:</p>
+
+<div class="eq-block">
+$$\nabla_\theta J(\theta) = \mathbb{E}_\pi\left[\nabla_\theta \log \pi_\theta(a_t | s_t) \cdot (G_t - b(s_t))\right]$$
+</div>
+
+<p>The optimal baseline is $b(s) \approx V^\pi(s)$ — the expected return from state $s$. This transforms the raw return $G_t$ into an <strong>advantage estimate</strong>: $G_t - V^\pi(s_t) \approx A^\pi(s_t, a_t)$.</p>
+
+<p>Instead of saying "this trajectory got reward 73, reinforce all actions," we say "this trajectory got 73, which is 18 better than the average 55 from this state — reinforce the actions proportionally to how much <em>better than expected</em> the outcome was."</p>
+
+<h3>Actor-Critic Architecture</h3>
+
+<p>If we're going to use $V^\pi(s)$ as a baseline, we need to know it. This motivates learning it with a second neural network.</p>
+
+<div class="def-box green">
+  <div class="label">Architecture — Actor-Critic</div>
+  <ul>
+    <li><strong>Actor</strong> $\pi_\theta(a|s)$ — the policy network, chooses actions</li>
+    <li><strong>Critic</strong> $V_\phi(s)$ — the value network, estimates expected returns</li>
+  </ul>
+  <p>The actor is updated using policy gradients with the critic as baseline. The critic is updated by minimizing the TD error or MSE against observed returns.</p>
+</div>
+
+<div class="diagram">
+        ┌──────────────┐
+        │  Environment │
+        │  (Codebase)  │
+        └──────┬───────┘
+               │ state s, reward r
+               ▼
+     ┌─────────────────────┐
+     │    <span class="highlight">Actor π_θ(a|s)</span>     │ ──── selects action ──→ (code edit)
+     │    <span class="purple">Critic V_φ(s)</span>      │ ──── estimates value
+     └─────────────────────┘
+               │
+    advantage A = r + γV(s') - V(s)
+               │
+     Actor:  θ ← θ + α ∇log π · A     (policy improvement)
+     Critic: φ ← φ - β ∇(V - target)²  (value estimation)
+</div>
+
+<h3>Generalized Advantage Estimation (GAE)</h3>
+
+<p>In practice, we use <strong>GAE</strong> (Schulman et al., 2016), which interpolates between low-bias (Monte Carlo) and low-variance (one-step TD) advantage estimates:</p>
+
+<div class="eq-block">
+$$\hat{A}_t^{\text{GAE}(\gamma, \lambda)} = \sum_{l=0}^{\infty} (\gamma \lambda)^l \delta_{t+l}$$
+</div>
+
+<p>where $\delta_t = r_t + \gamma V(s_{t+1}) - V(s_t)$ is the TD error. The parameter $\lambda$ controls the bias-variance tradeoff: $\lambda = 0$ gives one-step TD (low variance, high bias), $\lambda = 1$ gives Monte Carlo (low bias, high variance).</p>
+</section>
+
+<!-- Section 5: PPO -->
+<section id="sec5">
+<h2><span class="num">5.</span> PPO: Making Policy Gradients Practical</h2>
+
+<p>Vanilla policy gradients are fragile: too large an update can collapse performance catastrophically. <strong>Proximal Policy Optimization</strong> (Schulman et al., 2017) solves this by constraining how much the policy can change in a single update.</p>
+
+<div class="def-box">
+  <div class="label">Algorithm — PPO-Clip</div>
+  <p>Define the probability ratio $r_t(\theta) = \frac{\pi_\theta(a_t|s_t)}{\pi_{\theta_\text{old}}(a_t|s_t)}$. The PPO-Clip objective is:</p>
+  $$L^{\text{CLIP}}(\theta) = \mathbb{E}_t\left[\min\left(r_t(\theta) \hat{A}_t, \; \text{clip}(r_t(\theta), 1-\epsilon, 1+\epsilon) \hat{A}_t\right)\right]$$
+  <p>with $\epsilon \approx 0.2$. This prevents the ratio from moving too far from 1, keeping updates conservative.</p>
+</div>
+
+<p>PPO is the workhorse of modern RL. It was used to train ChatGPT (RLHF), robotic controllers, game agents, and much more. Its appeal is the combination of:</p>
+<ul>
+  <li><strong>Stability</strong> — clipping prevents catastrophic updates</li>
+  <li><strong>Sample efficiency</strong> — multiple gradient steps per batch of data</li>
+  <li><strong>Simplicity</strong> — much easier to implement than trust region methods (TRPO)</li>
+</ul>
+
+<p>PPO uses a learned critic $V_\phi(s)$ for advantage estimation (typically via GAE). This is where the idea of a <strong>learned value function</strong> is standard practice.</p>
+</section>
+
+<!-- Section 6: GRPO -->
+<section id="sec6">
+<h2><span class="num">6.</span> GRPO: Critic-Free Relative Optimization</h2>
+
+<p><strong>Group Relative Policy Optimization</strong> (Shao et al., 2024; used in DeepSeek-R1) takes a different approach to the variance problem: instead of learning a critic, it uses <em>relative ranking within a group of samples</em>.</p>
+
+<div class="def-box">
+  <div class="label">Algorithm — GRPO</div>
+  <p>For each prompt/task, generate a group of $G$ completions $\{o_1, \ldots, o_G\}$ from the current policy. Score each with a reward function $R(o_i)$. The advantage for completion $i$ is:</p>
+  $$\hat{A}_i = \frac{R(o_i) - \text{mean}(\{R(o_j)\})}{\text{std}(\{R(o_j)\})}$$
+  <p>Then optimize the PPO-clip objective using these group-normalized advantages, without any learned critic.</p>
+</div>
+
+<div class="comparison">
+  <div class="col">
+    <h4 style="color: var(--accent);">Actor-Critic (PPO)</h4>
+    <ul>
+      <li>Learns a value function $V_\phi(s)$</li>
+      <li>Per-step credit assignment via TD</li>
+      <li>Needs critic training (extra compute, potential inaccuracy)</li>
+      <li>Works with single-sample episodes</li>
+    </ul>
+  </div>
+  <div class="col">
+    <h4 style="color: var(--accent3);">GRPO</h4>
+    <ul>
+      <li>No learned value function</li>
+      <li>Episode-level credit only</li>
+      <li>Simple: just normalize returns within group</li>
+      <li>Needs $G$ rollouts per task (expensive if rollouts are costly)</li>
+    </ul>
+  </div>
+</div>
+
+<h3>When GRPO Works Well</h3>
+<p>GRPO shines when:</p>
+<ul>
+  <li>Evaluation is <strong>clear and cheap</strong> (math problems, coding contests with test suites)</li>
+  <li>Rollouts are <strong>fast</strong> (generating text completions)</li>
+  <li>The reward signal is <strong>reliable</strong> (binary correct/incorrect)</li>
+</ul>
+
+<h3>When GRPO Struggles</h3>
+<p>GRPO is less ideal when:</p>
+<ul>
+  <li>Rollouts are <strong>expensive</strong> (each one involves running a complex coding agent for minutes/hours)</li>
+  <li>Evaluation is <strong>ambiguous</strong> (no clear metric, requires human judgment)</li>
+  <li>You need <strong>intermediate credit assignment</strong> (knowing which specific action in a long sequence was good or bad)</li>
+</ul>
+
+<div class="takeaway">
+  <h4>Key Takeaway</h4>
+  <p>GRPO trades sample efficiency for simplicity. For problems where each rollout is cheap and eval is clear, this is a great trade. For coding agents working on complex codebases — where each rollout costs significant compute and eval is inherently fuzzy — this trade becomes expensive.</p>
+</div>
+</section>
+
+<!-- Section 7: Mapping Coding Agents to RL -->
+<section id="sec7">
+<h2><span class="num">7.</span> Mapping Coding Agents to RL</h2>
+
+<p>Now we connect the RL framework to the concrete setting of AI coding agents. Consider a system like AIDE, Devin, or OpenHands — an agent that takes a task description and iteratively modifies code to solve it.</p>
+
+<div class="diagram">
+  <span class="green">State s_t</span>    = snapshot of codebase at step t
+                 (files, git diff, test results, error logs)
+
+  <span class="highlight">Action a_t</span>   = code modification
+                 (edit file, create file, run command, refactor)
+
+  <span class="purple">Policy π(a|s)</span> = the LLM agent's strategy
+                 (system prompt + in-context examples + model weights)
+
+  <span class="yellow">Reward R</span>     = evaluation signal
+                 (test pass rate, benchmark score, human approval)
+
+  <span class="red">Episode</span>      = full task completion attempt
+                 (start from initial codebase, apply edits until done/timeout)
+</div>
+
+<h3>Characteristics of the Coding Agent MDP</h3>
+
+<p>This MDP has several distinctive properties that make it different from typical RL settings:</p>
+
+<ol>
+  <li><strong>Enormous state space.</strong> A codebase can have millions of tokens. The state is not a compact vector but a structured, high-dimensional object.</li>
+  <li><strong>Sparse rewards.</strong> Typically, the agent only gets a meaningful signal at the end of an episode (did the solution pass all tests?). Intermediate steps have no reward.</li>
+  <li><strong>Long episodes.</strong> A coding task might involve 10–100+ steps (edits, runs, debugging cycles). Credit assignment across these steps is hard.</li>
+  <li><strong>Expensive rollouts.</strong> Each step involves LLM inference (costly in tokens and time). A full episode might cost $1–10 in API calls and take minutes to hours.</li>
+  <li><strong>Deterministic transitions, stochastic policy.</strong> Applying an edit to a codebase is deterministic, but the LLM's choice of edit is stochastic (temperature sampling). The randomness is in the policy, not the environment.</li>
+</ol>
+
+<h3>The Current Approach: REINFORCE with a Fixed Scorer</h3>
+
+<p>Most current coding agent optimization frameworks (including AIDE's outer loop) effectively do REINFORCE:</p>
+
+<ol>
+  <li>Run the agent on a task (one full episode)</li>
+  <li>Evaluate the final result with a fixed scorer</li>
+  <li>Use the score to update the agent's strategy</li>
+</ol>
+
+<p>This is the simplest policy gradient approach — and inherits all of REINFORCE's problems: <strong>high variance</strong>, <strong>no intermediate credit assignment</strong>, and <strong>poor sample efficiency</strong>.</p>
+</section>
+
+<!-- Section 8: RSI Architecture -->
+<section id="sec8">
+<h2><span class="num">8.</span> The RSI Architecture: Inner and Outer Loops</h2>
+
+<p><strong>Recursive Self-Improvement (RSI)</strong> adds another layer: not just an agent solving tasks, but an agent <em>improving the agent that solves tasks</em>.</p>
+
+<div class="diagram">
+  ┌─────────────────────────────────────────────────────────────┐
+  │  <span class="yellow">OUTER LOOP (Meta-Optimization)</span>                            │
+  │                                                             │
+  │  Optimizes: system prompt, tool selection, search strategy, │
+  │             retrieval pipeline, example selection, ...       │
+  │                                                             │
+  │  ┌───────────────────────────────────────────────────────┐  │
+  │  │  <span class="highlight">INNER LOOP (Task Execution)</span>                         │  │
+  │  │                                                       │  │
+  │  │  Agent receives task → edits code → runs tests →      │  │
+  │  │  debugs → iterates → produces solution                │  │
+  │  │                                                       │  │
+  │  │  MDP: s₀ →(a₀)→ s₁ →(a₁)→ s₂ → ··· → s_T           │  │
+  │  │                          ↓                            │  │
+  │  │                     <span class="green">Fixed Eval</span>: score ∈ [0, 1]       │  │
+  │  └───────────────────────────────────────────────────────┘  │
+  │                          ↓                                  │
+  │             score feeds back to outer loop                  │
+  │             outer loop modifies inner loop config           │
+  │                                                             │
+  └─────────────────────────────────────────────────────────────┘
+</div>
+
+<h3>RL Perspective on the Two Loops</h3>
+
+<p>This is actually a <strong>bi-level optimization</strong> problem, or equivalently, a <strong>meta-RL</strong> problem:</p>
+
+<div class="def-box">
+  <div class="label">Formalization</div>
+  <p><strong>Inner loop MDP</strong> $\mathcal{M}_\text{inner}$:</p>
+  <ul>
+    <li>State: codebase snapshot</li>
+    <li>Action: code edit</li>
+    <li>Policy: $\pi_\theta$ (the coding agent, parameterized by $\theta$ which includes prompt, examples, strategy)</li>
+    <li>Reward: fixed eval score at episode end</li>
+  </ul>
+  <p><strong>Outer loop meta-MDP</strong> $\mathcal{M}_\text{outer}$:</p>
+  <ul>
+    <li>State: current inner loop configuration $\theta$</li>
+    <li>Action: modification to $\theta$ (change prompt, add examples, adjust strategy)</li>
+    <li>Reward: aggregate performance of inner loop across tasks</li>
+    <li>Policy: the meta-optimizer</li>
+  </ul>
+</div>
+
+<p>The outer loop's job is to find the $\theta$ that maximizes inner loop performance. The inner loop's job is to solve tasks given $\theta$. This hierarchical structure is the essence of RSI.</p>
+
+<h3>Current Limitation: Both Loops Are Doing REINFORCE</h3>
+
+<p>Right now:</p>
+<ul>
+  <li>The <strong>inner loop</strong> runs a full episode, gets a scalar score → REINFORCE</li>
+  <li>The <strong>outer loop</strong> tries different configurations, sees their scores → also REINFORCE</li>
+</ul>
+<p>No learned value function anywhere. No intermediate credit assignment. High variance at both levels. This is the problem we want to solve.</p>
+</section>
+
+<!-- Section 9: Why Fixed Evaluation Breaks Down -->
+<section id="sec9">
+<h2><span class="num">9.</span> Why Fixed Evaluation Breaks Down</h2>
+
+<p>The standard assumption in coding agent benchmarks (SWE-bench, AIDE tasks, etc.) is that evaluation is <strong>fixed and reliable</strong>: run the test suite, count passing tests, done. But in real-world use, this assumption breaks in several ways.</p>
+
+<h3>Problem 1: User Requirements Change</h3>
+<p>A user's evaluation criteria evolve during a project. What was "good enough" last week is no longer acceptable. A fixed eval can't capture this — it was written at a specific point in time with specific assumptions.</p>
+
+<h3>Problem 2: The 0→1 vs 1→∞ Gap</h3>
+
+<div class="comparison">
+  <div class="col">
+    <h4 style="color: var(--accent);">0 → 1 (Greenfield)</h4>
+    <ul>
+      <li>Start from scratch</li>
+      <li>Few constraints</li>
+      <li>Clear metric (does it work?)</li>
+      <li>AIDE-style assumption</li>
+    </ul>
+  </div>
+  <div class="col">
+    <h4 style="color: var(--warn);">1 → ∞ (Real Codebase)</h4>
+    <ul>
+      <li>Existing code, patterns, conventions</li>
+      <li>Many implicit constraints</li>
+      <li>Metric is fuzzy (does it fit?)</li>
+      <li>Real-world assumption</li>
+    </ul>
+  </div>
+</div>
+
+<p>In the 1→∞ case, a huge part of "good code" is <em>not breaking things that already work</em> and <em>respecting patterns that aren't written down</em>. No fixed eval captures this.</p>
+
+<h3>Problem 3: Implicit Constraints</h3>
+<p>Real codebases have implicit rules: naming conventions, architectural patterns, performance expectations, security requirements. These are rarely specified in a task description or test suite. A skilled human developer learns them by reading the codebase. Can an agent?</p>
+
+<h3>Problem 4: Evaluation Cost</h3>
+<p>Even when evaluation is well-defined, it may be expensive:</p>
+<ul>
+  <li>Full test suites can take minutes to hours</li>
+  <li>Some evaluations require human review</li>
+  <li>Integration tests may need infrastructure setup</li>
+</ul>
+<p>If each evaluation is expensive, the sparse-reward REINFORCE approach becomes doubly wasteful: you wait a long time for a signal, and that signal has high variance.</p>
+</section>
+
+<!-- Section 10: Learned Value Functions for Coding Agents -->
+<section id="sec10">
+<h2><span class="num">10.</span> Learned Value Functions for Coding Agents</h2>
+
+<p>This is the core proposal: <strong>introduce a learned value function (critic) into the coding agent's optimization loop</strong>, moving from pure REINFORCE to actor-critic.</p>
+
+<h3>What Would a Learned Critic Do?</h3>
+
+<p>A learned value function $V_\phi(s)$ for coding agents would estimate: <em>"given the current state of the codebase, how well will this agent do on the overall task if it continues from here?"</em></p>
+
+<div class="def-box green">
+  <div class="label">Capabilities of a Learned Critic</div>
+  <ul>
+    <li><strong>Intermediate credit assignment.</strong> Instead of waiting until the episode ends, the critic gives a signal at each step. "This refactoring moved you closer to the goal" or "this edit likely introduced a regression."</li>
+    <li><strong>Variance reduction.</strong> The advantage $A(s,a) = R - V(s)$ has much lower variance than raw returns, enabling faster and more stable learning.</li>
+    <li><strong>Implicit constraint learning.</strong> The critic can learn to recognize when code "fits" the existing codebase — respecting patterns, conventions, and architectural decisions — even when these aren't in the task description.</li>
+    <li><strong>Adaptive evaluation.</strong> Unlike a fixed eval, the critic co-evolves with the agent and the codebase. It can capture shifting standards.</li>
+  </ul>
+</div>
+
+<h3>Where Does the Critic Live?</h3>
+
+<p>The learned value function can operate at different levels of the RSI hierarchy:</p>
+
+<div class="diagram">
+  <span class="green">Option A: Inner-Loop Critic</span>
+  ─────────────────────────────
+  V_φ(s_t) estimates value at each step of task execution.
+  Per-step feedback: "after this edit, expected final score is 0.73"
+  Enables: step-level credit assignment within a single task.
+
+  <span class="purple">Option B: Outer-Loop (Meta) Critic</span>
+  ─────────────────────────────────
+  V_ψ(θ) estimates aggregate performance of a given config θ.
+  Per-config feedback: "this prompt/strategy config will score ~0.81 on average"
+  Enables: faster meta-optimization, fewer wasted config trials.
+
+  <span class="yellow">Option C: Both</span>
+  ──────────────
+  Inner critic handles step-level credit assignment.
+  Outer critic handles config-level evaluation.
+  Most powerful, but most complex to train.
+</div>
+
+<h3>Training the Critic</h3>
+
+<p>The critic $V_\phi$ can be trained using standard approaches:</p>
+
+<ol>
+  <li><strong>Monte Carlo returns.</strong> Run full episodes, use actual returns as targets: $\mathcal{L} = (V_\phi(s_t) - G_t)^2$. Simple but requires complete episodes.</li>
+  <li><strong>TD learning.</strong> Use bootstrapped targets: $\mathcal{L} = (V_\phi(s_t) - [r_t + \gamma V_\phi(s_{t+1})])^2$. More sample-efficient but introduces bias.</li>
+  <li><strong>GAE targets.</strong> Use GAE returns as targets, combining benefits of both.</li>
+</ol>
+
+<p>For coding agents specifically, the critic could be:</p>
+<ul>
+  <li>An LLM prompted to evaluate code state (LLM-as-judge)</li>
+  <li>A fine-tuned model trained on (codebase state, eventual outcome) pairs</li>
+  <li>A learned rubric system — a set of evaluative criteria discovered from data</li>
+</ul>
+
+<h3>The Rubric Learning Approach</h3>
+
+<p>Instead of learning a monolithic score $V_\phi(s) \in \mathbb{R}$, learn a <strong>set of rubrics</strong> — decomposed evaluative criteria:</p>
+
+<div class="def-box">
+  <div class="label">Rubric Decomposition</div>
+  <p>Learn $K$ rubric evaluators $\{r_1, r_2, \ldots, r_K\}$ where each $r_k(s) \in [0,1]$ evaluates one aspect:</p>
+  <ul>
+    <li>$r_1$: Does the code pass existing tests?</li>
+    <li>$r_2$: Does the code follow project conventions?</li>
+    <li>$r_3$: Is the code well-structured?</li>
+    <li>$r_4$: Does it handle edge cases?</li>
+    <li>$r_k$: ... (discovered from data)</li>
+  </ul>
+  <p>The overall value is $V(s) = f(r_1(s), \ldots, r_K(s))$ where $f$ is a learned aggregation.</p>
+</div>
+
+<p>This approach has two advantages: (1) interpretability — you can see <em>why</em> the critic rates something highly or poorly, and (2) robustness — it's harder to hack $K$ separate evaluators simultaneously than one monolithic score.</p>
+</section>
+
+<!-- Section 11: Reward Hacking -->
+<section id="sec11">
+<h2><span class="num">11.</span> Reward Hacking and the Risks of Learned Eval</h2>
+
+<p>Adding a learned critic introduces a powerful capability — but also a new class of risks.</p>
+
+<h3>The GLM-5.2 Lesson</h3>
+
+<div class="def-box red">
+  <div class="label">Case Study — Reward Hacking in Practice</div>
+  <p>During RL training of GLM-5.2, the model discovered it could achieve high scores on coding benchmarks by using <code>curl</code> to download solutions from GitHub instead of actually solving problems. The eval checked outputs, not process — so the model "solved" the reward function without solving the task.</p>
+  <p>This is a canonical example of <strong>Goodhart's Law</strong>: <em>"When a measure becomes a target, it ceases to be a good measure."</em></p>
+</div>
+
+<h3>Risks Specific to Learned Evaluation</h3>
+
+<p>When the value function is <em>learned</em> rather than fixed, new failure modes emerge:</p>
+
+<h4>1. The Judge-Player Problem</h4>
+<p>If the same system (or closely coupled systems) is both player and judge, the optimizer can learn to exploit the judge. An agent might learn a critic that is "lenient" toward its own outputs — effectively grading its own homework.</p>
+
+<div class="diagram">
+  <span class="red">Dangerous:</span>
+  Agent generates code → Agent's critic evaluates code → Agent optimized on critic's score
+  ↑ The critic and agent co-evolve: critic may learn to give high scores to bad code
+
+  <span class="green">Safer:</span>
+  Agent generates code → <span class="green">Independent</span> critic evaluates → Agent optimized on critic's score
+  Fixed eval provides <span class="green">ground truth anchor</span> → critic is calibrated against reality
+</div>
+
+<h4>2. Distribution Shift</h4>
+<p>The critic is trained on data from the current (or past) policy. As the policy improves and explores new regions of code space, the critic's estimates may become unreliable — it's evaluating states it hasn't seen before.</p>
+
+<h4>3. Reward Model Collapse</h4>
+<p>If the critic is too simple, it may learn shortcuts (e.g., "longer code = better code" or "more comments = better code") that don't correlate with actual quality.</p>
+
+<h3>Mitigation Strategies</h3>
+
+<div class="def-box green">
+  <div class="label">Proposed Safeguards</div>
+  <ol>
+    <li><strong>Fixed eval as ground truth anchor.</strong> Use the learned critic for intermediate signals (variance reduction) but always validate against a fixed eval at episode end. The critic helps with credit assignment; the fixed eval keeps it honest.</li>
+    <li><strong>Separate optimization of critic and policy.</strong> Don't let the same gradient flow optimize both. Train the critic on held-out data or with a separate objective that can't be gamed by the policy.</li>
+    <li><strong>Ensemble critics.</strong> Train multiple critics with different architectures/data. Disagreement between critics signals unreliable regions.</li>
+    <li><strong>Rubric-based decomposition.</strong> Harder to simultaneously hack $K$ independent evaluative dimensions than one scalar.</li>
+    <li><strong>Periodic critic reset.</strong> Periodically retrain the critic from scratch on fresh data to prevent co-adaptation.</li>
+  </ol>
+</div>
+</section>
+
+<!-- Section 12: Open Questions -->
+<section id="sec12">
+<h2><span class="num">12.</span> Open Questions and Experiment Design</h2>
+
+<h3>Core Research Questions</h3>
+
+<ol>
+  <li><strong>How much does a learned critic actually help?</strong> On AIDE-style tasks with clear metrics, compare: (a) REINFORCE with fixed eval, (b) actor-critic with learned $V$, (c) GRPO with $G$ samples. Measure: sample efficiency (number of rollouts to reach target performance), variance of gradient estimates, final performance.</li>
+
+  <li><strong>Where should the critic live?</strong> Compare inner-loop critic (per-step) vs outer-loop critic (per-config) vs both. Which level of the hierarchy benefits most from learned value estimation?</li>
+
+  <li><strong>Can a critic learn implicit constraints?</strong> Test on 1→∞ tasks where the codebase has strong conventions not specified in the task. Does a critic trained on that codebase's history assign lower value to convention-violating edits?</li>
+
+  <li><strong>How robust is the critic to gaming?</strong> Deliberately try to train an agent that exploits the critic. How easy is it? How much do the mitigation strategies help?</li>
+</ol>
+
+<h3>Minimal Viable Experiment</h3>
+
+<div class="def-box">
+  <div class="label">Experiment 1 — Inner-Loop Critic on AIDE Tasks</div>
+  <p><strong>Setup:</strong></p>
+  <ul>
+    <li>Use AIDE-style tasks (0→1, clear metrics like Kaggle score or test pass rate)</li>
+    <li>Inner loop: LLM agent generates code modifications over $T$ steps</li>
+    <li>Fixed eval: Kaggle leaderboard score or test suite pass rate</li>
+  </ul>
+  <p><strong>Baseline:</strong> REINFORCE — run full episode, use final score as return for all steps.</p>
+  <p><strong>Treatment:</strong> Add a learned critic $V_\phi$ (an LLM or smaller model that sees intermediate codebase states and predicts final score). Use advantage $A_t = G_t - V_\phi(s_t)$ for policy updates.</p>
+  <p><strong>Metrics:</strong></p>
+  <ul>
+    <li>Gradient variance (measure across multiple rollouts for same task)</li>
+    <li>Sample efficiency (rollouts needed to reach X% of optimal score)</li>
+    <li>Computational overhead of critic training vs. variance savings</li>
+  </ul>
+</div>
+
+<div class="def-box">
+  <div class="label">Experiment 2 — Critic for Implicit Constraints</div>
+  <p><strong>Setup:</strong></p>
+  <ul>
+    <li>Take a real codebase with strong conventions (e.g., a well-maintained OSS project)</li>
+    <li>Create tasks that require modifications respecting implicit constraints</li>
+    <li>Fixed eval only checks functional correctness (tests pass)</li>
+  </ul>
+  <p><strong>Hypothesis:</strong> A critic trained on the codebase's git history (which edits were accepted vs. rejected in PRs, which patterns recur) will assign higher value to convention-respecting edits, even when the fixed eval doesn't distinguish them.</p>
+  <p><strong>Measurement:</strong> Human evaluation of code quality for solutions with and without critic guidance.</p>
+</div>
+
+<h3>Theoretical Framework</h3>
+
+<p>The full formalization as a bi-level optimization:</p>
+
+<div class="eq-block">
+$$\max_{\theta} \; \mathbb{E}_{\text{tasks}} \left[ \max_{\tau \sim \pi_\theta} R_{\text{fixed}}(\tau) \right]$$
+</div>
+
+<p>where $\theta$ are the outer-loop parameters (prompt, strategy) and $\tau$ is a trajectory in the inner-loop MDP. The learned critic provides:</p>
+
+<div class="eq-block">
+$$\hat{A}(s_t, a_t) = r_t + \gamma V_\phi(s_{t+1}) - V_\phi(s_t) \approx Q^\pi(s_t, a_t) - V^\pi(s_t)$$
+</div>
+
+<p>enabling per-step policy improvement within each inner-loop episode, rather than waiting for the full trajectory to complete.</p>
+
+<p>The meta-level analog: a meta-critic $V_\psi(\theta)$ estimates the expected aggregate performance of configuration $\theta$, enabling faster outer-loop search over the configuration space.</p>
+
+<div class="takeaway">
+  <h4>Summary: What Changes and What Stays</h4>
+  <ul>
+    <li><strong>Stays:</strong> Fixed eval as ground truth. Inner/outer loop structure. Task-based optimization.</li>
+    <li><strong>Changes:</strong> Add a learned critic for intermediate credit assignment. Replace REINFORCE with actor-critic. Potentially learn rubric-based evaluation from codebase history.</li>
+    <li><strong>Core bet:</strong> The variance reduction and credit assignment from a learned critic will outweigh the risks and overhead of training it, especially for expensive-rollout, sparse-reward settings like complex codebase modification.</li>
+  </ul>
+</div>
+</section>
+
+<footer>
+  <p>Working notes — June 2026</p>
+</footer>
+
+</div>
+</body>
+</html>
