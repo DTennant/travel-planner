@@ -56,18 +56,18 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; back
 .section-title span { font-size: 1.8rem; }
 .cards-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 32px; }
 
-.car-card { background: var(--gradient-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow-card); display: flex; flex-direction: column; gap: 12px; transition: transform 0.2s; }
-.car-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-glow); }
-.car-icon { font-size: 2.5rem; }
-.car-name { font-size: 1.2rem; font-weight: 700; }
-.car-detail { font-size: 0.9rem; color: var(--text-secondary); }
-.car-price { font-size: 1.4rem; font-weight: 800; color: var(--accent-cyan); }
-.car-tag { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.2); border-radius: 6px; font-size: 0.8rem; color: var(--accent-cyan); width: fit-content; }
-
 .info-card { background: var(--gradient-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow-card); transition: transform 0.2s; }
 .info-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-glow); }
 .info-card-title { font-weight: 600; font-size: 1.05rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-.info-card-detail { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.7; }
+.info-card-detail { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.8; }
+.info-card-detail strong { color: var(--text-primary); }
+
+.drive-stat { display: flex; align-items: center; gap: 8px; padding: 6px 0; }
+.drive-stat-icon { font-size: 1.1rem; }
+.drive-stat-label { font-size: 0.85rem; color: var(--text-muted); min-width: 80px; }
+.drive-stat-value { font-size: 0.95rem; font-weight: 600; color: var(--accent-cyan); }
+
+.car-tag { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.2); border-radius: 6px; font-size: 0.8rem; color: var(--accent-cyan); width: fit-content; }
 
 .map-section { padding: 40px 0; }
 .map-wrapper { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); box-shadow: var(--shadow-card); }
@@ -85,14 +85,13 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; back
 .day-card { background: var(--gradient-card); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: transform 0.2s; animation: fadeSlideIn 0.5s ease-out both; }
 .day-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-glow); }
 @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-.day-card:nth-child(1){animation-delay:0s}.day-card:nth-child(2){animation-delay:.05s}.day-card:nth-child(3){animation-delay:.1s}.day-card:nth-child(4){animation-delay:.15s}.day-card:nth-child(5){animation-delay:.2s}
+.day-card:nth-child(1){animation-delay:0s}.day-card:nth-child(2){animation-delay:.05s}.day-card:nth-child(3){animation-delay:.1s}.day-card:nth-child(4){animation-delay:.15s}.day-card:nth-child(5){animation-delay:.2s}.day-card:nth-child(6){animation-delay:.25s}.day-card:nth-child(7){animation-delay:.3s}
 
 .day-header { padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; flex-wrap: wrap; gap: 8px; }
 .day-header:hover { background: var(--bg-card-hover); }
 .day-label { display: flex; align-items: center; gap: 10px; }
 .day-num { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1rem; flex-shrink: 0; }
 .day-info h3 { font-size: 1rem; font-weight: 600; line-height: 1.3; }
-.day-info .day-date { font-size: 0.8rem; color: var(--text-muted); }
 .day-meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
 .day-km { padding: 4px 10px; background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2); border-radius: 6px; font-size: 0.8rem; color: var(--accent-blue); font-weight: 500; }
 .day-expand { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: rgba(255,255,255,0.05); color: var(--text-muted); transition: transform 0.3s; font-size: 0.8rem; }
@@ -163,35 +162,34 @@ footer { text-align: center; padding: 40px 20px; color: var(--text-muted); font-
   <div class="hero-content">
     <div class="hero-flag">🏴󠁧󠁢󠁳󠁣󠁴󠁿</div>
     <h1>苏格兰高地自驾之旅</h1>
-    <p class="hero-sub">Edinburgh → Highlands → Isle of Skye · 5 Days</p>
-    <div class="hero-travelers">👫 Bingchen & Yue · 高地环线 · 租车自驾</div>
+    <p class="hero-sub">London → Edinburgh → Highlands · 7 Days · 自驾</p>
+    <div class="hero-travelers">👫 Bingchen & Yue · 自己的车 · 高地环线</div>
   </div>
 </section>
 
 <div class="container">
-  <section class="section" id="transport">
-    <h2 class="section-title"><span>🚗</span> 租车</h2>
+  <section class="section" id="overview">
+    <h2 class="section-title"><span>🚗</span> 行程概览</h2>
     <div class="cards-row">
-      <div class="car-card">
-        <div style="display:flex;align-items:center;gap:12px;">
-          <div class="car-icon">🚗</div>
-          <div><div class="car-name">租车 · Edinburgh 取还</div><div class="car-detail">5 天 · Waverley 站附近或机场取车</div></div>
-        </div>
-        <div class="car-price">£200 — 350</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <div class="car-tag">⛽ 油车</div>
-          <div class="car-tag">🗺️ ~1,000km 总里程</div>
-          <div class="car-tag">⛽ 油费约 £80-120</div>
+      <div class="info-card">
+        <div class="info-card-title">🗺️ 路线</div>
+        <div class="info-card-detail">
+          <div class="drive-stat"><span class="drive-stat-icon">📍</span><span class="drive-stat-label">起/终点</span><span class="drive-stat-value">London</span></div>
+          <div class="drive-stat"><span class="drive-stat-icon">🗺️</span><span class="drive-stat-label">总里程</span><span class="drive-stat-value">~2,000km</span></div>
+          <div class="drive-stat"><span class="drive-stat-icon">📅</span><span class="drive-stat-label">天数</span><span class="drive-stat-value">7 天</span></div>
+          <div class="drive-stat"><span class="drive-stat-icon">⛽</span><span class="drive-stat-label">油费预估</span><span class="drive-stat-value">£150 — 220</span></div>
         </div>
       </div>
       <div class="info-card">
-        <div class="info-card-title">📋 行程概览</div>
+        <div class="info-card-title">📋 每日路线</div>
         <div class="info-card-detail">
-          Day 1 · Edinburgh → Stirling → Glencoe<br>
-          Day 2 · Fort William → Glenfinnan → Skye<br>
-          Day 3 · Isle of Skye 全天<br>
-          Day 4 · Skye → Loch Ness → Inverness<br>
-          Day 5 · Inverness → Cairngorms → Edinburgh
+          <strong>Day 1</strong> · London → Edinburgh（~640km）<br>
+          <strong>Day 2</strong> · Edinburgh → Stirling → Glencoe<br>
+          <strong>Day 3</strong> · Fort William → Glenfinnan → Skye<br>
+          <strong>Day 4</strong> · Isle of Skye 全天<br>
+          <strong>Day 5</strong> · Skye → Loch Ness → Inverness<br>
+          <strong>Day 6</strong> · Inverness → Cairngorms → Edinburgh<br>
+          <strong>Day 7</strong> · Edinburgh → London（~640km）
         </div>
       </div>
     </div>
@@ -221,15 +219,14 @@ footer { text-align: center; padding: 40px 20px; color: var(--text-muted); font-
     <h2 class="section-title"><span>💰</span> 预算一览</h2>
     <div class="budget-card">
       <div class="budget-items">
-        <div class="budget-item"><div class="budget-item-label">🚗 租车 (5天)</div><div class="budget-item-value">£200 — 350</div></div>
-        <div class="budget-item"><div class="budget-item-label">⛽ 油费</div><div class="budget-item-value">£80 — 120</div></div>
-        <div class="budget-item"><div class="budget-item-label">🏠 住宿 (4晚, £70-150/晚)</div><div class="budget-item-value">£300 — 600</div></div>
-        <div class="budget-item"><div class="budget-item-label">🍽️ 餐饮 (5天)</div><div class="budget-item-value">£150 — 300</div></div>
+        <div class="budget-item"><div class="budget-item-label">⛽ 油费 (~2,000km)</div><div class="budget-item-value">£150 — 220</div></div>
+        <div class="budget-item"><div class="budget-item-label">🏠 住宿 (6晚)</div><div class="budget-item-value">£450 — 800</div></div>
+        <div class="budget-item"><div class="budget-item-label">🍽️ 餐饮 (7天)</div><div class="budget-item-value">£200 — 350</div></div>
         <div class="budget-item"><div class="budget-item-label">🎟️ 景点门票 & 活动</div><div class="budget-item-value">£80 — 150</div></div>
       </div>
       <div class="budget-total">
         <div class="budget-total-label">💎 预估总费用</div>
-        <div class="budget-total-value">£800 — 1,500</div>
+        <div class="budget-total-value">£900 — 1,500</div>
       </div>
     </div>
   </section>
@@ -240,10 +237,12 @@ footer { text-align: center; padding: 40px 20px; color: var(--text-muted); font-
   <section class="section" id="checklist">
     <h2 class="section-title"><span>🏠</span> 住宿清单</h2>
     <div class="checklist-card">
-      <div class="checklist-item"><input type="checkbox" id="acc1"><label class="cl-text" for="acc1">Day 1 · Glencoe / Fort William 格伦科</label><span class="cl-price">£80-120/晚</span><span class="cl-night">1晚</span></div>
-      <div class="checklist-item"><input type="checkbox" id="acc2"><label class="cl-text" for="acc2">Day 2-3 · Portree, Isle of Skye 天空岛</label><span class="cl-price">£90-150/晚</span><span class="cl-night">2晚</span></div>
-      <div class="checklist-item"><input type="checkbox" id="acc4"><label class="cl-text" for="acc4">Day 4 · Inverness 因弗内斯</label><span class="cl-price">£70-110/晚</span><span class="cl-night">1晚</span></div>
-      <div class="checklist-subtotal"><span>4晚合计估算</span><span style="color:var(--accent-cyan)">~£300 — 600</span></div>
+      <div class="checklist-item"><input type="checkbox" id="acc1"><label class="cl-text" for="acc1">Day 1 · Edinburgh 爱丁堡（路过住一晚）</label><span class="cl-price">£70-120/晚</span><span class="cl-night">1晚</span></div>
+      <div class="checklist-item"><input type="checkbox" id="acc2"><label class="cl-text" for="acc2">Day 2 · Glencoe / Fort William 格伦科</label><span class="cl-price">£80-120/晚</span><span class="cl-night">1晚</span></div>
+      <div class="checklist-item"><input type="checkbox" id="acc3"><label class="cl-text" for="acc3">Day 3-4 · Portree, Isle of Skye 天空岛</label><span class="cl-price">£90-150/晚</span><span class="cl-night">2晚</span></div>
+      <div class="checklist-item"><input type="checkbox" id="acc5"><label class="cl-text" for="acc5">Day 5 · Inverness 因弗内斯</label><span class="cl-price">£70-110/晚</span><span class="cl-night">1晚</span></div>
+      <div class="checklist-item"><input type="checkbox" id="acc6"><label class="cl-text" for="acc6">Day 6 · Edinburgh 爱丁堡（返程住一晚）</label><span class="cl-price">£70-120/晚</span><span class="cl-night">1晚</span></div>
+      <div class="checklist-subtotal"><span>6晚合计估算</span><span style="color:var(--accent-cyan)">~£450 — 800</span></div>
     </div>
   </section>
 </div>
@@ -253,11 +252,12 @@ footer { text-align: center; padding: 40px 20px; color: var(--text-muted); font-
   <section class="section" id="tips">
     <h2 class="section-title"><span>📝</span> 出行贴士</h2>
     <div class="tips-card">
+      <div class="tip-item"><div class="tip-icon">🛣️</div><div class="tip-text"><strong>London → Edinburgh</strong> — M1/A1(M) 约 640km/7h，可在 York 或 Newcastle 休息。避开周五下午出城高峰</div></div>
       <div class="tip-item"><div class="tip-icon">🚗</div><div class="tip-text"><strong>单车道公路</strong> — 高地很多 single track road，遇到 passing place 要让行。对面来车时谁离 passing place 近谁让</div></div>
       <div class="tip-item"><div class="tip-icon">🌧️</div><div class="tip-text"><strong>天气多变</strong> — 苏格兰天气说变就变，防水外套和层叠穿衣是必须的。夏天平均 12-18°C</div></div>
       <div class="tip-item"><div class="tip-icon">🦟</div><div class="tip-text"><strong>Midges 小飞虫</strong> — 6-9 月高地有大量 midges，带防虫喷雾 (Smidge 品牌好评)。风大或晴天时少一些</div></div>
-      <div class="tip-item"><div class="tip-icon">🥃</div><div class="tip-text"><strong>威士忌</strong> — 苏格兰是威士忌故乡，高地沿途有很多 distillery 可以参观。推荐 Talisker (Skye 岛上)</div></div>
-      <div class="tip-item"><div class="tip-icon">⛽</div><div class="tip-text"><strong>加油</strong> — 高地和 Skye 岛加油站少且贵，出发前加满。大城镇 (Fort William, Inverness) 油便宜</div></div>
+      <div class="tip-item"><div class="tip-icon">🥃</div><div class="tip-text"><strong>威士忌</strong> — 苏格兰是威士忌故乡，高地沿途有很多 distillery。推荐 Talisker (Skye 岛上)</div></div>
+      <div class="tip-item"><div class="tip-icon">⛽</div><div class="tip-text"><strong>加油</strong> — 高地和 Skye 岛加油站少且贵，进高地前加满。Fort William 和 Inverness 油价相对便宜</div></div>
       <div class="tip-item"><div class="tip-icon">📱</div><div class="tip-text"><strong>信号</strong> — 高地很多地方没有手机信号，提前下载离线地图 (Google Maps / Maps.me)</div></div>
     </div>
   </section>
@@ -269,7 +269,7 @@ footer { text-align: center; padding: 40px 20px; color: var(--text-muted); font-
 
 <nav class="nav-fab">
   <button class="nav-dot" onclick="document.getElementById('top').scrollIntoView({behavior:'smooth'})" title="Top"></button>
-  <button class="nav-dot" onclick="document.getElementById('transport').scrollIntoView({behavior:'smooth'})" title="Transport"></button>
+  <button class="nav-dot" onclick="document.getElementById('overview').scrollIntoView({behavior:'smooth'})" title="Overview"></button>
   <button class="nav-dot" onclick="document.getElementById('map-section').scrollIntoView({behavior:'smooth'})" title="Map"></button>
   <button class="nav-dot" onclick="document.getElementById('itinerary').scrollIntoView({behavior:'smooth'})" title="Itinerary"></button>
   <button class="nav-dot" onclick="document.getElementById('budget').scrollIntoView({behavior:'smooth'})" title="Budget"></button>
@@ -278,61 +278,74 @@ footer { text-align: center; padding: 40px 20px; color: var(--text-muted); font-
 </nav>
 
 <script>
-const dayColors = ['#14b8a6','#3b82f6','#8b5cf6','#ec4899','#f59e0b'];
+const dayColors = ['#6366f1','#14b8a6','#3b82f6','#8b5cf6','#ec4899','#f59e0b','#10b981'];
 
 const days = [
   {
-    num:1, title:'Edinburgh → Stirling → Glencoe', km:'~220km', emoji:'⛰️',
+    num:1, title:'London → Edinburgh', km:'~640km · 7h', emoji:'🛣️',
     spots: [
-      {icon:'🚗',name:'Edinburgh 取车出发',desc:'租车公司一般在 Waverley 站附近或机场'},
+      {icon:'🚗',name:'从 London 出发',desc:'走 M1 → A1(M) 北上，建议一早出发避开高峰'},
+      {icon:'☕',name:'York 约克',desc:'可选中途休息：约克大教堂和 Shambles 街值得一看（加 1-2h）'},
+      {icon:'🌉',name:'Newcastle / Durham',desc:'另一个休息点选择，Angel of the North 雕塑可以路过看看'},
+      {icon:'🏴󠁧󠁢󠁳󠁣󠁴󠁿',name:'抵达 Edinburgh',desc:'傍晚到达，找地方吃晚饭休息'},
+    ],
+    stay:'Edinburgh 爱丁堡',
+    tips:'💡 如果不赶时间，可以在 York 停留 2 小时逛逛老城，值得一看',
+    coords:[[51.5074,-0.1278],[53.9591,-1.0815],[54.7753,-1.5849],[55.9533,-3.1883]],
+    stayCoord:[55.9533,-3.1883],
+    labels:['London','York','Newcastle','Edinburgh'],
+  },
+  {
+    num:2, title:'Edinburgh → Stirling → Glencoe', km:'~220km · 3.5h', emoji:'⛰️',
+    spots: [
       {icon:'🏰',name:'Stirling Castle 斯特灵城堡',desc:'苏格兰历史核心，比爱丁堡城堡更有中世纪感 ~£17/人'},
-      {icon:'🌊',name:'Loch Lomond 洛蒙德湖',desc:'苏格兰最大湖泊，在 Luss 小镇停留拍照'},
+      {icon:'🌊',name:'Loch Lomond 洛蒙德湖',desc:'苏格兰最大湖泊，Luss 小镇停留拍照'},
       {icon:'⭐',name:'Glencoe 格伦科峡谷',desc:'苏格兰最壮观的峡谷！007 Skyfall 取景地。Three Sisters 观景台必停',star:true},
+      {icon:'🏔️',name:'Glencoe Visitor Centre',desc:'可以了解峡谷历史和 1692 年大屠杀'},
     ],
     stay:'Glencoe / Fort William 格伦科或威廉堡',
-    tips:'⛽ 出 Edinburgh 后加满油，高地油价贵',
-    coords:[[55.9533,-3.1883],[56.1230,-3.9287],[56.0907,-4.6327],[56.6823,-5.0964]],
+    tips:'⛽ 出 Edinburgh 前加满油，高地油价贵',
+    coords:[[56.1230,-3.9287],[56.0907,-4.6327],[56.6823,-5.0964]],
     stayCoord:[56.8198,-5.1052],
-    labels:['Edinburgh','Stirling Castle','Loch Lomond','Glencoe ⭐'],
+    labels:['Stirling Castle','Loch Lomond','Glencoe ⭐'],
   },
   {
-    num:2, title:'Fort William → Glenfinnan → Skye 天空岛', km:'~180km', emoji:'🌉',
+    num:3, title:'Fort William → Glenfinnan → Skye', km:'~180km · 3.5h', emoji:'🌉',
     spots: [
       {icon:'⭐',name:'Glenfinnan Viaduct 格伦芬南高架桥',desc:'Harry Potter 霍格沃茨特快取景地！Jacobite 蒸汽火车 10:00 和 14:30 经过',star:true},
-      {icon:'📸',name:'Glenfinnan Monument',desc:'高架桥下的纪念碑，Loch Shiel 湖景绝美'},
+      {icon:'📸',name:'Glenfinnan Monument',desc:'纪念碑旁看 Loch Shiel 湖景绝美'},
       {icon:'🏰',name:'Eilean Donan Castle 艾琳多南城堡',desc:'苏格兰最上镜的城堡，湖中孤堡 ~£11/人'},
-      {icon:'🌉',name:'Skye Bridge 跨海大桥',desc:'免费通行，上岛的唯一公路桥'},
-      {icon:'🏘️',name:'Portree 波特里',desc:'天空岛首府，彩色房子沿港口排列'},
+      {icon:'🌉',name:'Skye Bridge → Portree',desc:'过免费跨海大桥上天空岛，抵达首府 Portree'},
     ],
     stay:'Portree, Isle of Skye 天空岛波特里',
-    tips:'🚂 想看蒸汽火车过桥的话，到 Glenfinnan 东侧观景台等候。夏季热门，早到占位',
-    coords:[[56.8759,-5.4316],[56.8704,-5.4389],[57.2740,-5.5160],[57.2817,-5.7450],[57.4125,-6.1953]],
+    tips:'🚂 想看蒸汽火车过桥：到 Glenfinnan 东侧观景台等候，夏季热门早到占位',
+    coords:[[56.8759,-5.4316],[56.8704,-5.4389],[57.2740,-5.5160],[57.4125,-6.1953]],
     stayCoord:[57.4125,-6.1953],
-    labels:['Glenfinnan Viaduct ⭐','Glenfinnan Monument','Eilean Donan Castle','Skye Bridge','Portree'],
+    labels:['Glenfinnan Viaduct ⭐','Glenfinnan Monument','Eilean Donan Castle','Portree'],
   },
   {
-    num:3, title:'Isle of Skye 天空岛全天', km:'~130km 岛内', emoji:'🏔️',
+    num:4, title:'Isle of Skye 天空岛全天', km:'~130km 岛内', emoji:'🏔️',
     spots: [
       {icon:'⭐',name:'Old Man of Storr 老人岩',desc:'天空岛最著名地标，徒步约 1.5h 往返。建议早上 8 点前去避人潮',star:true},
       {icon:'🏔️',name:'Quiraing',desc:'壮观的山脊步道，像外星地貌。环线徒步约 2h'},
-      {icon:'🧚',name:'Fairy Pools 仙女池',desc:'清澈见底的天然泳池+瀑布群，步道约 1h。胆大可以下水（很冷！）'},
+      {icon:'🧚',name:'Fairy Pools 仙女池',desc:'清澈天然泳池+瀑布群，步道约 1h。胆大可以下水（很冷！）'},
       {icon:'🌅',name:'Neist Point 奈斯特角灯塔',desc:'Skye 最西端，悬崖灯塔，日落绝美'},
       {icon:'🥃',name:'Talisker Distillery',desc:'可选：岛上唯一威士忌酒厂，品鉴约 £15/人'},
     ],
     stay:'Portree, Isle of Skye 天空岛波特里',
-    tips:'🌧️ Skye 天气极不稳定，做好一天之内经历四季的准备。Old Man of Storr 路滑，穿防水登山鞋',
+    tips:'🌧️ Skye 天气极不稳定，一天经历四季很正常。穿防水登山鞋',
     coords:[[57.5072,-6.1831],[57.6431,-6.2636],[57.2503,-6.3625],[57.4233,-6.7886],[57.3023,-6.3557]],
     stayCoord:[57.4125,-6.1953],
-    labels:['Old Man of Storr ⭐','Quiraing','Fairy Pools','Neist Point','Talisker Distillery'],
+    labels:['Old Man of Storr ⭐','Quiraing','Fairy Pools','Neist Point','Talisker'],
   },
   {
-    num:4, title:'Skye → Loch Ness → Inverness', km:'~180km', emoji:'🐉',
+    num:5, title:'Skye → Loch Ness → Inverness', km:'~180km · 3h', emoji:'🐉',
     spots: [
-      {icon:'🌉',name:'离开 Skye 返回大陆',desc:'原路经 Skye Bridge 返回'},
-      {icon:'🐉',name:'Loch Ness 尼斯湖',desc:'世界最著名的湖泊之一，看看能不能找到水怪 🦕'},
+      {icon:'🌉',name:'离开 Skye',desc:'经 Skye Bridge 返回大陆'},
+      {icon:'🐉',name:'Loch Ness 尼斯湖',desc:'世界最著名的湖泊之一，试试找水怪 🦕'},
       {icon:'🏰',name:'Urquhart Castle 厄克特城堡',desc:'尼斯湖畔最佳观景城堡遗址 ~£14/人',star:true},
-      {icon:'🚢',name:'Loch Ness 游船',desc:'可选：从 Fort Augustus 或 Drumnadrochit 出发，约 £15-20/人'},
-      {icon:'🏙️',name:'Inverness 因弗内斯',desc:'高地首府，河畔漫步，逛逛 Victorian Market'},
+      {icon:'🚢',name:'Loch Ness 游船',desc:'可选：从 Drumnadrochit 出发，约 £15-20/人'},
+      {icon:'🏙️',name:'Inverness 因弗内斯',desc:'高地首府，河畔漫步，逛 Victorian Market'},
     ],
     stay:'Inverness 因弗内斯',
     tips:null,
@@ -341,19 +354,33 @@ const days = [
     labels:['Skye Bridge','Loch Ness','Urquhart Castle ⭐','Inverness'],
   },
   {
-    num:5, title:'Inverness → Cairngorms → Edinburgh', km:'~260km', emoji:'🦌',
+    num:6, title:'Inverness → Cairngorms → Edinburgh', km:'~260km · 4h', emoji:'🦌',
     spots: [
-      {icon:'🏔️',name:'Cairngorms National Park 凯恩戈姆国家公园',desc:'英国最大国家公园，路过 Aviemore 小镇'},
-      {icon:'🦌',name:'Highland Wildlife Park',desc:'可选：看苏格兰野猫、驯鹿等高地动物'},
-      {icon:'🏞️',name:'Queen\'s View',desc:'可选停留：俯瞰 Loch Tummel 的经典观景台'},
-      {icon:'🛣️',name:'A9 公路南下',desc:'经 Pitlochry、Perth 回 Edinburgh，沿途高地风光'},
-      {icon:'🚗',name:'Edinburgh 还车',desc:'回到 Edinburgh，行程结束'},
+      {icon:'🏔️',name:'Cairngorms National Park',desc:'英国最大国家公园，Aviemore 小镇可以停留'},
+      {icon:'🦌',name:'Highland Wildlife Park',desc:'可选：苏格兰野猫、驯鹿等高地动物'},
+      {icon:'🏞️',name:'Queen\'s View',desc:'可选：俯瞰 Loch Tummel 的经典观景台'},
+      {icon:'🏘️',name:'Pitlochry',desc:'可爱高地小镇，夏季有 salmon ladder 看三文鱼跳跃'},
+      {icon:'🏴󠁧󠁢󠁳󠁣󠁴󠁿',name:'抵达 Edinburgh',desc:'傍晚回到爱丁堡，最后一晚'},
+    ],
+    stay:'Edinburgh 爱丁堡',
+    tips:null,
+    coords:[[57.0439,-3.6369],[57.1059,-3.8074],[56.7060,-3.4440],[56.7027,-3.7344],[55.9533,-3.1883]],
+    stayCoord:[55.9533,-3.1883],
+    labels:['Cairngorms','Aviemore','Queen\'s View','Pitlochry','Edinburgh'],
+  },
+  {
+    num:7, title:'Edinburgh → London', km:'~640km · 7h', emoji:'🏠',
+    spots: [
+      {icon:'🚗',name:'从 Edinburgh 出发南下',desc:'A1(M) → M1 回 London，建议早上出发'},
+      {icon:'🏰',name:'Alnwick Castle',desc:'可选中途停留：Harry Potter 霍格沃茨取景地 ~£19/人'},
+      {icon:'☕',name:'沿途服务站休息',desc:'7 小时车程，每 2 小时休息一次'},
+      {icon:'🏠',name:'回到 London',desc:'到家！行程结束'},
     ],
     stay:null,
-    tips:'💡 Pitlochry 小镇可以停一下，有 salmon ladder 看三文鱼跳跃（夏季）',
-    coords:[[57.0439,-3.6369],[57.1059,-3.8074],[56.7060,-3.4440],[55.9533,-3.1883]],
+    tips:'💡 Alnwick Castle 是 Harry Potter 1-2 霍格沃茨外景地，如果还没去过值得停 1-2h',
+    coords:[[55.9533,-3.1883],[55.4155,-1.7060],[51.5074,-0.1278]],
     stayCoord:null,
-    labels:['Cairngorms','Aviemore','Pitlochry','Edinburgh'],
+    labels:['Edinburgh','Alnwick Castle','London'],
   },
 ];
 
@@ -393,33 +420,37 @@ function toggleDay(num) {
 }
 
 // Map
-const map = L.map('map', { center: [56.8, -4.5], zoom: 7, zoomControl: true, scrollWheelZoom: true });
+const map = L.map('map', { center: [55.5, -3.5], zoom: 6, zoomControl: true, scrollWheelZoom: true });
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 18 }).addTo(map);
 
 const routeOrder = [
-  [55.9533,-3.1883], // Edinburgh
-  [56.1230,-3.9287], // Stirling
-  [56.0907,-4.6327], // Loch Lomond
-  [56.6823,-5.0964], // Glencoe
-  [56.8198,-5.1052], // Fort William
-  [56.8759,-5.4316], // Glenfinnan
-  [57.0500,-5.5000], // en route
-  [57.2740,-5.5160], // Eilean Donan
-  [57.2817,-5.7450], // Skye Bridge
-  [57.4125,-6.1953], // Portree
-  [57.5072,-6.1831], // Old Man of Storr
-  [57.6431,-6.2636], // Quiraing
-  [57.4125,-6.1953], // back Portree
-  [57.2503,-6.3625], // Fairy Pools
-  [57.4233,-6.7886], // Neist Point
-  [57.4125,-6.1953], // back Portree
-  [57.2817,-5.7450], // leave Skye
-  [57.3229,-4.4244], // Loch Ness
-  [57.3244,-4.4420], // Urquhart Castle
-  [57.4778,-4.2247], // Inverness
-  [57.0439,-3.6369], // Cairngorms
-  [56.7060,-3.4440], // Pitlochry
-  [55.9533,-3.1883], // Edinburgh
+  [51.5074,-0.1278],  // London
+  [53.9591,-1.0815],  // York
+  [55.9533,-3.1883],  // Edinburgh
+  [56.1230,-3.9287],  // Stirling
+  [56.0907,-4.6327],  // Loch Lomond
+  [56.6823,-5.0964],  // Glencoe
+  [56.8198,-5.1052],  // Fort William
+  [56.8759,-5.4316],  // Glenfinnan
+  [57.0500,-5.5000],  // en route
+  [57.2740,-5.5160],  // Eilean Donan
+  [57.2817,-5.7450],  // Skye Bridge
+  [57.4125,-6.1953],  // Portree
+  [57.5072,-6.1831],  // Old Man of Storr
+  [57.6431,-6.2636],  // Quiraing
+  [57.4125,-6.1953],  // back Portree
+  [57.2503,-6.3625],  // Fairy Pools
+  [57.4233,-6.7886],  // Neist Point
+  [57.4125,-6.1953],  // back Portree
+  [57.2817,-5.7450],  // leave Skye
+  [57.3229,-4.4244],  // Loch Ness
+  [57.3244,-4.4420],  // Urquhart Castle
+  [57.4778,-4.2247],  // Inverness
+  [57.0439,-3.6369],  // Cairngorms
+  [56.7060,-3.4440],  // Pitlochry
+  [55.9533,-3.1883],  // Edinburgh
+  [55.4155,-1.7060],  // Alnwick
+  [51.5074,-0.1278],  // London
 ];
 
 L.polyline(routeOrder, { color: '#14b8a6', weight: 3, opacity: 0.6, dashArray: '8, 6', smoothFactor: 1.5 }).addTo(map);
