@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🇮🇹 意大利三城经典行 · Roma → Firenze → Venezia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root {
+  --bg-primary: #0a0e1a;
+  --bg-secondary: #111827;
+  --bg-card: #1a1f35;
+  --bg-card-hover: #222845;
+  --border: #2a3050;
+  --text-primary: #e8ecf4;
+  --text-secondary: #8b95b0;
+  --text-muted: #5a6380;
+  --accent-blue: #3b82f6;
+  --accent-purple: #8b5cf6;
+  --accent-pink: #ec4899;
+  --accent-cyan: #06b6d4;
+  --accent-green: #10b981;
+  --accent-orange: #f59e0b;
+  --accent-red: #ef4444;
+  --accent-italy: #ce2b37;
+  --gradient-hero: linear-gradient(135deg, #0a0e1a 0%, #1a1020 50%, #0a0e1a 100%);
+  --gradient-card: linear-gradient(135deg, #1a1f35 0%, #1e2440 100%);
+  --shadow-card: 0 4px 24px rgba(0,0,0,0.3);
+  --shadow-glow: 0 0 30px rgba(206,43,55,0.15);
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; scrollbar-width: thin; scrollbar-color: var(--border) var(--bg-primary); }
+body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg-primary); color: var(--text-primary); line-height: 1.6; min-height: 100vh; overflow-x: hidden; }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* Hero */
+.hero { background: var(--gradient-hero); padding: 60px 24px 40px; text-align: center; position: relative; overflow: hidden; }
+.hero::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(ellipse at 30% 50%, rgba(206,43,55,0.07) 0%, transparent 60%), radial-gradient(ellipse at 70% 50%, rgba(245,158,11,0.05) 0%, transparent 60%); }
+.hero-content { position: relative; z-index: 1; max-width: 800px; margin: 0 auto; }
+.hero-flag { font-size: 64px; margin-bottom: 12px; animation: float 3s ease-in-out infinite; }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+.hero h1 { font-size: clamp(2rem,5vw,3.2rem); font-weight: 800; background: linear-gradient(135deg, #e8ecf4, #ce2b37, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 8px; letter-spacing: -0.02em; }
+.hero-sub { font-size: 1.1rem; color: var(--text-secondary); font-weight: 300; }
+.hero-travelers { display: inline-flex; align-items: center; gap: 8px; margin-top: 16px; padding: 8px 20px; background: rgba(206,43,55,0.12); border: 1px solid rgba(206,43,55,0.3); border-radius: 100px; font-size: 0.95rem; color: #f87171; font-weight: 500; }
+.city-pills { display: flex; gap: 10px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
+.city-pill { padding: 6px 18px; border-radius: 100px; font-size: 0.85rem; font-weight: 600; border: 1px solid; }
+.pill-rome { background: rgba(206,43,55,0.12); border-color: rgba(206,43,55,0.4); color: #f87171; }
+.pill-florence { background: rgba(245,158,11,0.12); border-color: rgba(245,158,11,0.4); color: #fbbf24; }
+.pill-venice { background: rgba(59,130,246,0.12); border-color: rgba(59,130,246,0.4); color: #60a5fa; }
+
+/* Container */
+.container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+.section { padding: 40px 0; }
+.section-title { font-size: 1.6rem; font-weight: 700; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; }
+.section-title span { font-size: 1.8rem; }
+.cards-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 32px; }
+
+/* Flight cards */
+.flight-card { background: var(--gradient-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow-card); transition: transform 0.2s, box-shadow 0.2s; }
+.flight-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-glow); }
+.flight-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; font-weight: 600; font-size: 1.05rem; }
+.flight-header .badge { padding: 3px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
+.badge-out { background: rgba(16,185,129,0.15); color: var(--accent-green); }
+.badge-ret { background: rgba(239,68,68,0.15); color: var(--accent-red); }
+.badge-train { background: rgba(245,158,11,0.15); color: var(--accent-orange); }
+.flight-route { display: flex; align-items: center; gap: 12px; margin: 12px 0; }
+.flight-airport { text-align: center; }
+.flight-airport .code { font-size: 1.5rem; font-weight: 800; letter-spacing: 0.05em; }
+.flight-airport .time { font-size: 0.85rem; color: var(--text-secondary); }
+.flight-airport .city { font-size: 0.75rem; color: var(--text-muted); }
+.flight-line { flex: 1; position: relative; height: 2px; background: var(--border); }
+.flight-line::before { content: '✈️'; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 1.1rem; z-index: 1; }
+.flight-line.train::before { content: '🚄'; }
+.flight-meta { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-top: 8px; }
+
+/* Train card */
+.train-card { background: var(--gradient-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow-card); }
+.train-title { font-size: 1rem; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.train-leg { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.train-leg:last-child { border-bottom: none; }
+.train-leg .leg-icon { font-size: 1.5rem; }
+.train-leg .leg-info { flex: 1; }
+.train-leg .leg-name { font-weight: 600; font-size: 0.9rem; }
+.train-leg .leg-detail { font-size: 0.78rem; color: var(--text-secondary); }
+.train-leg .leg-price { font-weight: 700; color: var(--accent-cyan); font-size: 0.9rem; }
+
+/* Map */
+.map-wrapper { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); box-shadow: var(--shadow-card); }
+#map { height: 520px; width: 100%; background: var(--bg-secondary); }
+.leaflet-popup-content-wrapper { background: var(--bg-card) !important; color: var(--text-primary) !important; border-radius: var(--radius-sm) !important; box-shadow: var(--shadow-card) !important; border: 1px solid var(--border) !important; }
+.leaflet-popup-tip { background: var(--bg-card) !important; }
+.leaflet-popup-content { font-family: 'Inter', sans-serif !important; font-size: 13px !important; line-height: 1.5 !important; }
+.leaflet-popup-content strong { color: #f87171; }
+.leaflet-control-zoom a { background: var(--bg-card) !important; color: var(--text-primary) !important; border-color: var(--border) !important; }
+.leaflet-tile-pane { filter: brightness(0.7) contrast(1.1) saturate(0.8); }
+.map-legend { display: flex; flex-wrap: wrap; gap: 10px; padding: 14px; background: var(--bg-secondary); border-top: 1px solid var(--border); justify-content: center; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.78rem; color: var(--text-secondary); }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+/* Day cards */
+.day-card { background: var(--gradient-card); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: transform 0.2s; animation: fadeSlideIn 0.5s ease-out both; }
+.day-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-glow); }
+@keyframes fadeSlideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.day-card:nth-child(1){animation-delay:0s}.day-card:nth-child(2){animation-delay:.05s}.day-card:nth-child(3){animation-delay:.1s}.day-card:nth-child(4){animation-delay:.15s}.day-card:nth-child(5){animation-delay:.2s}.day-card:nth-child(6){animation-delay:.25s}.day-card:nth-child(7){animation-delay:.3s}.day-card:nth-child(8){animation-delay:.35s}
+
+.day-header { padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; flex-wrap: wrap; gap: 8px; }
+.day-header:hover { background: var(--bg-card-hover); }
+.day-label { display: flex; align-items: center; gap: 10px; }
+.day-num { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1rem; flex-shrink: 0; }
+.day-info h3 { font-size: 1rem; font-weight: 600; line-height: 1.3; }
+.day-info .day-date { font-size: 0.8rem; color: var(--text-muted); }
+.day-meta { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.day-city-tag { padding: 3px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; }
+.tag-rome { background: rgba(206,43,55,0.15); color: #f87171; }
+.tag-florence { background: rgba(245,158,11,0.15); color: #fbbf24; }
+.tag-venice { background: rgba(59,130,246,0.15); color: #60a5fa; }
+.tag-transit { background: rgba(16,185,129,0.15); color: #34d399; }
+.day-expand { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: rgba(255,255,255,0.05); color: var(--text-muted); transition: transform 0.3s; font-size: 0.8rem; }
+.day-card.open .day-expand { transform: rotate(180deg); }
+.day-body { max-height: 0; overflow: hidden; transition: max-height 0.5s ease; }
+.day-card.open .day-body { max-height: 1400px; }
+.day-content { padding: 20px 24px 24px; border-top: 1px solid var(--border); }
+.spot { display: flex; gap: 12px; padding: 8px 0; align-items: flex-start; }
+.spot-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 2px; }
+.spot-name { font-weight: 500; }
+.spot-desc { font-size: 0.85rem; color: var(--text-secondary); }
+.spot-star .spot-name { color: var(--accent-orange); font-weight: 600; }
+.day-stay { margin-top: 16px; padding: 12px 16px; background: rgba(139,92,246,0.08); border: 1px solid rgba(139,92,246,0.2); border-radius: var(--radius-sm); display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
+.day-tip { margin-top: 10px; padding: 10px 14px; background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); border-radius: var(--radius-sm); font-size: 0.85rem; color: #fbbf24; }
+
+/* Booking */
+.booking-card { background: var(--gradient-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px 20px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+.booking-card.must { border-left: 4px solid var(--accent-red); }
+.booking-card.recommend { border-left: 4px solid var(--accent-orange); }
+.booking-card.walkin { border-left: 4px solid var(--accent-green); }
+.booking-name { font-weight: 600; font-size: 0.95rem; }
+.booking-day { font-size: 0.8rem; color: var(--text-muted); }
+.booking-price { font-weight: 600; color: var(--accent-cyan); font-size: 0.95rem; }
+.booking-status { padding: 3px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; }
+.booking-status.red { background: rgba(239,68,68,0.15); color: var(--accent-red); }
+.booking-status.yellow { background: rgba(249,115,22,0.15); color: var(--accent-orange); }
+.booking-status.green { background: rgba(16,185,129,0.15); color: var(--accent-green); }
+.booking-link { font-size: 0.8rem; color: var(--accent-blue); text-decoration: none; }
+.booking-link:hover { text-decoration: underline; }
+
+/* Budget */
+.budget-card { background: var(--gradient-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow-card); }
+.budget-items { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+.budget-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; background: rgba(255,255,255,0.03); border-radius: var(--radius-sm); }
+.budget-item-label { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
+.budget-item-value { font-weight: 600; font-size: 0.9rem; }
+.budget-total { margin-top: 16px; padding: 16px; background: linear-gradient(135deg, rgba(206,43,55,0.12), rgba(245,158,11,0.1)); border: 1px solid rgba(206,43,55,0.3); border-radius: var(--radius-sm); display: flex; justify-content: space-between; align-items: center; }
+.budget-total-label { font-size: 1.1rem; font-weight: 700; }
+.budget-total-value { font-size: 1.5rem; font-weight: 800; background: linear-gradient(135deg, #f87171, #fbbf24); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+/* Checklist */
+.checklist-card { background: var(--gradient-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow-card); }
+.checklist-section-label { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin: 16px 0 8px; padding: 0 4px; }
+.label-rome { color: #f87171; }
+.label-florence { color: #fbbf24; }
+.label-venice { color: #60a5fa; }
+.checklist-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.9rem; }
+.checklist-item:last-child { border-bottom: none; }
+.checklist-item input[type="checkbox"] { appearance: none; -webkit-appearance: none; width: 22px; height: 22px; border: 2px solid var(--border); border-radius: 6px; cursor: pointer; position: relative; flex-shrink: 0; transition: all 0.2s; background: rgba(255,255,255,0.03); }
+.checklist-item input[type="checkbox"]:checked { background: var(--accent-green); border-color: var(--accent-green); }
+.checklist-item input[type="checkbox"]:checked::after { content: '✓'; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); color: white; font-size: 13px; font-weight: 700; }
+.checklist-item input[type="checkbox"]:checked ~ .cl-text { text-decoration: line-through; color: var(--text-muted); }
+.cl-night { padding: 2px 8px; background: rgba(139,92,246,0.15); border-radius: 4px; font-size: 0.75rem; color: var(--accent-purple); font-weight: 600; flex-shrink: 0; }
+.cl-price { padding: 2px 8px; background: rgba(6,182,212,0.1); border-radius: 4px; font-size: 0.75rem; color: var(--accent-cyan); font-weight: 500; flex-shrink: 0; margin-left: auto; }
+.checklist-subtotal { margin-top: 16px; padding: 12px 16px; background: rgba(139,92,246,0.08); border: 1px solid rgba(139,92,246,0.2); border-radius: var(--radius-sm); display: flex; justify-content: space-between; font-weight: 600; }
+
+/* Food section */
+.food-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.food-card { background: var(--gradient-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 20px; }
+.food-city { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px; }
+.food-item { display: flex; align-items: flex-start; gap: 10px; padding: 6px 0; font-size: 0.88rem; }
+.food-item .fi-icon { font-size: 1.1rem; flex-shrink: 0; }
+.food-item .fi-name { font-weight: 600; }
+.food-item .fi-note { font-size: 0.78rem; color: var(--text-secondary); }
+
+/* Tips */
+.tips-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.tip-card { background: var(--gradient-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 20px; }
+.tip-title { font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; font-size: 0.95rem; }
+.tip-list li { font-size: 0.85rem; color: var(--text-secondary); padding: 4px 0; list-style: none; padding-left: 18px; position: relative; }
+.tip-list li::before { content: '·'; position: absolute; left: 4px; color: var(--accent-orange); font-weight: 900; }
+
+/* Nav dots */
+.nav-fab { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 8px; z-index: 999; }
+.nav-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border); cursor: pointer; transition: all 0.2s; border: none; padding: 0; }
+.nav-dot:hover, .nav-dot.active { background: #ce2b37; transform: scale(1.3); }
+
+footer { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 0.85rem; border-top: 1px solid var(--border); }
+
+@media (max-width: 768px) {
+  .hero { padding: 40px 16px 30px; }
+  .hero-flag { font-size: 48px; }
+  #map { height: 380px; }
+  .cards-row { grid-template-columns: 1fr; }
+  .nav-fab { display: none; }
+  .day-header { padding: 16px; }
+  .day-content { padding: 16px; }
+  .container { padding: 0 12px; }
+  .food-grid, .tips-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<section class="hero" id="top">
+  <div class="hero-content">
+    <div class="hero-flag">🇮🇹</div>
+    <h1>意大利三城经典行</h1>
+    <p class="hero-sub">Roma · Firenze · Venezia · 8 Days from London</p>
+    <div class="hero-travelers">👫 Bingchen & Yue · 伦敦出发</div>
+    <div class="city-pills">
+      <span class="city-pill pill-rome">🏛️ 罗马 3晚</span>
+      <span class="city-pill pill-florence">🌷 佛罗伦萨 2晚</span>
+      <span class="city-pill pill-venice">🚤 威尼斯 2晚</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <section class="section" id="flights">
+    <h2 class="section-title"><span>✈️</span> 航班 & 城际列车</h2>
+    <div class="cards-row">
+      <div class="flight-card">
+        <div class="flight-header"><span class="badge badge-out">去程</span> BA548 · 入境罗马</div>
+        <div class="flight-route">
+          <div class="flight-airport"><div class="code">LHR</div><div class="time">07:35</div><div class="city">伦敦希思罗</div></div>
+          <div class="flight-line"></div>
+          <div class="flight-airport"><div class="code">FCO</div><div class="time">11:15</div><div class="city">罗马菲乌米奇诺</div></div>
+        </div>
+        <div class="flight-meta"><span>⏱ 2h40m 直飞</span><span>British Airways · ~£110/人</span></div>
+      </div>
+      <div class="flight-card">
+        <div class="flight-header"><span class="badge badge-ret">回程</span> BA575 · 威尼斯飞回</div>
+        <div class="flight-route">
+          <div class="flight-airport"><div class="code">VCE</div><div class="time">16:20</div><div class="city">威尼斯马可波罗</div></div>
+          <div class="flight-line"></div>
+          <div class="flight-airport"><div class="code">LHR</div><div class="time">17:55</div><div class="city">伦敦希思罗</div></div>
+        </div>
+        <div class="flight-meta"><span>⏱ 2h35m 直飞</span><span>💷 ~£130/人 · 不同城市进出</span></div>
+      </div>
+    </div>
+    <div class="train-card">
+      <div class="train-title">🚄 意大利高铁 Frecciarossa（意航红箭）</div>
+      <div class="train-leg">
+        <div class="leg-icon">🏛️→🌷</div>
+        <div class="leg-info">
+          <div class="leg-name">罗马特米尼站 → 佛罗伦萨圣母百花站</div>
+          <div class="leg-detail">Frecciarossa · ~1h30m · 每小时一班 · Day 4 出发</div>
+        </div>
+        <div class="leg-price">~£25-50/人</div>
+      </div>
+      <div class="train-leg">
+        <div class="leg-icon">🌷→🚤</div>
+        <div class="leg-info">
+          <div class="leg-name">佛罗伦萨圣母百花站 → 威尼斯圣卢西亚站</div>
+          <div class="leg-detail">Frecciarossa · ~2h · 直达 · Day 6 出发</div>
+        </div>
+        <div class="leg-price">~£30-60/人</div>
+      </div>
+      <div style="margin-top:12px;padding:10px 12px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;font-size:0.82rem;color:#fbbf24;">
+        💡 提前2个月在 <strong>Trenitalia.com</strong> 或 <strong>Italo</strong> 抢早鸟票，可以便宜 50%。避免现场买票。
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="container">
+  <section class="section" id="map-section">
+    <h2 class="section-title"><span>🗺️</span> 路线地图</h2>
+    <div class="map-wrapper">
+      <div id="map"></div>
+      <div class="map-legend" id="map-legend"></div>
+    </div>
+  </section>
+</div>
+
+<div class="container">
+  <section class="section" id="itinerary">
+    <h2 class="section-title"><span>📅</span> 每日行程</h2>
+    <div id="day-cards"></div>
+  </section>
+</div>
+
+<div class="container">
+  <section class="section" id="booking">
+    <h2 class="section-title"><span>🎫</span> 预约 & 门票</h2>
+    <div class="booking-card must">
+      <div><div class="booking-name">🏛️ 罗马斗兽场 + 古罗马广场</div><div class="booking-day">Day 1-2 · 建议第一天下午</div></div>
+      <div class="booking-price">~£30/人</div>
+      <span class="booking-status red">必须预约</span>
+      <a class="booking-link" href="https://www.coopculture.it" target="_blank">coopculture.it →</a>
+    </div>
+    <div class="booking-card must">
+      <div><div class="booking-name">🖼️ 梵蒂冈博物馆 + 西斯廷礼拜堂</div><div class="booking-day">Day 2 · 建议早场 8:00</div></div>
+      <div class="booking-price">~£35/人</div>
+      <span class="booking-status red">必须提前预约</span>
+      <a class="booking-link" href="https://tickets.museivaticani.va" target="_blank">museivaticani.va →</a>
+    </div>
+    <div class="booking-card must">
+      <div><div class="booking-name">🖼️ 乌菲齐美术馆</div><div class="booking-day">Day 4 · 佛罗伦萨第一天</div></div>
+      <div class="booking-price">~£25/人</div>
+      <span class="booking-status red">必须预约</span>
+      <a class="booking-link" href="https://www.uffizi.it" target="_blank">uffizi.it →</a>
+    </div>
+    <div class="booking-card must">
+      <div><div class="booking-name">⛪ 圣母百花大教堂登顶（穹顶）</div><div class="booking-day">Day 5 · 早晨人少</div></div>
+      <div class="booking-price">~£20/人</div>
+      <span class="booking-status red">必须预约</span>
+      <a class="booking-link" href="https://www.brunelleschi.it" target="_blank">brunelleschi.it →</a>
+    </div>
+    <div class="booking-card recommend">
+      <div><div class="booking-name">🚤 大运河 gondola 贡多拉</div><div class="booking-day">Day 6-7 · 威尼斯</div></div>
+      <div class="booking-price">~£70-80 / 30min/船（可4-6人坐）</div>
+      <span class="booking-status yellow">现场议价</span>
+    </div>
+    <div class="booking-card walkin">
+      <div><div class="booking-name">🗿 大卫像（学院美术馆）</div><div class="booking-day">Day 5 · 佛罗伦萨</div></div>
+      <div class="booking-price">~£16/人</div>
+      <span class="booking-status green">建议预约</span>
+      <a class="booking-link" href="https://www.galleriaaccademiafirenze.it" target="_blank">galleriaaccademia.it →</a>
+    </div>
+  </section>
+</div>
+
+<div class="container">
+  <section class="section" id="food">
+    <h2 class="section-title"><span>🍕</span> 必吃清单</h2>
+    <div class="food-grid">
+      <div class="food-card">
+        <div class="food-city label-rome">🏛️ 罗马</div>
+        <div class="food-item"><div class="fi-icon">🍕</div><div><div class="fi-name">Pizza al Taglio</div><div class="fi-note">切片披萨，街边立食，~€3/片</div></div></div>
+        <div class="food-item"><div class="fi-icon">🍝</div><div><div class="fi-name">Cacio e Pepe</div><div class="fi-note">奶酪黑椒意面，罗马灵魂菜</div></div></div>
+        <div class="food-item"><div class="fi-icon">🍨</div><div><div class="fi-name">Gelato di Crema</div><div class="fi-note">避开景点摊，找当地 gelateria</div></div></div>
+        <div class="food-item"><div class="fi-icon">☕</div><div><div class="fi-name">Espresso al banco</div><div class="fi-note">站着喝才是本地方式，~€1</div></div></div>
+      </div>
+      <div class="food-card">
+        <div class="food-city label-florence">🌷 佛罗伦萨</div>
+        <div class="food-item"><div class="fi-icon">🥩</div><div><div class="fi-name">Bistecca alla Fiorentina</div><div class="fi-note">托斯卡纳 T 骨牛排，按公斤卖</div></div></div>
+        <div class="food-item"><div class="fi-icon">🫙</div><div><div class="fi-name">Lampredotto</div><div class="fi-note">街头小吃，牛肚三明治，~€5</div></div></div>
+        <div class="food-item"><div class="fi-icon">🍷</div><div><div class="fi-name">Chianti 葡萄酒</div><div class="fi-note">托斯卡纳本地红酒，馆子里€5/杯</div></div></div>
+        <div class="food-item"><div class="fi-icon">🧁</div><div><div class="fi-name">Schiacciata</div><div class="fi-note">佛罗伦萨扁面包，早餐配</div></div></div>
+      </div>
+      <div class="food-card">
+        <div class="food-city label-venice">🚤 威尼斯</div>
+        <div class="food-item"><div class="fi-icon">🦑</div><div><div class="fi-name">Sarde in Saor</div><div class="fi-note">甜酸沙丁鱼，威尼斯传统菜</div></div></div>
+        <div class="food-item"><div class="fi-icon">🍢</div><div><div class="fi-name">Cicchetti</div><div class="fi-note">威尼斯小串/小吃，下午酒吧文化</div></div></div>
+        <div class="food-item"><div class="fi-icon">🍦</div><div><div class="fi-name">Fritto misto</div><div class="fi-note">炸海鲜拼盘，港口边吃最鲜</div></div></div>
+        <div class="food-item"><div class="fi-icon">🍸</div><div><div class="fi-name">Aperol Spritz</div><div class="fi-note">发源地就在威尼斯，必喝</div></div></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="container">
+  <section class="section" id="budget">
+    <h2 class="section-title"><span>💰</span> 预算估算（双人 8 天）</h2>
+    <div class="budget-card">
+      <div class="budget-items">
+        <div class="budget-item"><div class="budget-item-label">✈️ 机票 (2人，LHR→FCO / VCE→LHR)</div><div class="budget-item-value">£480 — 600</div></div>
+        <div class="budget-item"><div class="budget-item-label">🚄 城际列车 (罗马→佛罗伦萨→威尼斯，2人)</div><div class="budget-item-value">£100 — 200</div></div>
+        <div class="budget-item"><div class="budget-item-label">🏨 住宿 (7晚，中档酒店/B&B)</div><div class="budget-item-value">£700 — 1,100</div></div>
+        <div class="budget-item"><div class="budget-item-label">🍽️ 餐饮 (8天，混搭街食+餐厅)</div><div class="budget-item-value">£300 — 500</div></div>
+        <div class="budget-item"><div class="budget-item-label">🎟️ 门票 & 活动</div><div class="budget-item-value">£200 — 300</div></div>
+        <div class="budget-item"><div class="budget-item-label">🚌 市内交通 (地铁/Vaporetto/的士)</div><div class="budget-item-value">£80 — 120</div></div>
+      </div>
+      <div class="budget-total">
+        <div class="budget-total-label">💎 预估总费用</div>
+        <div class="budget-total-value">£1,860 — 2,820</div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="container">
+  <section class="section" id="checklist">
+    <h2 class="section-title"><span>🏨</span> 住宿清单</h2>
+    <div class="checklist-card">
+      <div class="checklist-section-label label-rome">🏛️ 罗马</div>
+      <div class="checklist-item"><input type="checkbox" id="acc1"><label class="cl-text" for="acc1">Day 1 · 罗马 — 推荐入住特米尼站附近或Trastevere区</label><span class="cl-price">£80-130/晚</span><span class="cl-night">1晚</span></div>
+      <div class="checklist-item"><input type="checkbox" id="acc2"><label class="cl-text" for="acc2">Day 2 · 罗马 — 同上</label><span class="cl-price">£80-130/晚</span><span class="cl-night">1晚</span></div>
+      <div class="checklist-item"><input type="checkbox" id="acc3"><label class="cl-text" for="acc3">Day 3 · 罗马 — 同上（半日托斯卡纳日归）</label><span class="cl-price">£80-130/晚</span><span class="cl-night">1晚</span></div>
+      <div class="checklist-section-label label-florence" style="margin-top:12px;">🌷 佛罗伦萨</div>
+      <div class="checklist-item"><input type="checkbox" id="acc4"><label class="cl-text" for="acc4">Day 4 · 佛罗伦萨 — 推荐 Oltrarno 区或老城中心</label><span class="cl-price">£90-150/晚</span><span class="cl-night">1晚</span></div>
+      <div class="checklist-item"><input type="checkbox" id="acc5"><label class="cl-text" for="acc5">Day 5 · 佛罗伦萨 — 同上</label><span class="cl-price">£90-150/晚</span><span class="cl-night">1晚</span></div>
+      <div class="checklist-section-label label-venice" style="margin-top:12px;">🚤 威尼斯</div>
+      <div class="checklist-item"><input type="checkbox" id="acc6"><label class="cl-text" for="acc6">Day 6 · 威尼斯 — 推荐岛内住（Castello或Dorsoduro区）</label><span class="cl-price">£110-180/晚</span><span class="cl-night">1晚</span></div>
+      <div class="checklist-item"><input type="checkbox" id="acc7"><label class="cl-text" for="acc7">Day 7 · 威尼斯 — 同上（最后一晚）</label><span class="cl-price">£110-180/晚</span><span class="cl-night">1晚</span></div>
+      <div class="checklist-subtotal"><span>7晚合计估算</span><span style="color:var(--accent-cyan)">~£700 — 1,100</span></div>
+    </div>
+  </section>
+</div>
+
+<div class="container">
+  <section class="section" id="tips">
+    <h2 class="section-title"><span>💡</span> 旅行贴士</h2>
+    <div class="tips-grid">
+      <div class="tip-card">
+        <div class="tip-title">🏛️ 罗马实用</div>
+        <ul class="tip-list">
+          <li>罗马通票 Roma Pass (48h/72h) 含地铁不限次 + 1-2个景点免费</li>
+          <li>梵蒂冈 Wednesday papal audience 免费，但需提前申请</li>
+          <li>许愿池 Trevi Fountain 早 7-8点去人少</li>
+          <li>FCO 机场 → 市区：Leonardo Express 快轨 ~30min，€14</li>
+          <li>景点附近避开餐厅，往里走两条街价格减半</li>
+        </ul>
+      </div>
+      <div class="tip-card">
+        <div class="tip-title">🌷 佛罗伦萨实用</div>
+        <ul class="tip-list">
+          <li>游客税 €3-7/人/晚，现金支付给酒店</li>
+          <li>米开朗基罗广场日落绝景，步行上山约 20min</li>
+          <li>乌菲齐周一关门，注意开放时间</li>
+          <li>老桥 Ponte Vecchio 日落前 1 小时最美</li>
+          <li>城市不大，景点集中，基本步行搞定</li>
+        </ul>
+      </div>
+      <div class="tip-card">
+        <div class="tip-title">🚤 威尼斯实用</div>
+        <ul class="tip-list">
+          <li>行李多：从圣卢西亚站可预约行李小船服务</li>
+          <li>Vaporetto (水上巴士) 72h 通票 ~€45，比单程划算</li>
+          <li>避开旺季 Murano 玻璃岛只需水上巴士 15min</li>
+          <li>威尼斯游客税 2026 起 €5-10/人/天（高峰日）</li>
+          <li>VCE 机场 → 市区：水上巴士 ~70min / 水上出租 ~35min</li>
+        </ul>
+      </div>
+      <div class="tip-card">
+        <div class="tip-title">💳 通用提示</div>
+        <ul class="tip-list">
+          <li>带 Wise 或 Starling 卡，免手续费，欧元汇率最优</li>
+          <li>意大利小餐馆仍然现金为王，备 €50-100 现金</li>
+          <li>意大利铁路票可在 Trenitalia / Rail Europe 提前买</li>
+          <li>eSIM 推荐 Airalo (意大利/欧洲套餐约 $10/7天)</li>
+          <li>Google Maps 意大利离线地图提前下载</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <p>🇮🇹 Bingchen & Yue · Italia · Roma · Firenze · Venezia · Made with ❤️</p>
+  <p style="margin-top:6px;font-size:0.75rem;">价格为估算参考，实际可能有所浮动 · 数据参考 British Airways / Trenitalia / Booking.com</p>
+</footer>
+
+<nav class="nav-fab">
+  <button class="nav-dot" onclick="document.getElementById('top').scrollIntoView({behavior:'smooth'})" title="Top"></button>
+  <button class="nav-dot" onclick="document.getElementById('flights').scrollIntoView({behavior:'smooth'})" title="Flights"></button>
+  <button class="nav-dot" onclick="document.getElementById('map-section').scrollIntoView({behavior:'smooth'})" title="Map"></button>
+  <button class="nav-dot" onclick="document.getElementById('itinerary').scrollIntoView({behavior:'smooth'})" title="Itinerary"></button>
+  <button class="nav-dot" onclick="document.getElementById('booking').scrollIntoView({behavior:'smooth'})" title="Booking"></button>
+  <button class="nav-dot" onclick="document.getElementById('budget').scrollIntoView({behavior:'smooth'})" title="Budget"></button>
+  <button class="nav-dot" onclick="document.getElementById('checklist').scrollIntoView({behavior:'smooth'})" title="Checklist"></button>
+</nav>
+
+<script>
+const dayColors = ['#ce2b37','#e05c28','#f59e0b','#10b981','#f59e0b','#3b82f6','#06b6d4','#8b5cf6'];
+const cityTags = [
+  {label:'罗马',cls:'tag-rome'},{label:'罗马',cls:'tag-rome'},{label:'罗马',cls:'tag-rome'},
+  {label:'罗马→佛罗伦萨',cls:'tag-transit'},{label:'佛罗伦萨',cls:'tag-florence'},
+  {label:'佛罗伦萨→威尼斯',cls:'tag-transit'},{label:'威尼斯',cls:'tag-venice'},{label:'威尼斯→LHR',cls:'tag-transit'}
+];
+
+const days = [
+  {
+    num:1, date:'Day 1 · 到达罗马', emoji:'✈️', title:'LHR → 罗马 → 古罗马初探',
+    spots:[
+      {icon:'🛬',name:'FCO 机场抵达',desc:'乘 Leonardo Express 快轨进市区，约 30min'},
+      {icon:'🏨',name:'入住酒店，放下行李',desc:'推荐 Trastevere 区或 Termini 站附近'},
+      {icon:'🏛️',name:'斗兽场（Colosseo）',desc:'提前网上预约！建议下午 16:00 后人稍少，含古罗马广场通票'},
+      {icon:'🏛️',name:'帕拉蒂尼山 & 古罗马广场',desc:'斗兽场旁，同票可入，感受帝国废墟'},
+      {icon:'🍕',name:'晚餐：Testaccio 区觅食',desc:'罗马最地道的平民餐饮区，远离游客陷阱'},
+    ],
+    stay:'罗马',
+    tip:'💡 Testaccio 市场 (Mercato di Testaccio) 是罗马最地道的街头美食圣地',
+    coords:[[41.8902,12.4922],[41.8874,12.4860],[41.8729,12.4779]],
+    stayCoord:[41.8948,12.4780],
+    labels:['斗兽场','古罗马广场','Testaccio'],
+  },
+  {
+    num:2, date:'Day 2 · 梵蒂冈 & 罗马中心', emoji:'⛪', title:'梵蒂冈博物馆 + 西班牙广场',
+    spots:[
+      {icon:'🎨',name:'梵蒂冈博物馆 + 西斯廷礼拜堂',desc:'⚠️ 必须提前预约！早 8:00 入场，建议 3 小时以上'},
+      {icon:'⛪',name:'圣彼得大教堂',desc:'免费入场，可付费登顶穹顶，罗马全景'},
+      {icon:'🛍️',name:'西班牙广场 & 购物街',desc:'下午轻松逛，Via Condotti 奢侈品街道'},
+      {icon:'⛲',name:'许愿池 Trevi Fountain',desc:'建议黄昏前往，人少一点。投币许愿 🪙'},
+      {icon:'🌙',name:'万神殿 Pantheon 夜游',desc:'晚间广场氛围极佳，外观免费欣赏'},
+    ],
+    stay:'罗马',
+    tip:'💡 梵蒂冈博物馆须网上预约，高峰期提前一个月订。早场人少 2 小时以上。',
+    coords:[[41.9065,12.4536],[41.8986,12.4769],[41.9009,12.4833],[41.9011,12.4833]],
+    stayCoord:[41.8948,12.4780],
+    labels:['梵蒂冈','西班牙广场','许愿池','万神殿'],
+  },
+  {
+    num:3, date:'Day 3 · 罗马散步日 + 郊游可选', emoji:'🚶', title:'博尔盖塞别墅 + Trastevere 老街',
+    spots:[
+      {icon:'🌳',name:'博尔盖塞别墅花园',desc:'罗马最大公园，免费入园，周末野餐首选'},
+      {icon:'🎨',name:'博尔盖塞美术馆（可选）',desc:'贝尔尼尼雕塑，需预约，2h时限，~€15/人'},
+      {icon:'🏘️',name:'Trastevere 区漫步',desc:'最有罗马气质的老街区，午餐就在这'},
+      {icon:'🌉',name:'台伯河畔散步',desc:'傍晚沿河道漫步至天使城堡'},
+      {icon:'🏰',name:'天使城堡 Castel Sant\'Angelo',desc:'可登顶俯瞰台伯河和罗马全景'},
+    ],
+    stay:'罗马',
+    tip:'💡 可选项：租车半日游 Castelli Romani 葡萄酒小镇（罗马郊外 30km），或 Ostia Antica 古港遗址',
+    coords:[[41.9145,12.4924],[41.8893,12.4696],[41.9017,12.4660]],
+    stayCoord:[41.8948,12.4780],
+    labels:['博尔盖塞','Trastevere','天使城堡'],
+  },
+  {
+    num:4, date:'Day 4 · 高铁到佛罗伦萨', emoji:'🚄', title:'Frecciarossa 北上 + 乌菲齐美术馆',
+    spots:[
+      {icon:'🚄',name:'罗马特米尼 → 佛罗伦萨 SMN 站',desc:'Frecciarossa，约 1h30min，建议上午 9-10 点班次'},
+      {icon:'🏨',name:'入住佛罗伦萨',desc:'推荐 Oltrarno（老桥对岸）或大教堂附近'},
+      {icon:'🖼️',name:'乌菲齐美术馆',desc:'⚠️ 需提前预约！波提切利《维纳斯的诞生》必看，建议 3h+',star:true},
+      {icon:'🌉',name:'老桥 Ponte Vecchio',desc:'黄金珠宝店铺一线，日落时分最美'},
+      {icon:'🌆',name:'米开朗基罗广场日落',desc:'全佛罗伦萨最佳俯瞰点，步行 20min 上山值得'},
+    ],
+    stay:'佛罗伦萨',
+    tip:'💡 米开朗基罗广场日落前 1 小时山上已聚集很多人，可再提前半小时到',
+    coords:[[43.7696,11.2558],[43.7684,11.2530],[43.7629,11.2650],[43.7631,11.2651]],
+    stayCoord:[43.7680,12.4780],
+    labels:['乌菲齐','老桥','米开朗基罗广场','Pitti宫'],
+  },
+  {
+    num:5, date:'Day 5 · 佛罗伦萨深度游', emoji:'🌷', title:'圣母百花大教堂 + 大卫像 + 托斯卡纳',
+    spots:[
+      {icon:'⛪',name:'圣母百花大教堂（外）',desc:'免费参观，广场本身已很震撼'},
+      {icon:'🔴',name:'登布鲁内莱斯基穹顶',desc:'⚠️ 必须预约！463级台阶，俯瞰整个佛罗伦萨，强烈推荐',star:true},
+      {icon:'🗿',name:'大卫像（学院美术馆）',desc:'真迹在此，卢浮宫的是复制品，~€16/人'},
+      {icon:'🍷',name:'下午：Enoteca 酒吧文化',desc:'随便找一家 enoteca，Chianti 佐 crostini'},
+      {icon:'🌾',name:'可选：托斯卡纳半日游',desc:'租车或参团，Siena / San Gimignano 任选，极美'},
+    ],
+    stay:'佛罗伦萨',
+    tip:'💡 圣母百花大教堂穹顶预约 brunelleschi.it，附近钟楼和洗礼堂同票可进。',
+    coords:[[43.7731,11.2560],[43.7768,11.2598],[43.7734,11.2551]],
+    stayCoord:[43.7680,12.4780],
+    labels:['大教堂穹顶','学院美术馆（大卫像）','钟楼'],
+  },
+  {
+    num:6, date:'Day 6 · 高铁到威尼斯', emoji:'🚤', title:'Frecciarossa 北上威尼斯 + 大运河初探',
+    spots:[
+      {icon:'🚄',name:'佛罗伦萨 SMN → 威尼斯圣卢西亚站',desc:'Frecciarossa，约 2h，建议上午出发'},
+      {icon:'🏨',name:'入住威尼斯岛内',desc:'⚠️ 强烈推荐住岛内！Dorsoduro 或 Castello 区氛围最好'},
+      {icon:'🚤',name:'大运河贡多拉',desc:'~€80/30min/船（最多 6 人），黄昏时最浪漫',star:true},
+      {icon:'🏛️',name:'圣马可广场 & 总督府',desc:'白天游人如潮，傍晚 19:00 后人少很多'},
+      {icon:'🍸',name:'Cicchetti 小吃巡回',desc:'威尼斯酒吧文化，各种小串配 Spritz，晚餐最佳方式'},
+    ],
+    stay:'威尼斯',
+    tip:'💡 威尼斯行李多时，从圣卢西亚站可预约 luggage porterage 服务（行李人工搬运到酒店）',
+    coords:[[45.4408,12.3155],[45.4341,12.3388]],
+    stayCoord:[45.4328,12.3377],
+    labels:['圣卢西亚站','圣马可广场'],
+  },
+  {
+    num:7, date:'Day 7 · 威尼斯岛屿探索', emoji:'🏝️', title:'Murano 玻璃岛 + Burano 彩色岛',
+    spots:[
+      {icon:'🔵',name:'Murano 穆拉诺玻璃岛',desc:'水上巴士约 15min，观看吹玻璃工艺，玻璃博物馆'},
+      {icon:'🌈',name:'Burano 布拉诺彩色岛',desc:'糖果色小屋，摄影胜地，水上巴士约 40min',star:true},
+      {icon:'🏝️',name:'Torcello 岛（可选）',desc:'威尼斯最古老的岛，安静无游客，拜占庭教堂'},
+      {icon:'🌅',name:'日落：里亚尔托桥',desc:'傍晚大运河最美一刻，桥上俯瞰'},
+      {icon:'🎭',name:'威尼斯面具店 & 纪念品',desc:'避开圣马可广场的店，找小巷手工坊'},
+    ],
+    stay:'威尼斯',
+    tip:'💡 Burano 彩色岛是威尼斯最出片的地方，建议上午去（光线好），下午回岛内探索',
+    coords:[[45.4564,12.3547],[45.4852,12.4168],[45.4751,12.4200],[45.4380,12.3359]],
+    stayCoord:[45.4328,12.3377],
+    labels:['Murano','Burano 🌈','Torcello','里亚尔托桥'],
+  },
+  {
+    num:8, date:'Day 8 · 返程', emoji:'🛫', title:'威尼斯 VCE → 伦敦 LHR',
+    spots:[
+      {icon:'🌅',name:'圣马可广场清晨',desc:'早起 7:00 前游人极少，最美的威尼斯'},
+      {icon:'🛍️',name:'最后采购',desc:'给自己买瓶 Murano 玻璃纪念品或意大利皮具'},
+      {icon:'🚌',name:'前往 VCE 机场',desc:'Vaporetto ALILAGUNA 水上巴士 ~70min / 出租车艇 ~35min £50+'},
+      {icon:'✈️',name:'BA575 · VCE 16:20 → LHR 17:55',desc:'2h35m，回家！'},
+    ],
+    stay:null,
+    tip:'💡 建议提前 3h 到机场，威尼斯岛到机场水上交通需留足时间',
+    coords:[[45.4341,12.3388],[45.5053,12.3519]],
+    stayCoord:null,
+    labels:['圣马可广场','VCE 机场'],
+  },
+];
+
+// Render day cards
+const dayCardsEl = document.getElementById('day-cards');
+days.forEach((day, i) => {
+  const isOpen = i === 0 ? ' open' : '';
+  const spotsHTML = day.spots.map(s => `
+    <div class="spot${s.star ? ' spot-star' : ''}">
+      <div class="spot-icon">${s.icon}</div>
+      <div><div class="spot-name">${s.name}</div><div class="spot-desc">${s.desc}</div></div>
+    </div>
+  `).join('');
+  const stayHTML = day.stay ? `<div class="day-stay"><div style="font-size:1.2rem">🏠</div><div><strong>住宿：</strong>${day.stay}</div></div>` : '';
+  const tipHTML = day.tip ? `<div class="day-tip">${day.tip}</div>` : '';
+
+  dayCardsEl.innerHTML += `
+    <div class="day-card${isOpen}" id="day-${day.num}">
+      <div class="day-header" onclick="toggleDay(${day.num})">
+        <div class="day-label">
+          <div class="day-num" style="background:${dayColors[i]};color:#fff">${day.emoji}</div>
+          <div class="day-info">
+            <h3>${day.date} · ${day.title}</h3>
+          </div>
+        </div>
+        <div class="day-meta">
+          <span class="day-city-tag ${cityTags[i].cls}">${cityTags[i].label}</span>
+          <div class="day-expand">▼</div>
+        </div>
+      </div>
+      <div class="day-body">
+        <div class="day-content">${spotsHTML}${stayHTML}${tipHTML}</div>
+      </div>
+    </div>
+  `;
+});
+
+function toggleDay(num) {
+  document.getElementById('day-' + num).classList.toggle('open');
+}
+
+// Map
+const map = L.map('map', { center: [43.5, 12.5], zoom: 6, zoomControl: true, scrollWheelZoom: true });
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 18 }).addTo(map);
+
+// Route line: Rome → Florence → Venice
+const routePoints = [
+  [41.8902,12.4922], // Rome Colosseum
+  [41.9065,12.4536], // Vatican
+  [41.8948,12.4780], // Rome center
+  [43.7696,11.2558], // Florence
+  [43.7731,11.2560], // Florence Duomo
+  [45.4341,12.3388], // Venice San Marco
+  [45.4564,12.3547], // Murano
+  [45.4852,12.4168], // Burano
+  [45.5053,12.3519], // VCE Airport
+];
+
+L.polyline(routePoints, { color: '#ce2b37', weight: 3, opacity: 0.6, dashArray: '8, 6', smoothFactor: 1.5 }).addTo(map);
+
+// City markers
+const cityMarkers = [
+  { coord: [41.8902, 12.4922], color: '#ce2b37', label: '🏛️ 罗马' },
+  { coord: [43.7696, 11.2558], color: '#f59e0b', label: '🌷 佛罗伦萨' },
+  { coord: [45.4341, 12.3388], color: '#3b82f6', label: '🚤 威尼斯' },
+  { coord: [45.4852, 12.4168], color: '#06b6d4', label: '🌈 Burano 彩色岛' },
+  { coord: [45.4564, 12.3547], color: '#06b6d4', label: '🔵 Murano 玻璃岛' },
+  { coord: [41.9065, 12.4536], color: '#ce2b37', label: '⛪ 梵蒂冈' },
+  { coord: [43.7731, 11.2560], color: '#f59e0b', label: '🔴 圣母百花大教堂' },
+];
+
+cityMarkers.forEach(m => {
+  L.circleMarker(m.coord, {
+    radius: 8, fillColor: m.color, color: '#fff', weight: 2, opacity: 1, fillOpacity: 0.9
+  }).addTo(map).bindPopup(`<div style="min-width:140px;"><strong>${m.label}</strong></div>`);
+});
+
+const legendEl = document.getElementById('map-legend');
+const legendData = [
+  {color:'#ce2b37',label:'罗马'},{color:'#f59e0b',label:'佛罗伦萨'},{color:'#3b82f6',label:'威尼斯'},{color:'#06b6d4',label:'岛屿'}
+];
+legendData.forEach(l => {
+  legendEl.innerHTML += `<div class="legend-item"><div class="legend-dot" style="background:${l.color}"></div><span>${l.label}</span></div>`;
+});
+
+// Checklist localStorage
+document.querySelectorAll('.checklist-item input[type="checkbox"]').forEach(cb => {
+  const key = 'italy-acc-' + cb.id;
+  if (localStorage.getItem(key) === 'true') cb.checked = true;
+  cb.addEventListener('change', () => localStorage.setItem(key, cb.checked));
+});
+</script>
+</body>
+</html>
