@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏝️ 马略卡 · 波联萨两日行程</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700&display=swap');
+:root{--bg:#fbf7f0;--card:#fff;--text:#2b2b2b;--dim:#6b6b6b;--sea:#0e7490;--sea2:#06b6d4;--sand:#e9d8b8;--terra:#c2410c;--olive:#65a30d;--border:#ece3d3}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Inter','Noto Sans SC',-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
+.hero{position:relative;padding:72px 24px 56px;text-align:center;color:#fff;background:linear-gradient(160deg,#0e7490 0%,#0891b2 45%,#f59e0b 120%);overflow:hidden}
+.hero::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:60px;background:var(--bg);clip-path:ellipse(70% 100% at 50% 100%)}
+.hero h1{font-size:2.4rem;font-weight:800;letter-spacing:-.5px}
+.hero p{opacity:.9;margin-top:6px}
+.chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.chip{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);padding:4px 12px;border-radius:999px;font-size:.85rem;backdrop-filter:blur(4px)}
+nav{position:sticky;top:0;z-index:1000;background:rgba(251,247,240,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);display:flex;justify-content:center;gap:6px;padding:10px;flex-wrap:wrap}
+nav a{color:var(--sea);text-decoration:none;font-weight:600;font-size:.9rem;padding:6px 14px;border-radius:999px}
+nav a:hover{background:#e0f2f7}
+main{max-width:920px;margin:0 auto;padding:24px 20px 80px}
+.alert{background:#fff7ed;border:1px solid #fed7aa;border-left:5px solid var(--terra);padding:14px 18px;border-radius:12px;margin:8px 0 28px;font-size:.95rem}
+.alert b{color:var(--terra)}
+.day{margin-top:44px}
+.day-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.day-num{font-size:.8rem;font-weight:700;color:#fff;background:var(--sea);padding:3px 12px;border-radius:999px;letter-spacing:1px}
+.day h2{font-size:1.6rem;font-weight:800}
+.day .sub{color:var(--dim);margin:4px 0 14px}
+.map{height:320px;border-radius:16px;border:1px solid var(--border);margin:10px 0 22px;z-index:1}
+.timeline{position:relative;padding-left:28px}
+.timeline::before{content:"";position:absolute;left:9px;top:6px;bottom:6px;width:2px;background:linear-gradient(var(--sea2),var(--sand))}
+.stop{position:relative;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 18px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.03)}
+.stop::before{content:"";position:absolute;left:-25px;top:20px;width:12px;height:12px;border-radius:50%;background:#fff;border:3px solid var(--sea)}
+.stop.meal::before{border-color:var(--terra)}
+.stop.sunset::before{border-color:#f59e0b}
+.time{font-size:.8rem;font-weight:700;color:var(--sea);letter-spacing:.5px}
+.stop.meal .time{color:var(--terra)}
+.stop.sunset .time{color:#d97706}
+.stop h3{font-size:1.08rem;margin:2px 0 4px}
+.stop p{color:#444;font-size:.94rem}
+.tags{margin-top:8px;display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:.75rem;background:#f1ece2;color:#5b5346;padding:2px 9px;border-radius:999px}
+.drive{font-size:.82rem;color:var(--dim);margin:-6px 0 12px 2px}
+.drive::before{content:"🚗 "}
+.tip{background:#ecfeff;border:1px dashed #67e8f9;border-radius:12px;padding:12px 16px;font-size:.92rem;margin-top:6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin-top:14px}
+.box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px}
+.box h3{font-size:1rem;margin-bottom:6px}
+.box ul{padding-left:18px;font-size:.93rem;color:#444}
+.box li{margin:3px 0}
+footer{text-align:center;color:var(--dim);font-size:.82rem;padding:30px}
+@media(max-width:600px){.hero h1{font-size:1.8rem}.map{height:260px}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>🏝️ 马略卡 · 波联萨两日行程</h1>
+  <p>Bingchen & Yue · 2026 年 10 月底</p>
+  <div class="chips">
+    <span class="chip">📍 住 Pollença 附近</span>
+    <span class="chip">🚗 自驾</span>
+    <span class="chip">🌡️ 白天 ~22°C · 水温 ~22°C</span>
+    <span class="chip">🌅 日落 ~17:20</span>
+  </div>
+</div>
+
+<nav>
+  <a href="#day1">Day 1 · Formentor</a>
+  <a href="#day2">Day 2 · Tramuntana</a>
+  <a href="#tips">注意事项</a>
+  <a href="#food">吃什么</a>
+</nav>
+
+<main>
+  <div class="alert">⏰ <b>10 月 25 日欧洲切回冬令时</b>，之后日落大约 17:20。下午的安排要往前挪，Sa Calobra 那段山路最好别摸黑开。</div>
+
+  <!-- DAY 1 -->
+  <section class="day" id="day1">
+    <div class="day-head"><span class="day-num">DAY 1</span><h2>Formentor 半岛 + 波联萨老城</h2></div>
+    <p class="sub">都在住处附近，开车不累，节奏轻松</p>
+    <div class="map" id="map1"></div>
+    <div class="timeline">
+      <div class="stop">
+        <div class="time">08:30</div>
+        <h3>出发去 Formentor 半岛</h3>
+        <p>趁大巴和人群还没到早点出门。10 月底这条路可以自己开车进，旺季那几个月才封路。</p>
+      </div>
+      <div class="stop">
+        <div class="time">08:50</div>
+        <h3>Mirador Es Colomer</h3>
+        <p>悬崖观景台，马略卡最经典的明信片角度，看海崖和小岛。</p>
+        <div class="tags"><span class="tag">📸 必拍</span><span class="tag">停留 20–30 分钟</span></div>
+      </div>
+      <div class="drive">往里约 40 分钟，路窄弯多</div>
+      <div class="stop">
+        <div class="time">09:45</div>
+        <h3>Cap de Formentor 灯塔</h3>
+        <p>半岛最北端，三面都是悬崖和海。灯塔停车位很少，早到很重要。</p>
+        <div class="tags"><span class="tag">🅿️ 车位少</span></div>
+      </div>
+      <div class="stop">
+        <div class="time">11:00</div>
+        <h3>Platja de Formentor</h3>
+        <p>松树林一直长到海边，水很浅很清。10 月底水温还有 22°C 左右，可以下水。</p>
+        <div class="tags"><span class="tag">🏊 能游泳</span><span class="tag">🅿️ 收费停车</span></div>
+      </div>
+      <div class="stop meal">
+        <div class="time">13:00 · 午饭</div>
+        <h3>Port de Pollença</h3>
+        <p>海边步道 Passeig Voramar 一路都是餐厅，吃海鲜饭或者 arroz brut。</p>
+      </div>
+      <div class="stop">
+        <div class="time">15:00</div>
+        <h3>Pollença 老城</h3>
+        <p>Plaça Major 喝杯咖啡，再爬 <b>Calvari 365 级台阶</b>，上面能看到老城和远处的海湾。</p>
+        <div class="tags"><span class="tag">🛍️ 周日上午 Plaça Major 有集市</span></div>
+      </div>
+      <div class="stop sunset">
+        <div class="time">17:00 · 傍晚</div>
+        <h3>Alcúdia 老城</h3>
+        <p>开车 15 分钟。沿中世纪城墙走一圈，晚饭就在城墙里面吃。</p>
+      </div>
+    </div>
+    <div class="tip">💡 如果第一天正好是<b>周日</b>，上下午可以对调：上午先去老城逛集市，下午再去 Formentor（光线也更适合拍照）。</div>
+  </section>
+
+  <!-- DAY 2 -->
+  <section class="day" id="day2">
+    <div class="day-head"><span class="day-num">DAY 2</span><h2>Tramuntana 山脉 + Sóller</h2></div>
+    <p class="sub">世界遗产山脉，一整天在开车，不过路上风景就是看点</p>
+    <div class="map" id="map2"></div>
+    <div class="timeline">
+      <div class="stop">
+        <div class="time">08:30</div>
+        <h3>Ma-10 山路往西开</h3>
+        <p>马略卡风景最好的一条公路，沿着山脊开，一边是山一边是海。</p>
+      </div>
+      <div class="stop">
+        <div class="time">09:10</div>
+        <h3>Lluc 修道院</h3>
+        <p>岛上最重要的朝圣地，藏在山谷里，停 30 分钟就够。</p>
+      </div>
+      <div class="drive">经 Nus de sa Corbata「领带结」发卡弯下山，大约 40 分钟</div>
+      <div class="stop">
+        <div class="time">10:15</div>
+        <h3>Sa Calobra + Torrent de Pareis</h3>
+        <p>下山那段路有个绕成一圈的「领带结」弯，很有名。到了以后穿过岩石隧道步行 15 分钟，进到峡谷口，两边是几百米高的悬崖，中间一片小石滩。</p>
+        <div class="tags"><span class="tag">⭐ 当天重点</span><span class="tag">🅿️ 收费，越早越好</span><span class="tag">👟 穿防滑鞋</span></div>
+      </div>
+      <div class="stop meal">
+        <div class="time">13:00 · 午饭</div>
+        <h3>Fornalutx</h3>
+        <p>石头小村，评选过西班牙最美村庄。橘子树、石板路，挑家小馆子吃饭。</p>
+      </div>
+      <div class="stop">
+        <div class="time">14:30</div>
+        <h3>Sóller → Port de Sóller</h3>
+        <p>从 Sóller 镇上坐老木头电车（1913 年开通）到港口，在港湾边走走，吃个冰淇淋。Sóller 的橘子很有名，可以喝杯鲜榨橙汁。</p>
+        <div class="tags"><span class="tag">🚋 老电车</span><span class="tag">🍊 橘子</span></div>
+      </div>
+      <div class="stop sunset">
+        <div class="time">16:45 · 日落</div>
+        <h3>Deià 或 Mirador de Ses Barques</h3>
+        <p>Deià 是艺术家聚居的山村，傍晚的光特别好。不想多开的话就去 Ses Barques 观景台，俯瞰 Sóller 港湾。</p>
+      </div>
+      <div class="drive">回程走 Sóller 隧道转高速，大约 1 小时，不用摸黑走山路</div>
+    </div>
+    <div class="tip">⛴️ <b>另一种玩法</b>：车停在 Sa Calobra，坐船去 Port de Sóller。不过 10 月底这条船随时可能停运，最后还得回去取车，挺折腾，不推荐硬凑。</div>
+  </section>
+
+  <!-- TIPS -->
+  <section class="day" id="tips">
+    <div class="day-head"><span class="day-num">INFO</span><h2>注意事项</h2></div>
+    <div class="grid">
+      <div class="box">
+        <h3>🚗 开车</h3>
+        <ul>
+          <li>Formentor 和 Sa Calobra 停车都收费，都是越早去越好停</li>
+          <li>山路上骑公路车的人很多，超车要小心</li>
+          <li>Sa Calobra 山路有大巴会车，遇到了就倒车让一让</li>
+        </ul>
+      </div>
+      <div class="box">
+        <h3>🌧️ 下雨备选</h3>
+        <ul>
+          <li><b>Coves del Drach</b>（Porto Cristo，开车约 1 小时）：溶洞里的地下湖上有音乐会</li>
+          <li><b>Coves de Campanet</b>：离住处近，人少</li>
+          <li>Alcúdia / Pollença 老城 + 咖啡馆</li>
+        </ul>
+      </div>
+      <div class="box">
+        <h3>🎒 带上</h3>
+        <ul>
+          <li>泳衣（Formentor 海滩）</li>
+          <li>防滑鞋（Sa Calobra 峡谷）</li>
+          <li>薄外套：山上风大，早晚凉</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="day" id="food">
+    <div class="day-head"><span class="day-num">FOOD</span><h2>吃什么</h2></div>
+    <div class="grid">
+      <div class="box"><h3>🥐 Ensaïmada</h3><ul><li>蜗牛形状的猪油甜面包，早餐配咖啡</li></ul></div>
+      <div class="box"><h3>🍆 Tumbet</h3><ul><li>马略卡蔬菜烩：茄子、土豆、红椒加番茄酱汁</li></ul></div>
+      <div class="box"><h3>🌶️ Sobrassada</h3><ul><li>红椒香肠，可以抹在面包上吃，配蜂蜜也行</li></ul></div>
+      <div class="box"><h3>🦐 Arroz brut / 海鲜饭</h3><ul><li>Arroz brut 是带汤的山区米饭；在港口就点海鲜饭</li></ul></div>
+    </div>
+  </section>
+</main>
+
+<footer>Made by 沙沙 🤖 · 出发前请再确认营业时间和路况</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const tiles='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+function mk(id,pts,color){
+  const m=L.map(id,{scrollWheelZoom:false});
+  L.tileLayer(tiles,{attribution:'© OpenStreetMap'}).addTo(m);
+  const ll=pts.map(p=>[p[1],p[2]]);
+  pts.forEach((p,i)=>{
+    L.marker([p[1],p[2]],{icon:L.divIcon({className:'',html:`<div style="background:${color};color:#fff;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:700 12px Inter;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3)">${i===0?'🏠':i}</div>`,iconSize:[24,24],iconAnchor:[12,12]})}).addTo(m).bindPopup(p[0]);
+  });
+  L.polyline(ll,{color,weight:3,dashArray:'6 6',opacity:.8}).addTo(m);
+  m.fitBounds(ll,{padding:[30,30]});
+}
+mk('map1',[
+  ['Pollença（住处）',39.8770,3.0160],
+  ['Mirador Es Colomer',39.9230,3.1130],
+  ['Cap de Formentor 灯塔',39.9617,3.2128],
+  ['Platja de Formentor',39.9290,3.1350],
+  ['Port de Pollença 午饭',39.9070,3.0830],
+  ['Pollença 老城 / Calvari',39.8790,3.0140],
+  ['Alcúdia 老城',39.8530,3.1210]
+],'#0e7490');
+mk('map2',[
+  ['Pollença（住处）',39.8770,3.0160],
+  ['Lluc 修道院',39.8230,2.8850],
+  ['Sa Calobra',39.8500,2.8050],
+  ['Fornalutx',39.7820,2.7400],
+  ['Sóller',39.7660,2.7150],
+  ['Port de Sóller',39.7960,2.6950],
+  ['Deià',39.7480,2.6490]
+],'#c2410c');
+</script>
+</body>
+</html>
