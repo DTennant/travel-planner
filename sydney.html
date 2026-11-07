@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🦘 悉尼六日行程 · 12 月 7–12 日</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700&display=swap');
+:root{--bg:#f6f9fb;--card:#fff;--text:#1f2a33;--dim:#64707a;--sea:#0369a1;--sea2:#38bdf8;--sand:#fde68a;--terra:#e11d48;--olive:#16a34a;--border:#e2e8ee}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Inter','Noto Sans SC',-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
+.hero{position:relative;padding:72px 24px 56px;text-align:center;color:#fff;background:linear-gradient(160deg,#0c4a6e 0%,#0369a1 45%,#f97316 125%);overflow:hidden}
+.hero::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:60px;background:var(--bg);clip-path:ellipse(70% 100% at 50% 100%)}
+.hero h1{font-size:2.4rem;font-weight:800;letter-spacing:-.5px}
+.hero p{opacity:.9;margin-top:6px}
+.chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.chip{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);padding:4px 12px;border-radius:999px;font-size:.85rem;backdrop-filter:blur(4px)}
+nav{position:sticky;top:0;z-index:1000;background:rgba(246,249,251,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);display:flex;justify-content:center;gap:6px;padding:10px;flex-wrap:wrap}
+nav a{color:var(--sea);text-decoration:none;font-weight:600;font-size:.88rem;padding:6px 12px;border-radius:999px}
+nav a:hover{background:#e0f2fe}
+main{max-width:920px;margin:0 auto;padding:24px 20px 80px}
+.alert{background:#fff1f2;border:1px solid #fecdd3;border-left:5px solid var(--terra);padding:14px 18px;border-radius:12px;margin:8px 0 14px;font-size:.95rem}
+.alert b{color:var(--terra)}
+.alert.info{background:#f0f9ff;border-color:#bae6fd;border-left-color:var(--sea)}
+.alert.info b{color:var(--sea)}
+.day{margin-top:44px}
+.day-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.day-num{font-size:.8rem;font-weight:700;color:#fff;background:var(--sea);padding:3px 12px;border-radius:999px;letter-spacing:1px}
+.day h2{font-size:1.6rem;font-weight:800}
+.day .sub{color:var(--dim);margin:4px 0 14px}
+.map{height:320px;border-radius:16px;border:1px solid var(--border);margin:10px 0 22px;z-index:1}
+.timeline{position:relative;padding-left:28px}
+.timeline::before{content:"";position:absolute;left:9px;top:6px;bottom:6px;width:2px;background:linear-gradient(var(--sea2),var(--sand))}
+.stop{position:relative;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 18px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.03)}
+.stop::before{content:"";position:absolute;left:-25px;top:20px;width:12px;height:12px;border-radius:50%;background:#fff;border:3px solid var(--sea)}
+.stop.meal::before{border-color:var(--terra)}
+.stop.sunset::before{border-color:#f59e0b}
+.time{font-size:.8rem;font-weight:700;color:var(--sea);letter-spacing:.5px}
+.stop.meal .time{color:var(--terra)}
+.stop.sunset .time{color:#d97706}
+.stop h3{font-size:1.08rem;margin:2px 0 4px}
+.stop p{color:#3d4852;font-size:.94rem}
+.tags{margin-top:8px;display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:.75rem;background:#eef2f6;color:#475461;padding:2px 9px;border-radius:999px}
+.tag.book{background:#ffe4e6;color:#be123c;font-weight:600}
+.move{font-size:.82rem;color:var(--dim);margin:-6px 0 12px 2px}
+.tip{background:#f0fdf4;border:1px dashed #86efac;border-radius:12px;padding:12px 16px;font-size:.92rem;margin-top:6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin-top:14px}
+.box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px}
+.box h3{font-size:1rem;margin-bottom:6px}
+.box ul{padding-left:18px;font-size:.93rem;color:#3d4852}
+.box li{margin:3px 0}
+table{width:100%;border-collapse:collapse;font-size:.92rem;background:var(--card);border-radius:14px;overflow:hidden;border:1px solid var(--border);margin-top:14px}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);vertical-align:top}
+th{background:#f0f9ff;color:var(--sea);font-weight:700}
+tr:last-child td{border-bottom:none}
+footer{text-align:center;color:var(--dim);font-size:.82rem;padding:30px}
+@media(max-width:600px){.hero h1{font-size:1.8rem}.map{height:260px}th,td{padding:8px}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>🦘 悉尼六日行程</h1>
+  <p>Bingchen & Yue · 2026 年 12 月 7 日（周一）– 12 日（周六）</p>
+  <div class="chips">
+    <span class="chip">🏨 Sheraton Grand Sydney Hyde Park</span>
+    <span class="chip">🚆 公共交通 + 渡轮</span>
+    <span class="chip">🌡️ 19–26°C · 初夏</span>
+    <span class="chip">🌅 日落 ~19:55</span>
+  </div>
+</div>
+
+<nav>
+  <a href="#day1">D1 · 海港初见</a>
+  <a href="#day2">D2 · Bondi</a>
+  <a href="#day3">D3 · 蓝山</a>
+  <a href="#day4">D4 · 动物园 + 大桥</a>
+  <a href="#day5">D5 · Manly</a>
+  <a href="#day6">D6 · 返程</a>
+  <a href="#book">🔖 要订的</a>
+  <a href="#tips">注意事项</a>
+</nav>
+
+<main>
+  <div class="alert">🔖 <b>12 月是悉尼圣诞聚餐季，好餐厅要尽早订。</b>Bennelong、Saint Peter / Sixpenny、Firedoor 和 BridgeClimb 都建议现在就订，清单见页面底部。</div>
+  <div class="alert info">🏨 <b>住 Sheraton，海德公园旁边。</b>走路 2 分钟到 St James 站，5 分钟到 Museum 站，这两站都在机场线上，进出机场不用换乘。到 Circular Quay 步行约 15 分钟，坐火车 2 站。</div>
+
+  <!-- DAY 1 -->
+  <section class="day" id="day1">
+    <div class="day-head"><span class="day-num">DAY 1 · 12/7 周一</span><h2>落地 · 海德公园 → 歌剧院</h2></div>
+    <p class="sub">刚下长途飞机，全程步行，节奏放慢。白天尽量别睡，晚上早点休息，倒时差最快</p>
+    <div class="map" id="map1"></div>
+    <div class="timeline">
+      <div class="stop">
+        <div class="time">上午 · 落地</div>
+        <h3>机场 → 酒店</h3>
+        <p>坐 T8 机场线到 <b>Museum</b> 或 <b>St James</b>，约 15 分钟，刷带 contactless 的银行卡或手机进站就行。到了先寄存行李，可以问一下能不能提前入住。</p>
+        <div class="tags"><span class="tag">🚆 约 AUD 20 / 人</span><span class="tag">🧳 寄存行李</span></div>
+      </div>
+      <div class="stop">
+        <div class="time">11:00</div>
+        <h3>Hyde Park + St Mary's Cathedral</h3>
+        <p>就在酒店门口。公园北头有 Archibald 喷泉，再过一条街是哥特式的圣玛丽大教堂，12 月里面有圣诞装饰。</p>
+      </div>
+      <div class="stop meal">
+        <div class="time">12:30 · 午饭</div>
+        <h3>酒店附近随便吃</h3>
+        <p>去 Pitt St 或 Westfield 的美食广场，或者找家附近的咖啡馆，吃简单点。悉尼的 flat white 和牛油果吐司值得一试。</p>
+      </div>
+      <div class="stop">
+        <div class="time">14:00</div>
+        <h3>Art Gallery of NSW</h3>
+        <p>穿过 The Domain 公园走 10 分钟。老馆加新馆 Sydney Modern 都免费，空调很足，适合倒时差的时候慢慢逛。新馆地下有个二战时期的储油罐改成的展厅，值得去。</p>
+        <div class="tags"><span class="tag">🎨 免费</span><span class="tag">每天 10:00–17:00</span></div>
+      </div>
+      <div class="stop">
+        <div class="time">16:00</div>
+        <h3>Mrs Macquarie's Chair → 皇家植物园</h3>
+        <p>海角上的观景点，<b>能把歌剧院和海港大桥拍在同一个画面里</b>。拍完沿海边穿过植物园往歌剧院走。</p>
+        <div class="tags"><span class="tag">📸 必拍</span></div>
+      </div>
+      <div class="stop sunset">
+        <div class="time">18:00 · 傍晚</div>
+        <h3>歌剧院 + Opera Bar</h3>
+        <p>先在歌剧院外面转一圈，然后去 Opera Bar 的露天座喝一杯，对面就是大桥。日落要到快 8 点。</p>
+      </div>
+      <div class="stop meal">
+        <div class="time">19:30 · 晚饭</div>
+        <h3>Mamak（Chinatown）</h3>
+        <p>马来西亚菜，现做 roti canai、沙爹和 nasi lemak，便宜好吃，排队快。从酒店步行 10 分钟。<br>不想排队的话，旁边的 <b>Chat Thai</b> 也不错。</p>
+        <div class="tags"><span class="tag">💰 $</span><span class="tag">不接受订位</span></div>
+      </div>
+    </div>
+    <div class="tip">💡 周一很多高端餐厅不营业，所以第一天不排大餐，正好适合倒时差。</div>
+  </section>
+
+  <!-- DAY 2 -->
+  <section class="day" id="day2">
+    <div class="day-head"><span class="day-num">DAY 2 · 12/8 周二</span><h2>Bondi → Coogee 海岸步道</h2></div>
+    <p class="sub">悉尼最经典的海岸线。带泳衣和防晒，上午凉快的时候出发</p>
+    <div class="map" id="map2"></div>
+    <div class="timeline">
+      <div class="move">🚆 Museum / St James → Bondi Junction 约 15 分钟，换 333 路公交到海滩；或者直接打 Uber，约 20 分钟</div>
+      <div class="stop meal">
+        <div class="time">08:00 · 早饭</div>
+        <h3>bills Bondi</h3>
+        <p>Bill Granger 的店，招牌是 <b>ricotta hotcakes</b> 和 scrambled eggs，也就是把澳式早午餐推向全世界的那家。</p>
+        <div class="tags"><span class="tag">🥞 招牌松饼</span><span class="tag">7:00 开门</span></div>
+      </div>
+      <div class="stop">
+        <div class="time">09:30</div>
+        <h3>Bondi Beach + Icebergs 泳池</h3>
+        <p>沿沙滩走到南头，就是悬崖边那个经常上明信片的海水泳池 Bondi Icebergs，门票几块钱，可以下去游。</p>
+        <div class="tags"><span class="tag">📸 必拍</span><span class="tag">🏊 海水泳池</span></div>
+      </div>
+      <div class="stop">
+        <div class="time">10:00 – 13:00</div>
+        <h3>Bondi to Coogee Coastal Walk</h3>
+        <p>大约 6km，一路经过 Tamarama、<b>Bronte</b>（也有海水泳池）、Waverley 墓园（建在悬崖上）和 <b>Clovelly</b>（海湾风平浪静，适合浮潜）。路上有不少台阶，走走停停 2–3 小时。</p>
+        <div class="tags"><span class="tag">👟 约 6km</span><span class="tag">🧴 紫外线很强</span><span class="tag">🏊 Bronte / Clovelly 能下水</span></div>
+      </div>
+      <div class="stop meal">
+        <div class="time">13:00 · 午饭</div>
+        <h3>Coogee</h3>
+        <p>在海滩边买份 fish & chips 坐着吃；或者去 Coogee Pavilion 的屋顶，看着海喝杯东西。</p>
+      </div>
+      <div class="stop">
+        <div class="time">下午</div>
+        <h3>回酒店休息</h3>
+        <p>坐 373/374 路公交直接回城，到 Museum 附近下车。洗个澡，睡个午觉。</p>
+      </div>
+      <div class="stop meal">
+        <div class="time">19:00 · 晚饭</div>
+        <h3>Firedoor（Surry Hills）</h3>
+        <p>Lennox Hastie 的店，<b>全部菜都用柴火做</b>，没有煤气也没有电炉，每种菜用的木头都不一样。可以点他们的干式熟成牛排。从酒店打车约 7 分钟。</p>
+        <div class="tags"><span class="tag book">🔖 必须提前订</span><span class="tag">💰 $$$$</span><span class="tag">周二至周六</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DAY 3 -->
+  <section class="day" id="day3">
+    <div class="day-head"><span class="day-num">DAY 3 · 12/9 周三</span><h2>蓝山 Blue Mountains</h2></div>
+    <p class="sub">世界遗产，桉树林散发的油雾让整个山谷看起来是蓝色的。一整天，早点出门</p>
+    <div class="map" id="map3"></div>
+    <div class="timeline">
+      <div class="move">🚆 Central → Katoomba，Blue Mountains Line 约 2 小时，每小时一班。坐在列车左边看风景更好。周末和工作日都有封顶票价，很便宜</div>
+      <div class="stop">
+        <div class="time">07:30</div>
+        <h3>Central 站上车</h3>
+        <p>从酒店坐火车到 Central 一站。车上可以补觉，或者路上买份早饭带着吃。</p>
+      </div>
+      <div class="stop">
+        <div class="time">10:00</div>
+        <h3>Echo Point · 三姐妹峰</h3>
+        <p>蓝山最经典的观景台，正对三姐妹峰和 Jamison 山谷。体力好的话可以走 Giant Stairway 下到谷底，大约 900 级台阶。</p>
+        <div class="tags"><span class="tag">📸 必拍</span><span class="tag">🚌 Katoomba 站有接驳 hop-on bus</span></div>
+      </div>
+      <div class="stop">
+        <div class="time">11:00</div>
+        <h3>Scenic World</h3>
+        <p>一张票包含四样：<b>Scenic Railway</b>（号称世界最陡的载客轨道车，52°）、谷底的雨林木栈道、Scenic Cableway 缆车，以及玻璃底的 Skyway 空中缆车。</p>
+        <div class="tags"><span class="tag">🎟️ 官网买票有优惠</span><span class="tag">停留 2 小时</span></div>
+      </div>
+      <div class="stop meal">
+        <div class="time">13:30 · 午饭</div>
+        <h3>Katoomba 或 Leura</h3>
+        <p>Leura 是旁边一个很漂亮的小镇，主街都是咖啡馆和甜品店。从 Katoomba 坐火车一站。</p>
+      </div>
+      <div class="stop">
+        <div class="time">15:00</div>
+        <h3>Wentworth Falls（选做）</h3>
+        <p>想多走点就去这里。Wentworth Falls 站下车，走到 Princes Rock 观景点看瀑布，来回大约 1 小时。走累了就直接回城。</p>
+      </div>
+      <div class="stop meal">
+        <div class="time">19:30 · 晚饭</div>
+        <h3>Din Tai Fung（World Square）</h3>
+        <p>回城累了就吃点熟悉的。<b>鼎泰丰 World Square 店</b>离酒店步行 8 分钟。<br>想换口味的话，Haymarket 一带川菜、东北菜、港式都有。</p>
+      </div>
+    </div>
+    <div class="tip">🚗 不想坐火车的话，可以报一个 Blue Mountains 一日游团，大多包含 Featherdale 野生动物园（能摸考拉）。或者租车自驾，单程约 1.5 小时，能顺路多去几个观景台。</div>
+  </section>
+
+  <!-- DAY 4 -->
+  <section class="day" id="day4">
+    <div class="day-head"><span class="day-num">DAY 4 · 12/10 周四</span><h2>Taronga 动物园 + The Rocks + 大桥</h2></div>
+    <p class="sub">坐渡轮看海港，下午在大桥一带，晚上歌剧院里吃大餐</p>
+    <div class="map" id="map4"></div>
+    <div class="timeline">
+      <div class="move">🚆 St James → Circular Quay 两站</div>
+      <div class="stop">
+        <div class="time">09:00</div>
+        <h3>F2 渡轮 → Taronga Zoo</h3>
+        <p>从 Circular Quay 2 号码头出发，坐 12 分钟。<b>船上能看到歌剧院和大桥</b>，很出片。到了码头坐 Sky Safari 缆车上山，然后一路往下逛。</p>
+        <div class="tags"><span class="tag">⛴️ 刷卡上船</span></div>
+      </div>
+      <div class="stop">
+        <div class="time">09:30 – 13:00</div>
+        <h3>Taronga Zoo</h3>
+        <p>考拉、袋鼠、鸭嘴兽、塔斯马尼亚袋獾都有。最大的特点是<b>动物园正对着海港和城市天际线</b>，长颈鹿区的背景就是歌剧院。</p>
+        <div class="tags"><span class="tag">🦘 澳洲动物</span><span class="tag">🎟️ 官网买票</span></div>
+      </div>
+      <div class="stop meal">
+        <div class="time">13:30 · 午饭</div>
+        <h3>The Rocks</h3>
+        <p>坐渡轮回 Circular Quay，在 The Rocks 吃。<b>Fortune of War</b> 和 <b>Lord Nelson</b> 都是悉尼最老的酒吧，吃 pub 午餐、喝啤酒。</p>
+      </div>
+      <div class="stop">
+        <div class="time">15:00</div>
+        <h3>BridgeClimb 或 免费走大桥</h3>
+        <p><b>BridgeClimb</b>：爬到大桥拱顶，大约 3 小时，有教练带队，价格不便宜，但这是悉尼最有代表性的体验之一。<br><b>省钱版</b>：桥面东侧的人行道免费，走到 Pylon Lookout（桥墩观景台，收少量门票）就能看到歌剧院。</p>
+        <div class="tags"><span class="tag book">🔖 BridgeClimb 要提前订</span></div>
+      </div>
+      <div class="stop">
+        <div class="time">18:00</div>
+        <h3>The Rocks 老街 + Observatory Hill</h3>
+        <p>回酒店换衣服之前，去天文台山的草坪坐一会儿，看大桥。</p>
+      </div>
+      <div class="stop meal sunset">
+        <div class="time">19:30 · 晚饭</div>
+        <h3>Bennelong（悉尼歌剧院内）</h3>
+        <p>就在歌剧院的一片「帆」里面，抬头是混凝土拱顶，窗外是海港。现代澳洲菜，最有名的甜点是做成歌剧院形状的 pavlova。</p>
+        <div class="tags"><span class="tag book">🔖 必须提前订</span><span class="tag">💰 $$$$</span><span class="tag">周一至周六晚餐</span></div>
+      </div>
+    </div>
+    <div class="tip">ℹ️ 原来很有名的 Quay 餐厅已经在 <b>2026 年 2 月关门</b>了，和它同一个集团的 Bennelong 现在是看海港最好的高端餐厅。</div>
+  </section>
+
+  <!-- DAY 5 -->
+  <section class="day" id="day5">
+    <div class="day-head"><span class="day-num">DAY 5 · 12/11 周五</span><h2>Manly + Paddington</h2></div>
+    <p class="sub">坐渡轮去北边的海滩，晚上吃这次最隆重的一顿</p>
+    <div class="map" id="map5"></div>
+    <div class="timeline">
+      <div class="stop">
+        <div class="time">09:00</div>
+        <h3>F1 渡轮 → Manly</h3>
+        <p>坐 30 分钟，会穿过海港口的 Sydney Heads，<b>这段船程本身就值回票价</b>。坐右边看歌剧院，出了海港口浪会大一点。</p>
+        <div class="tags"><span class="tag">⛴️ 刷卡上船</span></div>
+      </div>
+      <div class="stop">
+        <div class="time">09:45</div>
+        <h3>The Corso → Manly Beach → Shelly Beach</h3>
+        <p>从码头沿步行街 The Corso 走到海边，然后往南沿海边步道走 15 分钟，到 <b>Shelly Beach</b>。这是一个受保护的小海湾，水清浪小，能浮潜，经常能看到大型的 blue groper（蓝色的大鱼）。</p>
+        <div class="tags"><span class="tag">🤿 浮潜</span><span class="tag">海边可以租装备</span></div>
+      </div>
+      <div class="stop">
+        <div class="time">11:30</div>
+        <h3>North Head（选做）</h3>
+        <p>从 Shelly Beach 往上走到 North Head 观景台，可以俯瞰整个海港口和远处的城市。</p>
+      </div>
+      <div class="stop meal">
+        <div class="time">13:00 · 午饭</div>
+        <h3>Manly 海边</h3>
+        <p>Manly Wharf 一带和 The Corso 上都有很多海鲜店和咖啡馆。<b>Manly Wine</b> 适合坐下吃顿午饭。</p>
+      </div>
+      <div class="stop">
+        <div class="time">15:30</div>
+        <h3>Paddington</h3>
+        <p>坐渡轮回城，再坐公交或打车去 Paddington，离酒店不远。这里是维多利亚式排屋和 Oxford St 上的设计师小店，逛到晚饭时间刚好。</p>
+      </div>
+      <div class="stop meal">
+        <div class="time">19:00 · 晚饭（二选一）</div>
+        <h3>Saint Peter（Paddington）或 Sixpenny（Stanmore）</h3>
+        <p>今年 Good Food Guide 只有这两家拿到 3 hats，也就是悉尼的最高分：<br>
+        <b>Saint Peter</b>：Josh Niland 的海鲜餐厅，主张「从鱼鳞到鱼鳍全都用上」，能吃到鱼的干式熟成、鱼眼和鱼骨做的菜，在全球都有名。就在 Paddington，下午逛完可以直接走过去。<br>
+        <b>Sixpenny</b>：今年的年度餐厅，在内西区的小店里做季节性的品尝菜单，很安静。从酒店打车约 15 分钟。</p>
+        <div class="tags"><span class="tag book">🔖 都很难订，今天就去订</span><span class="tag">💰 $$$$</span></div>
+      </div>
+    </div>
+    <div class="tip">💡 这两家都订不到的话，备选：<b>Ester</b>（Chippendale，柴火烤炉，2 hats）、<b>Mr Wong</b>（CBD 粤菜，离酒店近）、<b>Porcine</b>（Paddington 法式小馆，今年升到 2 hats）。</div>
+  </section>
+
+  <!-- DAY 6 -->
+  <section class="day" id="day6">
+    <div class="day-head"><span class="day-num">DAY 6 · 12/12 周六</span><h2>鱼市场 · 市集 · 回家</h2></div>
+    <p class="sub">半天时间，在城里逛逛就好</p>
+    <div class="map" id="map6"></div>
+    <div class="timeline">
+      <div class="stop">
+        <div class="time">08:00</div>
+        <h3>退房，寄存行李</h3>
+        <p>行李先放在酒店前台，下午回来取了再去机场。</p>
+      </div>
+      <div class="stop meal">
+        <div class="time">08:30 · 早午饭（二选一）</div>
+        <h3>A. Sydney Fish Market</h3>
+        <p>南半球最大的鱼市场，在 Blackwattle Bay 的新址。早上去，现场买 <b>生蚝、海胆、龙虾和刺身</b>，在码头边坐着吃。从酒店打车 10 分钟，也可以坐轻轨。</p>
+        <div class="tags"><span class="tag">🦞 海鲜</span><span class="tag">越早越新鲜</span></div>
+      </div>
+      <div class="stop">
+        <div class="time">10:00</div>
+        <h3>B. Paddington Markets</h3>
+        <p><b>只在周六开</b>（10:00–16:00），是本地设计师和手作的市集，适合买伴手礼。昨天在 Paddington 没逛够的话就来这里。</p>
+        <div class="tags"><span class="tag">🛍️ 周六限定</span></div>
+      </div>
+      <div class="stop">
+        <div class="time">12:00</div>
+        <h3>Queen Victoria Building</h3>
+        <p>维多利亚时代的购物拱廊，12 月里面会立一棵很高的圣诞树。离酒店步行 5 分钟，最后在这里买点东西、吃个午饭。</p>
+      </div>
+      <div class="stop">
+        <div class="time">下午 · 出发</div>
+        <h3>酒店 → 机场国际航站楼</h3>
+        <p>回酒店取行李，从 St James 或 Museum 坐 T8 去 International 站，约 15 分钟。国际航班建议<b>起飞前 3 小时</b>从酒店出发。退税（TRS）柜台在过安检之后。</p>
+        <div class="tags"><span class="tag">✈️ 提前 3 小时</span><span class="tag">🧾 TRS 退税</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOOKING -->
+  <section class="day" id="book">
+    <div class="day-head"><span class="day-num">BOOK</span><h2>要提前订的</h2></div>
+    <table>
+      <tr><th>什么</th><th>哪天</th><th>备注</th></tr>
+      <tr><td>🔥 Firedoor</td><td>12/8 周二 晚</td><td>周二至周六营业 · firedoor.com.au</td></tr>
+      <tr><td>🎭 Bennelong</td><td>12/10 周四 晚</td><td>周一至周六晚餐 · bennelong.com.au</td></tr>
+      <tr><td>🐟 Saint Peter <i>或</i> 🌿 Sixpenny</td><td>12/11 周五 晚</td><td>Saint Peter 每天晚餐都开 · Sixpenny 周三至周日</td></tr>
+      <tr><td>🌉 BridgeClimb</td><td>12/10 周四 下午</td><td>bridgeclimb.com · 也可以改成 sunset 场</td></tr>
+      <tr><td>🦘 Taronga Zoo</td><td>12/10 周四 上午</td><td>官网买票有折扣，不用很早订</td></tr>
+      <tr><td>🚠 Scenic World</td><td>12/9 周三</td><td>官网买票有折扣</td></tr>
+    </table>
+  </section>
+
+  <!-- TIPS -->
+  <section class="day" id="tips">
+    <div class="day-head"><span class="day-num">INFO</span><h2>注意事项</h2></div>
+    <div class="grid">
+      <div class="box">
+        <h3>🚆 交通</h3>
+        <ul>
+          <li>火车、渡轮、公交和轻轨都能直接刷 contactless 银行卡或手机，不用办 Opal 卡</li>
+          <li>每天和每周都有消费封顶，周末更便宜</li>
+          <li>坐火车进出机场站要另付一笔 station access fee，所以单程比普通站贵</li>
+          <li>Uber 很普及，晚上回酒店打车最方便</li>
+        </ul>
+      </div>
+      <div class="box">
+        <h3>☀️ 防晒（重要）</h3>
+        <ul>
+          <li>12 月紫外线指数经常到 11+（极端级别），阴天也一样会晒伤</li>
+          <li>SPF50+ 防晒霜、帽子、墨镜都要带，当地药店买防晒霜更便宜</li>
+          <li>只在<b>红黄旗之间</b>游泳，那是救生员看守的区域，离岸流很危险</li>
+        </ul>
+      </div>
+      <div class="box">
+        <h3>🌧️ 下雨备选</h3>
+        <ul>
+          <li>Art Gallery of NSW / Australian Museum（就在酒店对面）</li>
+          <li>SEA LIFE 水族馆（Darling Harbour）</li>
+          <li>QVB + Strand Arcade 逛街</li>
+          <li>晚上看演出：Capitol Theatre《The Nutcracker》（12/4–23），Theatre Royal《SIX》（演到 12/20），或者查查歌剧院当周的节目</li>
+        </ul>
+      </div>
+      <div class="box">
+        <h3>🔌 其他</h3>
+        <ul>
+          <li>插头是 <b>Type I</b>（八字斜插），和英国的不一样，要带转换头</li>
+          <li>不用给小费；周日和公共假日部分餐厅会加 10–15% 附加费</li>
+          <li>傍晚可能有雷阵雨，一般一两个小时就停</li>
+          <li>当地比伦敦快 11 小时</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="day" id="food">
+    <div class="day-head"><span class="day-num">FOOD</span><h2>悉尼吃什么</h2></div>
+    <div class="grid">
+      <div class="box"><h3>☕ Flat white + 早午餐</h3><ul><li>悉尼的咖啡和 brunch 文化很有名，随便一家社区咖啡馆都不会差</li></ul></div>
+      <div class="box"><h3>🦪 Sydney rock oysters</h3><ul><li>本地岩牡蛎，个头小，味道浓，鱼市场和海鲜餐厅都有</li></ul></div>
+      <div class="box"><h3>🦐 Balmain bugs / 对虾</h3><ul><li>澳洲特有的扁平龙虾，12 月正好是吃海鲜的季节</li></ul></div>
+      <div class="box"><h3>🍰 Pavlova / Lamington</h3><ul><li>蛋白霜加奶油加水果；椰丝巧克力小蛋糕</li></ul></div>
+      <div class="box"><h3>🥧 Meat pie</h3><ul><li>Harry's Café de Wheels（Woolloomooloo）的 Tiger pie 是夜宵经典</li></ul></div>
+      <div class="box"><h3>🍜 亚洲菜</h3><ul><li>Haymarket 和 Chinatown 东南亚、中餐选择很多，Mamak 和 Chat Thai 是代表</li></ul></div>
+    </div>
+  </section>
+</main>
+
+<footer>Made by 沙沙 🤖 · 出发前请再确认营业时间和订位</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const tiles='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+function mk(id,pts,color){
+  const m=L.map(id,{scrollWheelZoom:false});
+  L.tileLayer(tiles,{attribution:'© OpenStreetMap'}).addTo(m);
+  const ll=pts.map(p=>[p[1],p[2]]);
+  pts.forEach((p,i)=>{
+    L.marker([p[1],p[2]],{icon:L.divIcon({className:'',html:`<div style="background:${color};color:#fff;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:700 12px Inter;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3)">${i===0?'🏠':i}</div>`,iconSize:[24,24],iconAnchor:[12,12]})}).addTo(m).bindPopup(p[0]);
+  });
+  L.polyline(ll,{color,weight:3,dashArray:'6 6',opacity:.8}).addTo(m);
+  m.fitBounds(ll,{padding:[30,30]});
+}
+const H=['Sheraton Grand Hyde Park（酒店）',-33.8722,151.2107];
+mk('map1',[H,
+  ['St Mary\'s Cathedral',-33.8712,151.2133],
+  ['Art Gallery of NSW',-33.8688,151.2174],
+  ['Mrs Macquarie\'s Chair',-33.8597,151.2226],
+  ['皇家植物园',-33.8642,151.2166],
+  ['歌剧院 / Opera Bar',-33.8568,151.2153],
+  ['Mamak 晚饭',-33.8790,151.2040]
+],'#0369a1');
+mk('map2',[H,
+  ['bills Bondi 早饭',-33.8915,151.2747],
+  ['Bondi Icebergs',-33.8950,151.2745],
+  ['Tamarama',-33.8997,151.2706],
+  ['Bronte',-33.9035,151.2683],
+  ['Clovelly',-33.9142,151.2628],
+  ['Coogee 午饭',-33.9205,151.2585],
+  ['Firedoor 晚饭',-33.8846,151.2094]
+],'#e11d48');
+mk('map3',[H,
+  ['Central 站',-33.8832,151.2063],
+  ['Echo Point 三姐妹峰',-33.7320,150.3120],
+  ['Scenic World',-33.7277,150.3013],
+  ['Leura 午饭',-33.7130,150.3310],
+  ['Wentworth Falls',-33.7290,150.3760]
+],'#16a34a');
+mk('map4',[H,
+  ['Circular Quay',-33.8615,151.2108],
+  ['Taronga Zoo',-33.8436,151.2413],
+  ['The Rocks 午饭',-33.8599,151.2090],
+  ['BridgeClimb / 大桥',-33.8577,151.2073],
+  ['Observatory Hill',-33.8594,151.2046],
+  ['Bennelong 晚饭',-33.8570,151.2150]
+],'#7c3aed');
+mk('map5',[H,
+  ['Circular Quay',-33.8615,151.2108],
+  ['Manly Wharf',-33.8000,151.2843],
+  ['Shelly Beach',-33.8003,151.2975],
+  ['North Head',-33.8180,151.2970],
+  ['Paddington',-33.8846,151.2266],
+  ['Saint Peter 晚饭',-33.8858,151.2290]
+],'#ea580c');
+mk('map6',[H,
+  ['Sydney Fish Market',-33.8730,151.1920],
+  ['Paddington Markets',-33.8848,151.2268],
+  ['Queen Victoria Building',-33.8718,151.2067],
+  ['悉尼机场 国际航站楼',-33.9366,151.1658]
+],'#0891b2');
+</script>
+</body>
+</html>
