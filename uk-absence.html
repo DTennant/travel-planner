@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UK 离境天数计算 · ILR / 入籍</title>
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --ink:#1d2330; --muted:#6b7280; --ok:#16a34a; --bad:#dc2626; --warn:#d97706; --acc:#2563eb; --line:#e5e7eb; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Noto Sans SC",sans-serif; background:var(--bg); color:var(--ink); line-height:1.5; }
+  header { background:#111827; color:#fff; padding:20px 24px; }
+  header h1 { margin:0; font-size:20px; }
+  header p { margin:4px 0 0; color:#9ca3af; font-size:13px; }
+  main { max-width:1100px; margin:0 auto; padding:20px 16px 60px; display:grid; gap:16px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px 18px; }
+  .card h2 { margin:0 0 12px; font-size:16px; }
+  .row { display:flex; flex-wrap:wrap; gap:12px; align-items:end; }
+  label { font-size:12px; color:var(--muted); display:flex; flex-direction:column; gap:4px; }
+  input, select { font:inherit; padding:6px 8px; border:1px solid #cbd5e1; border-radius:6px; background:#fff; }
+  input[type=text] { min-width:180px; }
+  button { font:inherit; padding:6px 12px; border-radius:6px; border:1px solid #cbd5e1; background:#fff; cursor:pointer; }
+  button.primary { background:var(--acc); color:#fff; border-color:var(--acc); }
+  button.danger { color:var(--bad); }
+  button:hover { filter:brightness(0.96); }
+  table { width:100%; border-collapse:collapse; font-size:14px; }
+  th, td { padding:6px 8px; border-bottom:1px solid var(--line); text-align:left; vertical-align:middle; }
+  th { font-size:12px; color:var(--muted); font-weight:600; }
+  td input { width:100%; }
+  td.num { text-align:right; font-variant-numeric:tabular-nums; }
+  tr.planned td { background:#fffbeb; }
+  .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; }
+  .stat { border:1px solid var(--line); border-radius:10px; padding:12px; }
+  .stat .k { font-size:12px; color:var(--muted); }
+  .stat .v { font-size:24px; font-weight:700; font-variant-numeric:tabular-nums; }
+  .stat .s { font-size:12px; color:var(--muted); }
+  .ok { color:var(--ok); } .bad { color:var(--bad); } .warn { color:var(--warn); }
+  .pill { display:inline-block; padding:1px 8px; border-radius:999px; font-size:12px; font-weight:600; }
+  .pill.ok { background:#dcfce7; } .pill.bad { background:#fee2e2; } .pill.warn { background:#fef3c7; }
+  .bar { height:10px; background:#e5e7eb; border-radius:999px; overflow:hidden; margin:6px 0 2px; }
+  .bar > div { height:100%; }
+  .cal { display:grid; gap:2px; font-size:11px; }
+  .cal .mrow { display:grid; grid-template-columns:64px repeat(31, 1fr); gap:2px; align-items:center; }
+  .cal .d { height:14px; border-radius:2px; cursor:pointer; }
+  .cal .d.g { background:#86efac; } .cal .d.r { background:#fca5a5; } .cal .d.y { background:#fde68a; } .cal .d.n { background:transparent; cursor:default; }
+  .cal .d.sel { outline:2px solid #111827; }
+  .legend span { display:inline-flex; align-items:center; gap:4px; margin-right:12px; font-size:12px; color:var(--muted); }
+  .legend i { width:12px; height:12px; border-radius:2px; display:inline-block; }
+  .timeline { position:relative; height:auto; }
+  .tl-year { display:grid; grid-template-columns:48px 1fr 60px; gap:8px; align-items:center; margin:4px 0; font-size:12px; }
+  .tl-track { position:relative; height:18px; background:#eef2f7; border-radius:4px; }
+  .tl-seg { position:absolute; top:0; height:100%; border-radius:3px; background:#ef4444; opacity:.85; }
+  .tl-seg.p { background:#f59e0b; }
+  .note { font-size:12px; color:var(--muted); }
+  .rules li { margin:3px 0; }
+  .checks div { margin:4px 0; }
+  details summary { cursor:pointer; font-weight:600; }
+  textarea { width:100%; min-height:120px; font-family:ui-monospace,monospace; font-size:12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🇬🇧 UK 离境天数计算 · ILR / 入籍规划</h1>
+  <p>只算整天：出发日和回英日都算在英国。数据存在浏览器本地（localStorage），改动自动保存。</p>
+</header>
+<main>
+
+<section class="card">
+  <h2>⚙️ 关键日期</h2>
+  <div class="row">
+    <label>GTV 开始日<input type="date" id="gtvStart"></label>
+    <label>预计 ILR 日期<input type="date" id="ilrDate"></label>
+    <label>计划递交入籍日期<input type="date" id="appDate"></label>
+    <label>"今天"（用于区分已发生/计划）<input type="date" id="today"></label>
+    <button id="appEarliest">设为 ILR+12 个月</button>
+  </div>
+  <p class="note">入籍一般要求拿到 ILR 满 12 个月后才能递（配偶是英国公民的除外）。</p>
+</section>
+
+<section class="card">
+  <h2>📊 在计划递交日的入籍检查</h2>
+  <div class="stats" id="stats"></div>
+  <div class="checks" id="checks" style="margin-top:12px"></div>
+</section>
+
+<section class="card">
+  <h2>✈️ 出行记录</h2>
+  <table>
+    <thead><tr><th style="width:150px">离开英国</th><th style="width:150px">回到英国</th><th>行程</th><th style="width:70px">计划?</th><th style="width:70px" class="num">整天</th><th style="width:60px"></th></tr></thead>
+    <tbody id="trips"></tbody>
+  </table>
+  <div class="row" style="margin-top:12px">
+    <button class="primary" id="addTrip">+ 添加行程</button>
+    <span class="note">勾选"计划"表示还没发生的出行，会以黄色显示，同样计入计算。红眼航班请填实际落地日期。</span>
+  </div>
+</section>
+
+<section class="card">
+  <h2>🗓️ 哪天可以递入籍？</h2>
+  <div class="legend">
+    <span><i style="background:#86efac"></i>三条都满足</span>
+    <span><i style="background:#fde68a"></i>450 天超了但 ≤480（酌情可能放过）</span>
+    <span><i style="background:#fca5a5"></i>不满足</span>
+  </div>
+  <p class="note">从 ILR+12 个月开始往后 36 个月。点任意一天设为计划递交日。</p>
+  <div id="earliest" style="margin:8px 0;font-weight:600"></div>
+  <div class="cal" id="cal"></div>
+</section>
+
+<section class="card">
+  <h2>📈 每年离境时间线</h2>
+  <div class="legend"><span><i style="background:#ef4444"></i>已发生</span><span><i style="background:#f59e0b"></i>计划</span></div>
+  <div class="timeline" id="timeline"></div>
+</section>
+
+<section class="card">
+  <h2>🏠 ILR 检查</h2>
+  <div id="ilr"></div>
+</section>
+
+<section class="card">
+  <h2>📜 规则说明</h2>
+  <ul class="rules">
+    <li><b>入籍（现行 British Nationality Act，Sch.1）</b>：申请日前 5 年离境 ≤ 450 天；申请日前 12 个月离境 ≤ 90 天；申请日往前正好 5 年那天必须在英国。</li>
+    <li>450 天超一点（约 480 天以内）Home Office 通常会酌情放过；联系强（房子、工作、家庭）可能放宽更多，但不保证。</li>
+    <li><b>ILR 老规则</b>：任意滚动 12 个月离境 ≤ 180 天。</li>
+    <li><b>Earned Settlement（CP 1707）</b>：还没立法，GTV 3 年路径预计只看 GTV 开始后的时间。是否同时改入籍规则目前还不确定。</li>
+    <li>计数方法：离境天数 = 回英日 − 出发日 − 1（只算整天）。</li>
+  </ul>
+</section>
+
+<section class="card">
+  <details>
+    <summary>💾 导入 / 导出 / 重置</summary>
+    <p class="note">换浏览器或设备时，把这里的 JSON 复制过去导入。</p>
+    <textarea id="json"></textarea>
+    <div class="row" style="margin-top:8px">
+      <button id="export">导出到文本框</button>
+      <button id="import">从文本框导入</button>
+      <button class="danger" id="reset">重置为默认数据</button>
+    </div>
+  </details>
+</section>
+
+</main>
+<script>
+const DEFAULT = {
+  gtvStart: "2025-08-09",
+  ilrDate: "2028-08-09",
+  appDate: "2029-08-09",
+  today: new Date().toISOString().slice(0,10),
+  trips: [
+    { out:"2024-08-24", back:"2024-09-30", label:"伦敦→SFO … 米兰→伦敦（实习）", planned:false },
+    { out:"2024-10-07", back:"2024-11-28", label:"伦敦→SFO … SFO→伦敦（实习）", planned:false },
+    { out:"2024-12-10", back:"2025-02-23", label:"伦敦→LA … 北京→爱丁堡", planned:false },
+    { out:"2025-09-26", back:"2025-10-08", label:"上海", planned:false },
+    { out:"2025-11-10", back:"2025-11-19", label:"伦敦→温哥华 … 纽约→伦敦", planned:false },
+    { out:"2025-12-02", back:"2025-12-08", label:"LA", planned:false },
+    { out:"2026-03-14", back:"2026-03-21", label:"马赛", planned:false },
+    { out:"2026-06-01", back:"2026-06-12", label:"上海", planned:false },
+    { out:"2026-07-18", back:"2026-07-26", label:"上海", planned:false },
+    { out:"2026-10-24", back:"2026-10-28", label:"Palma", planned:false },
+  ]
+};
+const KEY = "uk-absence-v1";
+let S = load();
+
+function load() {
+  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.trips) return s; } catch(e) {}
+  return JSON.parse(JSON.stringify(DEFAULT));
+}
+function save() { localStorage.setItem(KEY, JSON.stringify(S)); }
+
+// ---- date helpers: work with integer day numbers (UTC) ----
+const DAY = 86400000;
+function dn(s) { if (!s) return NaN; const [y,m,d] = s.split("-").map(Number); return Date.UTC(y,m-1,d)/DAY; }
+function ds(n) { return new Date(n*DAY).toISOString().slice(0,10); }
+function addYears(s, k) {
+  const [y,m,d] = s.split("-").map(Number);
+  let t = new Date(Date.UTC(y+k, m-1, d));
+  if (t.getUTCMonth() !== m-1) t = new Date(Date.UTC(y+k, m, 0)); // 2/29 → 2/28
+  return t.toISOString().slice(0,10);
+}
+function addMonths(s, k) {
+  const [y,m,d] = s.split("-").map(Number);
+  let t = new Date(Date.UTC(y, m-1+k, d));
+  if (t.getUTCDate() !== d) t = new Date(Date.UTC(y, m+k, 0));
+  return t.toISOString().slice(0,10);
+}
+
+// Set of absent day numbers (strictly between out and back)
+function absentSet() {
+  const set = new Map(); // day -> planned?
+  for (const t of S.trips) {
+    const a = dn(t.out), b = dn(t.back);
+    if (isNaN(a) || isNaN(b) || b <= a) continue;
+    for (let d = a+1; d < b; d++) set.set(d, set.get(d) === false ? false : !!t.planned);
+  }
+  return set;
+}
+function tripDays(t) { const a = dn(t.out), b = dn(t.back); return (isNaN(a)||isNaN(b)||b<=a) ? 0 : b-a-1; }
+
+// prefix sums over a range for fast window queries
+function buildPrefix(set, start, end) {
+  const n = end - start + 1, p = new Int32Array(n+1);
+  for (let i = 0; i < n; i++) p[i+1] = p[i] + (set.has(start+i) ? 1 : 0);
+  return { count: (a, b) => { // days in [a, b)
+    a = Math.max(a, start); b = Math.min(b, end+1); if (b <= a) return 0; return p[b-start] - p[a-start];
+  }};
+}
+
+function checkApp(appStr, set, pre) {
+  const app = dn(appStr);
+  const fiveAgoStr = addYears(appStr, -5);
+  const fiveAgo = dn(fiveAgoStr);
+  const oneAgo = dn(addYears(appStr, -1));
+  const d5 = pre.count(fiveAgo, app);
+  const d1 = pre.count(oneAgo, app);
+  const presentOnStart = !set.has(fiveAgo);
+  return { d5, d1, presentOnStart, fiveAgoStr };
+}
+
+function render() {
+  for (const k of ["gtvStart","ilrDate","appDate","today"]) document.getElementById(k).value = S[k] || "";
+  const set = absentSet();
+  const start = dn("2015-01-01"), end = dn("2045-12-31");
+  const pre = buildPrefix(set, start, end);
+
+  // trips table
+  const tb = document.getElementById("trips");
+  tb.innerHTML = "";
+  const order = S.trips.map((t,i)=>i).sort((a,b)=> (S.trips[a].out||"9").localeCompare(S.trips[b].out||"9"));
+  let total = 0;
+  for (const i of order) {
+    const t = S.trips[i], days = tripDays(t); total += days;
+    const tr = document.createElement("tr");
+    if (t.planned) tr.className = "planned";
+    tr.innerHTML = `<td><input type="date" value="${t.out||""}" data-i="${i}" data-f="out"></td>
+      <td><input type="date" value="${t.back||""}" data-i="${i}" data-f="back"></td>
+      <td><input type="text" value="${(t.label||"").replace(/"/g,"&quot;")}" data-i="${i}" data-f="label"></td>
+      <td><input type="checkbox" ${t.planned?"checked":""} data-i="${i}" data-f="planned"></td>
+      <td class="num">${days}</td>
+      <td><button class="danger" data-del="${i}">删除</button></td>`;
+    tb.appendChild(tr);
+  }
+  const trT = document.createElement("tr");
+  trT.innerHTML = `<td colspan="4" style="text-align:right;font-weight:600">合计</td><td class="num" style="font-weight:700">${total}</td><td></td>`;
+  tb.appendChild(trT);
+
+  // stats for appDate
+  const stats = document.getElementById("stats"), checks = document.getElementById("checks");
+  if (S.appDate) {
+    const r = checkApp(S.appDate, set, pre);
+    const today = dn(S.today);
+    const pct = Math.min(100, r.d5/450*100);
+    const col5 = r.d5 <= 450 ? "var(--ok)" : r.d5 <= 480 ? "var(--warn)" : "var(--bad)";
+    const col1 = r.d1 <= 90 ? "var(--ok)" : "var(--bad)";
+    // already used in window up to today
+    const usedSoFar = pre.count(dn(r.fiveAgoStr), Math.min(today, dn(S.appDate)));
+    const monthsLeft = Math.max(0, (dn(S.appDate) - today) / 30.44);
+    const remaining = 450 - r.d5;
+    const perYear = monthsLeft > 0 ? Math.max(0, remaining) / (monthsLeft/12) : 0;
+    stats.innerHTML = `
+      <div class="stat"><div class="k">5 年窗口离境（${r.fiveAgoStr} → ${S.appDate}）</div>
+        <div class="v" style="color:${col5}">${r.d5} / 450</div>
+        <div class="bar"><div style="width:${pct}%;background:${col5}"></div></div>
+        <div class="s">其中截至今天已发生 ${usedSoFar} 天</div></div>
+      <div class="stat"><div class="k">申请前 12 个月离境</div>
+        <div class="v" style="color:${col1}">${r.d1} / 90</div>
+        <div class="bar"><div style="width:${Math.min(100,r.d1/90*100)}%;background:${col1}"></div></div></div>
+      <div class="stat"><div class="k">5 年额度剩余（含已计划行程）</div>
+        <div class="v ${remaining>=0?"ok":"bad"}">${remaining}</div>
+        <div class="s">${monthsLeft>0 ? `今天到递交日约 ${monthsLeft.toFixed(0)} 个月，平均每年还能出去 ${perYear.toFixed(0)} 天` : "递交日已过"}</div></div>
+      <div class="stat"><div class="k">${r.fiveAgoStr}（5 年前那天）</div>
+        <div class="v ${r.presentOnStart?"ok":"bad"}">${r.presentOnStart?"在英国":"在国外"}</div></div>`;
+    const ilrOk = !S.ilrDate || dn(S.appDate) >= dn(addMonths(S.ilrDate, 12));
+    const pill = (ok, w) => `<span class="pill ${ok?"ok":(w?"warn":"bad")}">${ok?"✓":(w?"!":"✗")}</span>`;
+    checks.innerHTML = `
+      <div>${pill(r.d5<=450, r.d5<=480)} 5 年内离境 ≤ 450 天：${r.d5} 天${r.d5>450 && r.d5<=480 ? "（超了，但在 480 内，通常可酌情）":""}</div>
+      <div>${pill(r.d1<=90)} 申请前 12 个月离境 ≤ 90 天：${r.d1} 天</div>
+      <div>${pill(r.presentOnStart)} 申请日往前正好 5 年（${r.fiveAgoStr}）人在英国</div>
+      <div>${pill(ilrOk)} 已持有 ILR 满 12 个月（ILR ${S.ilrDate||"?"} → 最早 ${S.ilrDate?addMonths(S.ilrDate,12):"?"}）</div>`;
+  }
+
+  // calendar of valid application dates
+  const cal = document.getElementById("cal");
+  cal.innerHTML = "";
+  if (S.ilrDate) {
+    const first = addMonths(S.ilrDate, 12);
+    const [fy, fm] = first.split("-").map(Number);
+    let firstGood = null, firstGoodStrict = null;
+    for (let k = 0; k < 36; k++) {
+      const y = fy + Math.floor((fm-1+k)/12), m = (fm-1+k)%12 + 1;
+      const row = document.createElement("div"); row.className = "mrow";
+      row.innerHTML = `<div>${y}-${String(m).padStart(2,"0")}</div>`;
+      const nd = new Date(Date.UTC(y, m, 0)).getUTCDate();
+      for (let d = 1; d <= 31; d++) {
+        const cell = document.createElement("div"); cell.className = "d";
+        const s = `${y}-${String(m).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+        if (d > nd || s < first) { cell.classList.add("n"); row.appendChild(cell); continue; }
+        const r = checkApp(s, set, pre);
+        const base = r.d1 <= 90 && r.presentOnStart;
+        let cls = "r";
+        if (base && r.d5 <= 450) cls = "g"; else if (base && r.d5 <= 480) cls = "y";
+        cell.classList.add(cls);
+        if (s === S.appDate) cell.classList.add("sel");
+        cell.title = `${s}\n5年: ${r.d5} 天 | 12个月: ${r.d1} 天 | ${r.fiveAgoStr}: ${r.presentOnStart?"在英国":"在国外"}`;
+        cell.onclick = () => { S.appDate = s; save(); render(); };
+        if (cls === "g" && !firstGoodStrict) firstGoodStrict = s;
+        if (cls !== "r" && !firstGood) firstGood = s;
+        row.appendChild(cell);
+      }
+      cal.appendChild(row);
+    }
+    // date after which all pre-ILR-era trips have aged out
+    document.getElementById("earliest").innerHTML =
+      `最早可以递（三条都满足）：${firstGoodStrict ? firstGoodStrict : "36 个月内没有"}` +
+      (firstGood && firstGood !== firstGoodStrict ? `　｜ 含酌情范围：${firstGood}` : "");
+  }
+
+  // timeline per year
+  const tl = document.getElementById("timeline");
+  tl.innerHTML = "";
+  const years = new Set();
+  for (const d of set.keys()) years.add(new Date(d*DAY).getUTCFullYear());
+  [...years].sort().forEach(y => {
+    const y0 = dn(`${y}-01-01`), y1 = dn(`${y+1}-01-01`), len = y1 - y0;
+    const row = document.createElement("div"); row.className = "tl-year";
+    const track = document.createElement("div"); track.className = "tl-track";
+    let cnt = 0;
+    for (const t of S.trips) {
+      const a = dn(t.out)+1, b = dn(t.back);
+      const s = Math.max(a, y0), e = Math.min(b, y1);
+      if (e <= s) continue;
+      cnt += e - s;
+      const seg = document.createElement("div"); seg.className = "tl-seg" + (t.planned ? " p" : "");
+      seg.style.left = ((s-y0)/len*100) + "%"; seg.style.width = Math.max(0.4, (e-s)/len*100) + "%";
+      seg.title = `${t.label}\n${t.out} → ${t.back}（本年 ${e-s} 天）`;
+      track.appendChild(seg);
+    }
+    row.innerHTML = `<div>${y}</div>`; row.appendChild(track);
+    const c = document.createElement("div"); c.textContent = cnt + " 天"; c.style.textAlign = "right";
+    row.appendChild(c);
+    tl.appendChild(row);
+  });
+
+  // ILR rolling 12-month max
+  const ilr = document.getElementById("ilr");
+  if (S.gtvStart) {
+    const g = dn(S.gtvStart), endI = S.ilrDate ? dn(S.ilrDate) : g + 365*3;
+    let worst = 0, worstEnd = null;
+    for (let d = g + 1; d <= endI; d++) {
+      const c = pre.count(Math.max(g, dn(addYears(ds(d), -1))), d);
+      if (c > worst) { worst = c; worstEnd = d; }
+    }
+    // also check across whole history (old rule ignoring GTV start)
+    let worstAll = 0, worstAllEnd = null;
+    const keys = [...set.keys()];
+    if (keys.length) {
+      const lo = Math.min(...keys), hi = Math.max(...keys) + 366;
+      for (let d = lo; d <= hi; d++) {
+        const c = pre.count(dn(addYears(ds(d), -1)), d);
+        if (c > worstAll) { worstAll = c; worstAllEnd = d; }
+      }
+    }
+    const since = pre.count(g, endI);
+    ilr.innerHTML = `
+      <div class="checks">
+      <div><span class="pill ${worst<=180?"ok":"bad"}">${worst<=180?"✓":"✗"}</span> GTV 开始（${S.gtvStart}）到 ILR（${S.ilrDate||"?"}）之间，任意 12 个月最多离境 <b>${worst}</b> 天${worstEnd?`（截至 ${ds(worstEnd-1)} 的 12 个月）`:""}，限制 180</div>
+      <div><span class="pill ${worstAll<=180?"ok":"warn"}">${worstAll<=180?"✓":"!"}</span> 不管 GTV 开始日、整个历史里任意 12 个月最多 <b>${worstAll}</b> 天${worstAllEnd?`（截至 ${ds(worstAllEnd-1)}）`:""}</div>
+      <div class="note">GTV 开始到 ILR 合计离境 ${since} 天。</div>
+      </div>`;
+  }
+}
+
+// ---- events ----
+document.getElementById("trips").addEventListener("change", e => {
+  const el = e.target, i = el.dataset.i, f = el.dataset.f;
+  if (i === undefined) return;
+  S.trips[i][f] = el.type === "checkbox" ? el.checked : el.value;
+  save(); render();
+});
+document.getElementById("trips").addEventListener("click", e => {
+  const i = e.target.dataset.del;
+  if (i === undefined) return;
+  if (!confirm("删除这条行程？")) return;
+  S.trips.splice(Number(i), 1); save(); render();
+});
+document.getElementById("addTrip").onclick = () => {
+  S.trips.push({ out: S.today, back: S.today, label: "", planned: true }); save(); render();
+};
+for (const k of ["gtvStart","ilrDate","appDate","today"])
+  document.getElementById(k).addEventListener("change", e => { S[k] = e.target.value; save(); render(); });
+document.getElementById("appEarliest").onclick = () => { if (S.ilrDate) { S.appDate = addMonths(S.ilrDate, 12); save(); render(); } };
+document.getElementById("export").onclick = () => { document.getElementById("json").value = JSON.stringify(S, null, 2); };
+document.getElementById("import").onclick = () => {
+  try { const s = JSON.parse(document.getElementById("json").value); if (!s.trips) throw 0; S = s; save(); render(); alert("导入成功"); }
+  catch(e) { alert("JSON 格式不对"); }
+};
+document.getElementById("reset").onclick = () => {
+  if (!confirm("重置为默认数据？你本地的改动会丢失。")) return;
+  S = JSON.parse(JSON.stringify(DEFAULT)); save(); render();
+};
+render();
+</script>
+</body>
+</html>
