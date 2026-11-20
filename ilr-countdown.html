@@ -43,6 +43,11 @@
   .stat .v { font-size:22px; font-weight:700; font-variant-numeric:tabular-nums; }
   .stat .s { font-size:12px; color:var(--muted); }
   .ok { color:var(--ok); } .warn { color:var(--warn); }
+  .yrs { display:flex; gap:8px; flex-wrap:wrap; }
+  .yr { border:1px solid var(--line); border-radius:10px; padding:8px 12px; font-size:13px; min-width:110px; }
+  .yr.ok { border-color:rgba(52,211,153,.5); }
+  .rule { font-size:13px; color:var(--muted); margin:0 0 12px; }
+  .rule b { color:var(--ink); }
   .note { font-size:12px; color:var(--muted); margin-top:28px; }
   .note a { color:var(--acc); }
   @media (max-width:520px){ .unit .n { font-size:32px; } h1 { font-size:24px; } }
@@ -77,6 +82,12 @@
   </div>
 
 
+  <div class="card">
+    <h2>💷 3 年路径收入条件</h2>
+    <p class="rule">近 4 个税年中有 <b>3 年</b>收入 ≥ <b>£125,141</b>（刚好高于 additional rate 门槛 £125,140）。另一条路是被认定为 Highest Talent Group（标准待 MAC review）。</p>
+    <div class="yrs" id="yrs"></div>
+  </div>
+
   <div class="note">
     规则依据：Earned Settlement 咨询稿（CP 1707，2026-11-02 公布），尚未立法，预计 2026-12 起分阶段写入 Immigration Rules、2027 年内实施；细节（含 Highest Talent Group）以最终规则为准。
     现行规则下 Exceptional Promise 为 5 年路径，ILR 可在满期前最多 28 天递交。入籍按现行国籍法：拿 ILR 后满 12 个月。<br>
@@ -93,11 +104,21 @@ const SCENARIOS = {
 };
 const EVENTS = [
   { d:'2025-08-09', t:'GTV 开始', x:'Global Talent (Exceptional Promise) 生效' },
+  { d:'2026-04-05', t:'2025/26 税年结束', x:'收入条件 ✓ 达标（1/3）' },
+  { d:'2027-04-05', t:'2026/27 税年结束', x:'收入条件第 2 年' },
+  { d:'2028-04-05', t:'2027/28 税年结束', x:'收入条件第 3 年' },
   { d:'2028-07-12', t:'最早可递 ILR（提前 28 天）', x:'假设新规沿用 28 天提前递交的做法' },
   { d:'2028-08-09', t:'🎉 ILR（3 年路径）', x:'拿到永居' },
   { d:'2029-08-09', t:'可申请入籍', x:'ILR 满 12 个月；递交日避开 5 年前在国外的日子' },
   { d:'2029-12-01', t:'🛂 英国护照（预估）', x:'入籍审批 + 宣誓仪式 + 护照申请，约 3–6 个月' },
   { d:'2030-08-09', t:'ILR（5 年兜底）', x:'若新规未按预期落地，走现行 5 年路径' },
+];
+
+const TAX_YEARS = [
+  { y:'2025/26', s:'ok', v:'✓ 达标' },
+  { y:'2026/27', s:'pending', v:'进行中' },
+  { y:'2027/28', s:'pending', v:'未开始' },
+  { y:'2028/29', s:'pending', v:'备用年' },
 ];
 
 const DAY = 86400000;
@@ -164,9 +185,12 @@ function renderStatic() {
   document.getElementById('stats').innerHTML = [
     ['GTV 已过', fmt(daysIn) + ' 天', `3 年路径共 ${fmt(totalDays)} 天`],
     ['距 ILR（3 年）', '约 ' + months + ' 个月', `≈ ${weeks} 周`],
+    ['收入条件', '1 / 3', '2025/26 已达标'],
     ['UK 离境累计', '~213 天', '截至 2026-11；3 年路径只看 GTV 后的约 50 天'],
   ].map(([k,v,s]) => `<div class="stat"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s}</div></div>`).join('');
 
+  document.getElementById('yrs').innerHTML = TAX_YEARS.map(t =>
+    `<div class="yr ${t.s==='ok'?'ok':''}"><div style="font-weight:600">${t.y}</div><div class="${t.s==='ok'?'ok':''}" style="font-size:12px">${t.v}</div></div>`).join('');
 }
 
 renderTabs(); renderStatic(); tick();
