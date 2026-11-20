@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>永居倒计时 · UK ILR Countdown</title>
+<style>
+  :root { --bg:#0b0f17; --card:#131a26; --line:#222c3d; --ink:#e6ebf5; --muted:#8a96ab; --acc:#7c9cff; --acc2:#c084fc; --ok:#34d399; --warn:#fbbf24; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Noto Sans SC",sans-serif; background:radial-gradient(1200px 600px at 50% -10%, #1b2440 0%, var(--bg) 60%); color:var(--ink); min-height:100vh; line-height:1.5; }
+  main { max-width:920px; margin:0 auto; padding:40px 18px 80px; }
+  .eyebrow { text-align:center; color:var(--muted); font-size:13px; letter-spacing:.15em; text-transform:uppercase; }
+  h1 { text-align:center; margin:6px 0 4px; font-size:30px; }
+  .sub { text-align:center; color:var(--muted); font-size:14px; margin-bottom:28px; }
+  .tabs { display:flex; justify-content:center; gap:8px; flex-wrap:wrap; margin-bottom:22px; }
+  .tabs button { font:inherit; font-size:13px; color:var(--muted); background:transparent; border:1px solid var(--line); border-radius:999px; padding:6px 14px; cursor:pointer; }
+  .tabs button.on { color:#0b0f17; background:linear-gradient(90deg,var(--acc),var(--acc2)); border-color:transparent; font-weight:600; }
+  .clock { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; max-width:640px; margin:0 auto; }
+  .unit { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:18px 8px 12px; text-align:center; }
+  .unit .n { font-size:46px; font-weight:800; font-variant-numeric:tabular-nums; background:linear-gradient(180deg,#fff,#a9b8ff); -webkit-background-clip:text; background-clip:text; color:transparent; line-height:1.1; }
+  .unit .l { font-size:12px; color:var(--muted); margin-top:4px; }
+  .target { text-align:center; margin:16px 0 6px; color:var(--muted); font-size:14px; }
+  .target b { color:var(--ink); }
+  .bar { max-width:640px; margin:18px auto 4px; height:10px; background:#1c2433; border-radius:999px; overflow:hidden; }
+  .bar > div { height:100%; background:linear-gradient(90deg,var(--acc),var(--acc2)); border-radius:999px; transition:width .5s; }
+  .barlbl { max-width:640px; margin:0 auto; display:flex; justify-content:space-between; font-size:12px; color:var(--muted); }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:18px 20px; margin-top:28px; }
+  .card h2 { margin:0 0 14px; font-size:16px; }
+  .tl { position:relative; padding-left:22px; }
+  .tl::before { content:""; position:absolute; left:6px; top:6px; bottom:6px; width:2px; background:var(--line); }
+  .ev { position:relative; padding:6px 0 12px; }
+  .ev::before { content:""; position:absolute; left:-21px; top:12px; width:12px; height:12px; border-radius:50%; background:#1c2433; border:2px solid var(--muted); }
+  .ev.done::before { background:var(--ok); border-color:var(--ok); }
+  .ev.next::before { background:var(--acc); border-color:var(--acc); box-shadow:0 0 0 5px rgba(124,156,255,.2); }
+  .ev .d { font-size:12px; color:var(--muted); font-variant-numeric:tabular-nums; }
+  .ev .t { font-weight:600; }
+  .ev .x { font-size:13px; color:var(--muted); }
+  .ev .left { float:right; font-size:13px; font-variant-numeric:tabular-nums; color:var(--muted); }
+  .ev.done .left { color:var(--ok); }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; }
+  .stat { border:1px solid var(--line); border-radius:12px; padding:12px 14px; }
+  .stat .k { font-size:12px; color:var(--muted); }
+  .stat .v { font-size:22px; font-weight:700; font-variant-numeric:tabular-nums; }
+  .stat .s { font-size:12px; color:var(--muted); }
+  .ok { color:var(--ok); } .warn { color:var(--warn); }
+  .note { font-size:12px; color:var(--muted); margin-top:28px; }
+  .note a { color:var(--acc); }
+  @media (max-width:520px){ .unit .n { font-size:32px; } h1 { font-size:24px; } }
+</style>
+</head>
+<body>
+<main>
+  <div class="eyebrow">Indefinite Leave to Remain</div>
+  <h1>🇬🇧 永居倒计时</h1>
+  <div class="sub">Global Talent · Exceptional Promise · GTV 起始 2025-08-09</div>
+
+  <div class="tabs" id="tabs"></div>
+
+  <div class="clock">
+    <div class="unit"><div class="n" id="cd-d">–</div><div class="l">天</div></div>
+    <div class="unit"><div class="n" id="cd-h">–</div><div class="l">小时</div></div>
+    <div class="unit"><div class="n" id="cd-m">–</div><div class="l">分钟</div></div>
+    <div class="unit"><div class="n" id="cd-s">–</div><div class="l">秒</div></div>
+  </div>
+  <div class="target" id="target"></div>
+  <div class="bar"><div id="bar"></div></div>
+  <div class="barlbl"><span id="bar-l"></span><span id="bar-pct"></span><span id="bar-r"></span></div>
+
+  <div class="card">
+    <h2>📍 时间线</h2>
+    <div class="tl" id="tl"></div>
+  </div>
+
+  <div class="card">
+    <h2>📊 进度</h2>
+    <div class="grid" id="stats"></div>
+  </div>
+
+
+  <div class="note">
+    规则依据：Earned Settlement 咨询稿（CP 1707，2026-11-02 公布），尚未立法，预计 2026-12 起分阶段写入 Immigration Rules、2027 年内实施；细节（含 Highest Talent Group）以最终规则为准。
+    现行规则下 Exceptional Promise 为 5 年路径，ILR 可在满期前最多 28 天递交。入籍按现行国籍法：拿 ILR 后满 12 个月。<br>
+    离境天数明细：<a href="uk-absence.html">UK 离境天数计算</a>
+  </div>
+</main>
+
+<script>
+const GTV_START = '2025-08-09';
+const SCENARIOS = {
+  ilr3:  { label:'ILR · 3 年路径（新规）', date:'2028-08-09', from:GTV_START, desc:'Earned Settlement 新规 · 3 年路径' },
+  cit:   { label:'入籍资格', date:'2029-08-09', from:GTV_START, desc:'ILR 后满 12 个月，可递入籍申请' },
+  ilr5:  { label:'ILR · 5 年（现行规则兜底）', date:'2030-08-09', from:GTV_START, desc:'现行 Exceptional Promise 规则' },
+};
+const EVENTS = [
+  { d:'2025-08-09', t:'GTV 开始', x:'Global Talent (Exceptional Promise) 生效' },
+  { d:'2028-07-12', t:'最早可递 ILR（提前 28 天）', x:'假设新规沿用 28 天提前递交的做法' },
+  { d:'2028-08-09', t:'🎉 ILR（3 年路径）', x:'拿到永居' },
+  { d:'2029-08-09', t:'可申请入籍', x:'ILR 满 12 个月；递交日避开 5 年前在国外的日子' },
+  { d:'2029-12-01', t:'🛂 英国护照（预估）', x:'入籍审批 + 宣誓仪式 + 护照申请，约 3–6 个月' },
+  { d:'2030-08-09', t:'ILR（5 年兜底）', x:'若新规未按预期落地，走现行 5 年路径' },
+];
+
+const DAY = 86400000;
+const toDate = s => new Date(s + 'T00:00:00Z');  // UK midnight ≈ UTC (fine for a countdown)
+const fmt = n => n.toLocaleString('en-GB');
+let current = localStorage.getItem('ilr-scn') || 'ilr3';
+if (!SCENARIOS[current]) current = 'ilr3';
+
+function renderTabs() {
+  const el = document.getElementById('tabs');
+  el.innerHTML = '';
+  for (const [k, s] of Object.entries(SCENARIOS)) {
+    const b = document.createElement('button');
+    b.textContent = s.label;
+    if (k === current) b.className = 'on';
+    b.onclick = () => { current = k; localStorage.setItem('ilr-scn', k); renderTabs(); tick(); renderStatic(); };
+    el.appendChild(b);
+  }
+}
+
+function tick() {
+  const s = SCENARIOS[current];
+  const now = Date.now(), end = toDate(s.date).getTime(), start = toDate(s.from).getTime();
+  let diff = Math.max(0, end - now);
+  const d = Math.floor(diff / DAY); diff -= d * DAY;
+  const h = Math.floor(diff / 3600000); diff -= h * 3600000;
+  const m = Math.floor(diff / 60000); diff -= m * 60000;
+  const sec = Math.floor(diff / 1000);
+  document.getElementById('cd-d').textContent = fmt(d);
+  document.getElementById('cd-h').textContent = String(h).padStart(2,'0');
+  document.getElementById('cd-m').textContent = String(m).padStart(2,'0');
+  document.getElementById('cd-s').textContent = String(sec).padStart(2,'0');
+  const pct = Math.min(100, Math.max(0, (now - start) / (end - start) * 100));
+  document.getElementById('bar').style.width = pct.toFixed(3) + '%';
+  document.getElementById('bar-pct').textContent = pct.toFixed(2) + '%';
+}
+
+function renderStatic() {
+  const s = SCENARIOS[current];
+  const end = toDate(s.date);
+  document.getElementById('target').innerHTML =
+    `距离 <b>${s.label}</b> · <b>${end.toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric',weekday:'short',timeZone:'UTC'})}</b><br><span style="font-size:12px">${s.desc}</span>`;
+  document.getElementById('bar-l').textContent = s.from;
+  document.getElementById('bar-r').textContent = s.date;
+
+  const now = Date.now();
+  let nextSet = false;
+  document.getElementById('tl').innerHTML = EVENTS.map(e => {
+    const t = toDate(e.d).getTime();
+    const done = t <= now;
+    let cls = done ? 'done' : '';
+    if (!done && !nextSet) { cls = 'next'; nextSet = true; }
+    const days = Math.ceil((t - now) / DAY);
+    const left = done ? '✓ 已过' : `还有 ${fmt(days)} 天`;
+    return `<div class="ev ${cls}"><span class="left">${left}</span><div class="d">${e.d}</div><div class="t">${e.t}</div><div class="x">${e.x}</div></div>`;
+  }).join('');
+
+  const start = toDate(GTV_START).getTime();
+  const daysIn = Math.floor((now - start) / DAY);
+  const ilr3 = toDate(SCENARIOS.ilr3.date).getTime();
+  const totalDays = Math.round((ilr3 - start) / DAY);
+  const weeks = Math.ceil((ilr3 - now) / (7 * DAY));
+  const months = (() => { const n = new Date(now), e = new Date(ilr3); return (e.getUTCFullYear()-n.getUTCFullYear())*12 + e.getUTCMonth()-n.getUTCMonth(); })();
+  document.getElementById('stats').innerHTML = [
+    ['GTV 已过', fmt(daysIn) + ' 天', `3 年路径共 ${fmt(totalDays)} 天`],
+    ['距 ILR（3 年）', '约 ' + months + ' 个月', `≈ ${weeks} 周`],
+    ['UK 离境累计', '~213 天', '截至 2026-11；3 年路径只看 GTV 后的约 50 天'],
+  ].map(([k,v,s]) => `<div class="stat"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s}</div></div>`).join('');
+
+}
+
+renderTabs(); renderStatic(); tick();
+setInterval(tick, 1000);
+setInterval(renderStatic, 60000);
+</script>
+</body>
+</html>
